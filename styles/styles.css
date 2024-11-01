@@ -1,0 +1,22 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+.clock {
+    position: absolute;
+    font-size: 20px;
+    color: #000000;
+    pointer-events: none; /* Prevents clock from interfering with mouse events */
+}
+
+.imageOne {
+    background-color: #000000;
+    background-image: url('../images/black.png');
+    color: #ff0000;
+}
+
+.imageTwo {
+    background-color: #000000;
+    background-image: url('../images/color.png');
+    color: #00ff00;
+}

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="./styles/styles.css">
+    <script src="./js/scripts.js" defer></script>
+</head>
+<body>
+
+<p>Here are the files: 
+<a href="http://" onMouseOver="change_it(dir_images + 'c')" onMouseOut="default_img()">YAML</a>, 
+<a href="http://" onMouseOver="change_it(dir_images + 'a')" onMouseOut="default_img()">SQL</a>, 
+<a href="http://" onMouseOver="change_it(dir_images + 'b')" onMouseOut="default_img()">JSON</a>, 
+<a href="http://" onMouseOver="change_it(dir_images + 'e')" onMouseOut="default_img()">CSV</a>
+</p>
+
+<img src="./images/d.png" width="190" height="200" name="photo">
+
+<pre>
+As we extend the porting of CSV to SQL and back (refer: <a href="https://github.com/ursa-mikail/sql_csv_porting">sql_csv_porting</a>), we illustrate data porting with CSV, YAML, and JSON as well.
+
+Starting from a CSV file, we generate random data with field headers:
+[service, user, time_stamp, hash_of_all_data].
+
+We demonstrate this by generating 3 rows of random data (all fields random), such as service_hex_5_bytes, etc.
+
+The versatility of the data porting package is shown as:
+CSV <--> YAML <--> JSON (for YAML and JSON, output the formatted files).
+
+Output to: ./sample_data/data/
+
+From the SQL, all data including field headers is displayed.
+
+For YAML and JSON, read from ./sample_data/data/ and convert back to CSV.
+
+.
+├── 01_generate_data_to_csv.py
+├── 02_csv_to_yaml_and_json.py
+├── 03_csv_to_sql_and_display.py
+├── 04_yaml_and_json_to_csv.py
+└── sample_data
+    └── data
+        ├── data.csv
+        ├── data.db
+        ├── data.json
+        ├── data.yaml
+        ├── json_to_csv.csv
+        └── yaml_to_csv.csv
+
+</pre>
+
+<hr>
+
+<textarea
+  rows="20"
+  cols="70"
+  class="imageOne"
+  onMouseOver="this.className='imageTwo'"
+  onMouseOut="this.className='imageOne'">
+
+
+1. Either we build a system, or be governed under someone elses'.
+2. The easiest way out, usually leads back in.
+3. When you slice an elephant into 2, you may not get 2 small elephants. You can get a dead one - or rather 2 halves.
+4. If you fail to test, you fail to plan. Hence, plan your test, test your plans.
+5. Be a sniper, not a blanket bomber. 
+6. Always be tooling. 
+7. To master the craft, one must first master the craftsman.
+
+- Mikail Eliyah
+</textarea>
+
+<hr>
+
+<div id="clock" class="clock"></div>
+
+</body>
+</html>
