@@ -15,6 +15,18 @@
         button {
             margin-top: 10px;
         }
+        #ciphered-link, #key-output {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        textarea {
+            width: 100%;
+            height: 80px;
+            margin-top: 10px;
+        }
     </style>
     <script src="https://www.youtube.com/iframe_api"></script>
 </head>
@@ -32,6 +44,17 @@
 <button id="copy-time-button">Copy Current Time Link</button>
 <p id="current-time">Current Time Copied: <span id="current-time-display">0:00</span></p>
 <hr>
+
+<h2>Ciphered Link and Key:</h2>
+<textarea id="ciphered-link" readonly></textarea>
+<textarea id="key-output" readonly></textarea>
+
+<h2>Decipher Tool:</h2>
+<label for="decipher-input">Enter Ciphered Link to Decipher:</label>
+<input type="text" id="decipher-input" placeholder="Enter Base64 Encoded Link">
+<button id="decipher-button">Decipher Link</button>
+<p id="deciphered-output">Deciphered Link: <span id="deciphered-link"></span></p>
+
 <script>
     let player;
     const defaultVideoId = 'Q10_srZ-pbs'; // Default video ID
@@ -68,6 +91,12 @@
                 alert(`Current time link ${videoLink} copied to clipboard!`);
             });
             document.getElementById('current-time-display').textContent = formattedTime;
+
+            // Generate random 50-byte hex key and ciphered link
+            const key = generateRandomHex(50);
+            const cipheredLink = btoa(videoLink); // Base64 encode the link to simulate "ciphering"
+            document.getElementById('key-output').value = key;
+            document.getElementById('ciphered-link').value = cipheredLink;
         }
     }
 
@@ -88,6 +117,25 @@
         return timeString;
     }
 
+    function generateRandomHex(length) {
+        let result = '';
+        const characters = '0123456789abcdef';
+        for (let i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+        return result;
+    }
+
+    function decipherBase64Link() {
+        const encodedLink = document.getElementById('decipher-input').value;
+        try {
+            const decodedLink = atob(encodedLink); // Decode Base64
+            document.getElementById('deciphered-link').textContent = decodedLink;
+        } catch (e) {
+            alert('Invalid input. Please enter a valid Base64 encoded link.');
+        }
+    }
+
     document.getElementById('copy-time-button').addEventListener('click', copyCurrentTime);
     document.getElementById('load-video-button').addEventListener('click', () => {
         const videoUrl = document.getElementById('video-url').value;
@@ -98,6 +146,7 @@
             alert('Please enter a valid YouTube video URL.');
         }
     });
+    document.getElementById('decipher-button').addEventListener('click', decipherBase64Link);
 </script>
 
 </body>
