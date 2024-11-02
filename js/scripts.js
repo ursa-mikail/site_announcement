@@ -5,8 +5,6 @@ const site2 = url + 'data.db';
 const site3 = url + 'data.json';
 const site4 = url + 'data.csv';
 
-const redirectUrl = "https://ursa-mikail.github.io/site_announcement/#";
-
 function redirectToSite(site) {
     window.location.href = site;
 }
