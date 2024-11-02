@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Your YouTube Embed with Current Time Link</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #player {
+            margin-bottom: 10px;
+        }
+        button {
+            margin-top: 10px;
+        }
+    </style>
+    <script src="https://www.youtube.com/iframe_api"></script>
+</head>
+<body>
+
+<h1>Get Your YouTube Embed with Current Time Link</h1>
+
+<label for="video-url">YouTube Video URL:</label>
+<input type="text" id="video-url" placeholder="Enter YouTube Video URL" value="https://www.youtube.com/watch?v=Q10_srZ-pbs">
+<button id="load-video-button">Load Video</button>
+
+<hr>
+<div id="player"></div>
+<br>
+<button id="copy-time-button">Copy Current Time Link</button>
+<p id="current-time">Current Time Copied: <span id="current-time-display">0:00</span></p>
+<hr>
+<script>
+    let player;
+    const defaultVideoId = 'Q10_srZ-pbs'; // Default video ID
+
+    function onYouTubeIframeAPIReady() {
+        loadVideo(defaultVideoId); // Load the default video
+    }
+
+    function loadVideo(videoId) {
+        if (player) {
+            player.destroy(); // Destroy the existing player if it exists
+        }
+        player = new YT.Player('player', {
+            height: '360',
+            width: '640',
+            videoId: videoId,
+            events: {
+                'onReady': onPlayerReady
+            }
+        });
+    }
+
+    function onPlayerReady(event) {
+        // Player is ready
+    }
+
+    function copyCurrentTime() {
+        if (player) {
+            const currentTime = player.getCurrentTime(); // Time in seconds
+            const formattedTime = formatTime(currentTime);
+            const videoId = document.getElementById('video-url').value.split('v=')[1]; // Extract the video ID from URL
+            const videoLink = `https://youtu.be/${videoId}?t=${formattedTime}`;
+            navigator.clipboard.writeText(videoLink).then(() => {
+                alert(`Current time link ${videoLink} copied to clipboard!`);
+            });
+            document.getElementById('current-time-display').textContent = formattedTime;
+        }
+    }
+
+    function formatTime(seconds) {
+        const days = Math.floor(seconds / (3600 * 24));
+        const hours = Math.floor((seconds % (3600 * 24)) / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const remainingSeconds = Math.floor(seconds % 60);
+        
+        let timeString = '';
+        if (days > 0) {
+            timeString += `${days}d`;
+        }
+        if (hours > 0 || days > 0) {
+            timeString += `${hours}h`;
+        }
+        timeString += `${minutes}m${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}s`;
+        return timeString;
+    }
+
+    document.getElementById('copy-time-button').addEventListener('click', copyCurrentTime);
+    document.getElementById('load-video-button').addEventListener('click', () => {
+        const videoUrl = document.getElementById('video-url').value;
+        const videoId = videoUrl.split('v=')[1]; // Extract video ID from URL
+        if (videoId) {
+            loadVideo(videoId);
+        } else {
+            alert('Please enter a valid YouTube video URL.');
+        }
+    });
+</script>
+
+</body>
+</html>
