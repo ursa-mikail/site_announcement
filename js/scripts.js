@@ -5,6 +5,8 @@ const site2 = url + 'data.db';
 const site3 = url + 'data.json';
 const site4 = url + 'data.csv';
 
+const redirectUrl = "https://ursa-mikail.github.io/site_announcement/#";
+
 function change_it(what_file) {
     var file_extension = ".png";
     document.photo.src = what_file + file_extension;
