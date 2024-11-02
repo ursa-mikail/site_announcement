@@ -12,5 +12,11 @@ Summary of Content Options:
 4. **a04: Get Your YouTube Embed with Current Time Link**
    - In this part, users can embed a YouTube video and generate a link that includes the current playback time. Users can input a YouTube video URL, load the video, and copy a link that directs to the specific time. This section also includes a ciphered link feature with a tool to decipher Base64 encoded links.
 
-5. **ax_summary: Summary of All Pages**
+5. **a05: Duration Calculator and YAML Generator**
+   - The Duration Calculator and YAML Generator is a simple web application designed to help users calculate the duration between two dates and generate a YAML configuration based on the input data. The tool allows users to input their name, a list of tasks, and start and end dates. It then calculates the number of days between the start and end dates and formats the information into a YAML format.
+
+
+6. **ax_summary: Summary of All Pages**
    - The ax_summary provides an overarching overview of all the sections (a1 to a4). It synthesizes the key points and functionalities from each part, ensuring that users have a clear understanding of the tools and resources available across the different functionalities.
+
+

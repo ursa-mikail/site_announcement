@@ -2,47 +2,158 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="../styles/styles.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
-    <title>QR Code Generator</title>
-    
+    <title>Simple Duration Calculator and YAML Generator</title>
     <style>
-        #qrcode {
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .output {
             margin-top: 20px;
-            width: 128px; /* QR code size */
-            height: 128px; /* QR code size */
+            padding: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
         }
     </style>
-    
-    <script>
-        $(document).ready(function() {
-            $('#generate-btn').click(function() {
-                const textToEncode = $('#text-input').val();
-                generateQRCode(textToEncode);
-            });
-        });
-
-        function generateQRCode(message) {
-            $('#qrcode').empty(); // Clear previous QR code
-            $('#qrcode').qrcode({
-                width: 128,
-                height: 128,
-                text: message
-            });
-        }
-    </script>
 </head>
 <body>
 
-<h1>Generate QR Code</h1>
-<p>Enter text below to generate a QR code:</p>
+<div class="container">
+    <h1>Duration Calculator and YAML Generator</h1>
+    <div class="form-group">
+        <label for="user_name">User Name:</label>
+        <input type="text" id="user_name">
+    </div>
+    <div class="form-group">
+        <label for="data">Data (Things to be done):</label>
+        <textarea id="data" rows="4"></textarea>
+    </div>
+    <div class="form-group">
+        <label for="time_start">Start Date (YYYY-MM-DD):</label>
+        <input type="text" id="time_start">
+        <button type="button" onclick="setNow('time_start')">Set to Now</button>
+    </div>
+    <div class="form-group">
+        <label for="time_end">End Date (YYYY-MM-DD):</label>
+        <input type="text" id="time_end">
+        <button type="button" onclick="setNow('time_end')">Set to Now</button>
+    </div>
+    <button onclick="calculateDuration()">Calculate Duration</button>
 
-<input type="text" id="text-input" placeholder="Enter text here">
-<button id="generate-btn">Generate QR Code</button>
+    <div class="form-group">
+        <label for="yaml_input">YAML Input:</label>
+        <textarea id="yaml_input" rows="4"></textarea>
+    </div>
+    <button onclick="updateYaml()">Update YAML</button>
 
-<div id="qrcode"></div> <!-- QR Code will be generated here -->
+    <div class="output" id="result"></div>
+    <div class="output" id="yaml_output"></div>
+</div>
+
+<script>
+    function setNow(elementId) {
+        const now = new Date().toISOString().split('T')[0];
+        document.getElementById(elementId).value = now;
+    }
+
+    function calculateDuration() {
+        const userName = document.getElementById('user_name').value;
+        const data = document.getElementById('data').value;
+        const startDate = new Date(document.getElementById('time_start').value);
+        const endDate = new Date(document.getElementById('time_end').value);
+
+        if (isNaN(startDate) || isNaN(endDate)) {
+            alert('Please enter valid dates.');
+            return;
+        }
+
+        const timeDiff = endDate - startDate;
+        const daysDiff = timeDiff / (1000 * 3600 * 24);
+
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = `<p>Time left: ${daysDiff} days</p>`;
+
+        const yamlOutput = document.getElementById('yaml_output');
+        yamlOutput.innerHTML = `<pre>
+user_name: ${userName}
+data: "${data.replace(/\n/g, ' ')}"
+time_start: ${startDate.toISOString().split('T')[0]}
+time_end: ${endDate.toISOString().split('T')[0]}
+time_left: ${daysDiff} days
+</pre>`;
+    }
+
+    function parseYaml(yaml) {
+        const lines = yaml.split('\n');
+        const yamlObject = {};
+        let key = '';
+        let value = '';
+
+        lines.forEach(line => {
+            if (line.includes(':')) {
+                [key, value] = line.split(':').map(str => str.trim());
+                yamlObject[key] = value;
+            }
+        });
+
+        return yamlObject;
+    }
+
+    function updateYaml() {
+        const yamlInput = document.getElementById('yaml_input').value;
+        const yamlObject = parseYaml(yamlInput);
+
+        const now = new Date();
+        let startDate = new Date(yamlObject.time_start);
+        const endDate = yamlObject.time_end === '<set to now>' ? now : new Date(yamlObject.time_end);
+
+        if (yamlObject.time_start === '<set to now>') {
+            startDate = now;
+        }
+
+        const timeDiff = endDate - startDate;
+        const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = `<p>Time left: ${daysDiff} days</p>`;
+
+        const yamlOutput = document.getElementById('yaml_output');
+        yamlOutput.innerHTML = `<pre>
+user_name: ${yamlObject.user_name}
+data: "${yamlObject.data.replace(/\n/g, ' ')}"
+time_start: ${startDate.toISOString().split('T')[0]}
+time_end: ${endDate.toISOString().split('T')[0]}
+time_left: ${daysDiff} days
+</pre>`;
+    }
+</script>
 
 </body>
 </html>
