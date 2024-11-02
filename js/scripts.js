@@ -1,4 +1,4 @@
-var dir_images = './images/';
+var dir_images = '../images/';
 const url = "https://github.com/ursa-mikail/sql_csv_yaml_json_porting/tree/main/sample_data/data/"
 const site1 = url + 'data.yaml';
 const site2 = url + 'data.db';
@@ -8,6 +8,8 @@ const site4 = url + 'data.csv';
 function redirectToSite(site) {
     window.location.href = site;
 }
+
+
 
 function change_it(what_file) {
     var file_extension = ".png";

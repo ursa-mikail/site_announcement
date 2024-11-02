@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Text and SHA-256</title>
+    <link rel="stylesheet" type="text/css" href="../styles/styles.css">
+    <script src="../js/scripts.js" defer></script>
+</head>
+<body>
+
+<h1>Random Text Generator And Sha256 Check</h1>
+<p id="random-text" style="cursor: pointer; border: 1px solid #ccc; padding: 10px;">Click here to get random text!</p>
+
+<input type="text" id="input-text" placeholder="Click the text above to copy..." readonly>
+<button id="compute-hash">Compute SHA-256</button>
+
+<h2>SHA-256 Hash:</h2>
+<p id="hash-result">Hash will appear here...</p>
+
+<script>
+    const randomTextElement = document.getElementById('random-text');
+    const inputTextElement = document.getElementById('input-text');
+    const hashResultElement = document.getElementById('hash-result');
+
+    // Function to generate random text
+    function getRandomText() {
+        const randomTexts = [
+            "Lorem ipsum dolor sit amet.",
+            "Sed ut perspiciatis unde omnis.",
+            "But I must explain to you how all this mistaken idea.",
+            "At vero eos et accusamus et iusto odio.",
+            "Duis aute irure dolor in reprehenderit.",
+            "Sed ut perspiciatis unde omnis iste natus error."
+        ];
+        return randomTexts[Math.floor(Math.random() * randomTexts.length)];
+    }
+
+    // Update random text and copy to input
+    randomTextElement.addEventListener('click', () => {
+        const randomText = getRandomText();
+        inputTextElement.value = randomText;
+        navigator.clipboard.writeText(randomText).then(() => {
+            alert('Random text copied to clipboard!');
+        }).catch(err => {
+            console.error('Could not copy text: ', err);
+        });
+    });
+
+    // Compute SHA-256
+    document.getElementById('compute-hash').addEventListener('click', async () => {
+        const text = inputTextElement.value;
+        const encoder = new TextEncoder();
+        const data = encoder.encode(text);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        hashResultElement.textContent = hashHex;
+    });
+</script>
+
+</body>
+</html>
