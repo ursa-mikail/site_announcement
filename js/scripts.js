@@ -9,8 +9,6 @@ function redirectToSite(site) {
     window.location.href = site;
 }
 
-
-
 function change_it(what_file) {
     var file_extension = ".png";
     document.photo.src = what_file + file_extension;

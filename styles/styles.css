@@ -3,6 +3,7 @@ body {
 }
 
 .clock {
+    border: 2px solid blue;     
     position: absolute;
     font-size: 20px;
     color: #000000;
