@@ -7,6 +7,10 @@ const site4 = url + 'data.csv';
 
 const redirectUrl = "https://ursa-mikail.github.io/site_announcement/#";
 
+function redirectToSite(site) {
+    window.location.href = redirectUrl + site;
+}
+
 function change_it(what_file) {
     var file_extension = ".png";
     document.photo.src = what_file + file_extension;
