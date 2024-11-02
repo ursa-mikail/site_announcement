@@ -39,3 +39,19 @@ function updateClock() {
 
 setInterval(updateClock, 1000);
 updateClock(); // Initial call to set the clock immediately
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const selectElement = document.getElementById('content-select');
+            selectElement.addEventListener('change', (event) => {
+                const file = event.target.value;
+                loadContent(file);
+            });
+            loadContent(selectElement.value);  // Load default content
+        });
+
+        function loadContent(file) {
+            document.getElementById('content-iframe').src = `./announcement/${file}.html`;
+        }
+
+
