@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AX Summary</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #content-select {
+            margin-bottom: 10px;
+        }
+        #summary {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>AX Summary</h1>
+
+<label for="content-select">Select Content:</label>
+<select id="content-select">
+    <option value="a1.html">a1</option>
+    <option value="a2.html">a2</option>
+    <option value="a3.html">a3</option>
+    <option value="a4.html">a4</option>
+    <option value="ax_summary.html">ax_summary</option>
+</select>
+<button id="load-summary">Load Summary</button>
+<button id="go-to-content">Go To Selected Content</button>
+
+<div id="summary"></div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("load-summary").addEventListener("click", loadSummary);
+        document.getElementById("go-to-content").addEventListener("click", goToContent);
+    });
+
+    function loadSummary() {
+        fetch("./summary_all_pages.txt") // Adjust this if your file structure requires a different path
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.statusText);
+                }
+                return response.text();
+            })
+            .then(data => {
+                const lines = data.split('\n');
+                let content = '';
+                lines.forEach(line => {
+                    // Handle bold text
+                    line = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+                    if (line.startsWith('# ')) {
+                        content += `<h1>${line.substring(2)}</h1>`;
+                    } else if (line.startsWith('## ')) {
+                        content += `<h2>${line.substring(3)}</h2>`;
+                    } else if (line.startsWith('### ')) {
+                        content += `<h3>${line.substring(4)}</h3>`;
+                    } else if (line.startsWith('- ')) {
+                        content += `<li>${line.substring(2)}</li>`;
+                    } else {
+                        content += `<p>${line}</p>`;
+                    }
+                });
+                document.getElementById('summary').innerHTML = content;
+            })
+            .catch(error => {
+                console.error('Error fetching the summary:', error);
+                document.getElementById('summary').innerHTML = 'Error loading summary: ' + error.message;
+            });
+    }
+
+    function goToContent() {
+        const selectedValue = document.getElementById("content-select").value;
+        window.location.href = selectedValue; // Redirects to the selected content page
+    }
+</script>
+
+</body>
+</html>
