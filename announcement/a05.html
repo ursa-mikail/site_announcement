@@ -18,9 +18,10 @@
     
     <script>
         $(document).ready(function() {
-            // Sample text to generate QR code from
-            const textToEncode = "This is a sample text to generate a QR code.";
-            generateQRCode(textToEncode);
+            $('#generate-btn').click(function() {
+                const textToEncode = $('#text-input').val();
+                generateQRCode(textToEncode);
+            });
         });
 
         function generateQRCode(message) {
@@ -36,8 +37,10 @@
 <body>
 
 <h1>Generate QR Code</h1>
-<p>This QR code is generated from the text below:</p>
-<p>"This is a sample text to generate a QR code."</p>
+<p>Enter text below to generate a QR code:</p>
+
+<input type="text" id="text-input" placeholder="Enter text here">
+<button id="generate-btn">Generate QR Code</button>
 
 <div id="qrcode"></div> <!-- QR Code will be generated here -->
 
