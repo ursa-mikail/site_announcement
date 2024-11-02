@@ -12,10 +12,10 @@
     </style>
 </head>
 <body>
-    <h1>Speak To Your Friend</h1>
+    <h1>AES Encryption/Decryption Tool</h1>
     
     <h2>Generate Random Hex</h2>
-    <input type="number" id="hexLength" placeholder="Enter number of hex bytes" min="1">
+    <input type="number" id="hexLength" placeholder="Enter number of hex characters" min="1">
     <button id="generateHex">Generate Random Hex</button>
     <p id="randomHex"></p>
     
@@ -36,12 +36,14 @@
     <button id="decryptButton">Decrypt</button>
     <p id="decryptedText"></p>
 
+    <button id="clearFields">Clear All Fields</button>
+
     <script>
         // Function to generate random hex
         function generateRandomHex() {
             const length = parseInt(document.getElementById("hexLength").value);
             let randomHex = '';
-            for (let i = 0; i < (length*2); i++) {
+            for (let i = 0; i < length; i++) {
                 randomHex += Math.floor(Math.random() * 16).toString(16);
             }
             document.getElementById("randomHex").innerText = randomHex;
@@ -74,11 +76,26 @@
             document.getElementById("decryptedText").innerText = decrypted;
         }
 
+        // Clear all fields function
+        function clearFields() {
+            document.getElementById("hexLength").value = '';
+            document.getElementById("textLength").value = '';
+            document.getElementById("randomHex").innerText = '';
+            document.getElementById("randomText").innerText = '';
+            document.getElementById("textToEncrypt").value = '';
+            document.getElementById("encryptionKey").value = '';
+            document.getElementById("encryptedText").innerText = '';
+            document.getElementById("textToDecrypt").value = '';
+            document.getElementById("decryptionKey").value = '';
+            document.getElementById("decryptedText").innerText = '';
+        }
+
         // Event listeners
         document.getElementById("generateHex").addEventListener("click", generateRandomHex);
         document.getElementById("generateText").addEventListener("click", generateRandomText);
         document.getElementById("encryptButton").addEventListener("click", encrypt);
         document.getElementById("decryptButton").addEventListener("click", decrypt);
+        document.getElementById("clearFields").addEventListener("click", clearFields);
     </script>
 </body>
 </html>
