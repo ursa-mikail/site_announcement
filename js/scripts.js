@@ -8,7 +8,7 @@ const site4 = url + 'data.csv';
 const redirectUrl = "https://ursa-mikail.github.io/site_announcement/#";
 
 function redirectToSite(site) {
-    window.location.href = redirectUrl + site;
+    window.location.href = site;
 }
 
 function change_it(what_file) {
