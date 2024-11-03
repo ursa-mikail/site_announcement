@@ -2,47 +2,147 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="../styles/styles.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
-    <title>QR Code Generator</title>
-    
+    <title>Cipher/Decipher Announcement</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <style>
-        #qrcode {
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"],
+        textarea,
+        input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .output {
             margin-top: 20px;
-            width: 128px; /* QR code size */
-            height: 128px; /* QR code size */
+            padding: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            position: relative;
+        }
+        .copy-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        .copy-button:hover {
+            background-color: #218838;
         }
     </style>
-    
-    <script>
-        $(document).ready(function() {
-            $('#generate-btn').click(function() {
-                const textToEncode = $('#text-input').val();
-                generateQRCode(textToEncode);
-            });
-        });
-
-        function generateQRCode(message) {
-            $('#qrcode').empty(); // Clear previous QR code
-            $('#qrcode').qrcode({
-                width: 128,
-                height: 128,
-                text: message
-            });
-        }
-    </script>
 </head>
 <body>
 
-<h1>Generate QR Code</h1>
-<p>Enter text below to generate a QR code:</p>
+<div class="container">
+    <h1>Decipher Announcement</h1>
+    <div class="form-group">
+        <label for="key">Key (Hex):</label>
+        <input type="text" id="key">
+    </div>
+    <button onclick="decipherFile()">Decipher</button>
 
-<input type="text" id="text-input" placeholder="Enter text here">
-<button id="generate-btn">Generate QR Code</button>
+    <h1>Cipher Text</h1>
+    <div class="form-group">
+        <label for="plainText">Plain Text:</label>
+        <textarea id="plainText" rows="4"></textarea>
+    </div>
+    <button onclick="cipherText()">Cipher</button>
 
-<div id="qrcode"></div> <!-- QR Code will be generated here -->
+    <div class="output" id="output">
+        <button class="copy-button" onclick="copyToClipboard()">Copy to Clipboard</button>
+        <pre id="outputContent"></pre>
+    </div>
+</div>
+
+<script>
+    function decipherFile() {
+        const keyHex = document.getElementById('key').value;
+        const defaultFilePath = './announcement/data_ciphered.txt';
+
+        if (!keyHex) {
+            alert('Please provide the key.');
+            return;
+        }
+
+        fetch(defaultFilePath)
+            .then(response => response.text())
+            .then(cipheredData => {
+                const key = CryptoJS.enc.Hex.parse(keyHex);
+                const iv = CryptoJS.enc.Hex.parse(cipheredData.slice(0, 32)); // IV is the first 32 hex characters (16 bytes)
+                const encrypted = CryptoJS.enc.Base64.stringify(CryptoJS.enc.Hex.parse(cipheredData.slice(32)));
+
+                const decrypted = CryptoJS.AES.decrypt(encrypted, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
+                const plaintext = decrypted.toString(CryptoJS.enc.Utf8);
+
+                document.getElementById('outputContent').innerText = plaintext;
+            })
+            .catch(error => {
+                console.error('Error reading the file:', error);
+                document.getElementById('outputContent').innerText = 'Error reading the file.';
+            });
+    }
+
+    function cipherText() {
+        const keyHex = document.getElementById('key').value;
+        const plainText = document.getElementById('plainText').value;
+
+        if (!keyHex || !plainText) {
+            alert('Please provide both the key and the plain text.');
+            return;
+        }
+
+        const key = CryptoJS.enc.Hex.parse(keyHex);
+        const iv = CryptoJS.lib.WordArray.random(16); // Generate a random IV
+
+        const encrypted = CryptoJS.AES.encrypt(plainText, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
+        const cipheredData = iv.concat(encrypted.ciphertext).toString(CryptoJS.enc.Hex);
+
+        document.getElementById('outputContent').innerText = cipheredData;
+    }
+
+    function copyToClipboard() {
+        const outputContent = document.getElementById('outputContent').innerText;
+        const tempTextArea = document.createElement('textarea');
+        tempTextArea.value = outputContent;
+        document.body.appendChild(tempTextArea);
+        tempTextArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempTextArea);
+        alert('Copied to clipboard!');
+    }
+</script>
 
 </body>
 </html>
