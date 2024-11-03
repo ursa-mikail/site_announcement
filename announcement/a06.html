@@ -103,7 +103,7 @@
 <script>
     function decipherFile() {
         const keyHex = document.getElementById('key').value;
-        const defaultFilePath = './announcement/data_ciphered.txt';
+        const defaultFilePath = './data_ciphered.txt';
 
         if (!keyHex) {
             alert('Please provide the key.');
@@ -111,11 +111,12 @@
         }
 
         fetch(defaultFilePath)
-            .then(response => response.text())
-            .then(cipheredData => {
+            .then(response => response.arrayBuffer())
+            .then(buffer => {
+                const cipheredDataHex = Array.from(new Uint8Array(buffer)).map(b => ('00' + b.toString(16)).slice(-2)).join('');
                 const key = CryptoJS.enc.Hex.parse(keyHex);
-                const iv = CryptoJS.enc.Hex.parse(cipheredData.slice(0, 32)); // IV is the first 32 hex characters (16 bytes)
-                const encrypted = CryptoJS.enc.Base64.stringify(CryptoJS.enc.Hex.parse(cipheredData.slice(32)));
+                const iv = CryptoJS.enc.Hex.parse(cipheredDataHex.slice(0, 32)); // IV is the first 32 hex characters (16 bytes)
+                const encrypted = CryptoJS.enc.Base64.stringify(CryptoJS.enc.Hex.parse(cipheredDataHex.slice(32)));
 
                 const decrypted = CryptoJS.AES.decrypt(encrypted, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
                 const plaintext = decrypted.toString(CryptoJS.enc.Utf8);
