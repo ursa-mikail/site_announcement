@@ -21,8 +21,7 @@
             margin-bottom: 5px;
         }
         input[type="text"],
-        textarea,
-        input[type="file"] {
+        textarea {
             width: 100%;
             padding: 8px;
             box-sizing: border-box;
@@ -48,7 +47,7 @@
             word-wrap: break-word;
             position: relative;
         }
-        .copy-button {
+        .copy-button, .download-button {
             position: absolute;
             top: 10px;
             right: 10px;
@@ -58,18 +57,12 @@
             border: none;
             cursor: pointer;
         }
+        .download-button {
+            right: 120px;
+            background-color: #ffc107;
+        }
         .copy-button:hover {
             background-color: #218838;
-        }
-        .download-button {
-            position: absolute;
-            top: 10px;
-            right: 120px;
-            padding: 5px 10px;
-            background-color: #ffc107;
-            color: #fff;
-            border: none;
-            cursor: pointer;
         }
         .download-button:hover {
             background-color: #e0a800;
@@ -103,30 +96,31 @@
 <script>
     function decipherFile() {
         const keyHex = document.getElementById('key').value;
-        const defaultFilePath = './data_ciphered.txt';
+        const defaultFilePath = './data_ciphered.txt'; // Updated path for the same directory
 
         if (!keyHex) {
             alert('Please provide the key.');
             return;
         }
 
-        fetch(defaultFilePath)
-            .then(response => response.arrayBuffer())
-            .then(buffer => {
-                const cipheredDataHex = Array.from(new Uint8Array(buffer)).map(b => ('00' + b.toString(16)).slice(-2)).join('');
-                const key = CryptoJS.enc.Hex.parse(keyHex);
-                const iv = CryptoJS.enc.Hex.parse(cipheredDataHex.slice(0, 32)); // IV is the first 32 hex characters (16 bytes)
-                const encrypted = CryptoJS.enc.Base64.stringify(CryptoJS.enc.Hex.parse(cipheredDataHex.slice(32)));
+        try {
+            const response = await fetch(defaultFilePath);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const cipheredDataHex = await response.text();
+            const key = CryptoJS.enc.Hex.parse(keyHex);
+            const iv = CryptoJS.enc.Hex.parse(cipheredDataHex.slice(0, 32)); // IV is the first 32 hex characters (16 bytes)
+            const encrypted = CryptoJS.enc.Hex.parse(cipheredDataHex.slice(32));
 
-                const decrypted = CryptoJS.AES.decrypt(encrypted, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
-                const plaintext = decrypted.toString(CryptoJS.enc.Utf8);
+            const decrypted = CryptoJS.AES.decrypt({ ciphertext: encrypted }, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
+            const plaintext = decrypted.toString(CryptoJS.enc.Utf8);
 
-                document.getElementById('outputContent').innerText = plaintext;
-            })
-            .catch(error => {
-                console.error('Error reading the file:', error);
-                document.getElementById('outputContent').innerText = 'Error reading the file.';
-            });
+            document.getElementById('outputContent').innerText = plaintext || 'Decryption failed, invalid key or data.';
+        } catch (error) {
+            console.error('Error reading the file:', error);
+            document.getElementById('outputContent').innerText = 'Error reading the file. Please ensure the file exists and the path is correct.';
+        }
     }
 
     function cipherText() {
