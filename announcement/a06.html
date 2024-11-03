@@ -3,34 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Decipher Announcement</title>
+    <title>Encrypt/Decrypt Announcements</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <style>
         body { font-family: Arial, sans-serif; }
-        textarea { width: 100%; height: 100px; }
-        input { width: 100%; }
+        textarea, input { width: 100%; margin-top: 10px; }
         .output { margin-top: 10px; }
     </style>
 </head>
 <body>
-    <h1>Decipher Announcement</h1>
+    <h1>Encrypt/Decrypt Announcements</h1>
 
     <h2>Encrypt</h2>
-    <textarea id="textToEncrypt" placeholder="Enter text to encrypt"></textarea>
-    <input type="text" id="encryptionKey" placeholder="Enter encryption key (Hex)">
+    <textarea id="textToEncrypt" placeholder="Enter text to encrypt">Sample input text for encryption</textarea>
+    <input type="text" id="encryptionKey" placeholder="Enter encryption key (Hex)" value="000102030405060708090A0B0C0D0E0F">
     <button onclick="encryptText()">Encrypt</button>
     <pre id="encryptedText"></pre>
+    <button onclick="copyCipheredToClipboard()">Copy Ciphered Output to Clipboard</button>
+    <button onclick="downloadCipheredOutput('ciphered_output.txt')">Download Ciphered Output</button>
 
     <h2>Decipher</h2>
-    <input type="text" id="key" placeholder="Enter decryption key (Hex)">
-    <button onclick="decipherFile()">Decipher File</button>
+    <input type="text" id="key" placeholder="Enter decryption key (Hex)" value="000102030405060708090A0B0C0D0E0F">
+    <button onclick="decipherStaticData()">Decipher</button>
+    <input type="file" id="fileInput" accept=".txt" />
+    <button onclick="loadCipheredData()">Load Ciphered Data</button>
     <div class="output">
         <pre id="outputContent"></pre>
-        <button onclick="copyToClipboard()">Copy to Clipboard</button>
-        <button onclick="downloadFile()">Download Output as Text</button>
+        <button onclick="copyToClipboard()">Copy Decrypted Output to Clipboard</button>
+        <button onclick="downloadFile('out.txt')">Download Decrypted Output as Text</button>
     </div>
 
     <script>
+        let lastEncrypted = ""; // Store last encrypted text for decryption
+
+        // Automatically load data from the specified file
+        window.onload = function() {
+            fetch('./data_ciphered.txt')
+                .then(response => {
+                    if (!response.ok) throw new Error('File not found or inaccessible');
+                    return response.text();
+                })
+                .then(text => {
+                    lastEncrypted = text; // Store last encrypted data
+                    document.getElementById("encryptedText").innerText = lastEncrypted; // Display it for the user
+                })
+                .catch(error => {
+                    console.error(error);
+                    alert('Failed to load data_ciphered.txt');
+                });
+        };
+
         function encryptText() {
             const textToEncrypt = document.getElementById("textToEncrypt").value;
             const keyHex = document.getElementById("encryptionKey").value;
@@ -45,48 +67,55 @@
             const encrypted = CryptoJS.AES.encrypt(textToEncrypt, key, { iv: iv }).toString();
 
             // Prepend IV to encrypted data for later use in decryption
-            const result = iv.toString() + encrypted;
-            document.getElementById("encryptedText").innerText = result;
+            lastEncrypted = iv.toString() + encrypted; // Store last encrypted data
+            document.getElementById("encryptedText").innerText = lastEncrypted;
         }
 
-function decipherFile() {
-    const keyHex = document.getElementById('key').value;
+        function decipherStaticData() {
+            const keyHex = document.getElementById('key').value;
 
-    if (!keyHex) {
-        alert('Please provide the decryption key.');
-        return;
-    }
-
-    fetch("./data_ciphered.txt") // Ensure this path is correct
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok: ' + response.statusText);
+            if (!keyHex) {
+                alert('Please provide the decryption key.');
+                return;
             }
-            return response.text();
-        })
-        .then(cipheredData => {
-            // Ensure the data is treated as a string, then parse accordingly
-            const ivHex = cipheredData.slice(0, 32); // First 32 chars are IV
-            const encryptedHex = cipheredData.slice(32); // Remainder is encrypted text
+
+            if (!lastEncrypted) {
+                alert('No encrypted data available to decrypt.');
+                return;
+            }
+
+            // Extract IV and encrypted text from the stored data
+            const ivHex = lastEncrypted.slice(0, 32); // First 32 chars are IV
+            const encryptedBase64 = lastEncrypted.slice(32); // Remainder is encrypted text
 
             const iv = CryptoJS.enc.Hex.parse(ivHex);
-            const encrypted = CryptoJS.enc.Hex.parse(encryptedHex);
-
+            const encrypted = CryptoJS.enc.Base64.parse(encryptedBase64);
             const key = CryptoJS.enc.Hex.parse(keyHex);
 
             // Decrypt the data
-            const decrypted = CryptoJS.AES.decrypt({ ciphertext: encrypted }, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
+            const decrypted = CryptoJS.AES.decrypt({ ciphertext: encrypted }, key, { iv: iv });
             const plaintext = decrypted.toString(CryptoJS.enc.Utf8);
 
             // Display the decrypted text
             document.getElementById('outputContent').innerText = plaintext || 'Decryption failed, invalid key or data.';
-        })
-        .catch(error => {
-            console.error('Error deciphering the file:', error);
-            document.getElementById('outputContent').innerText = 'Error deciphering the file: ' + error.message;
-        });
-}
+        }
 
+        function loadCipheredData() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Please select a file to load.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                lastEncrypted = e.target.result; // Store last encrypted data
+                document.getElementById("encryptedText").innerText = lastEncrypted; // Display it for the user
+            };
+            reader.readAsText(file);
+        }
 
         function copyToClipboard() {
             const outputContent = document.getElementById('outputContent').innerText;
@@ -99,12 +128,32 @@ function decipherFile() {
             alert('Copied to clipboard!');
         }
 
-        function downloadFile() {
+        function downloadFile(filename) {
             const outputContent = document.getElementById('outputContent').innerText;
             const blob = new Blob([outputContent], { type: 'text/plain' });
             const link = document.createElement('a');
             link.href = window.URL.createObjectURL(blob);
-            link.download = 'output.txt';
+            link.download = filename;
+            link.click();
+        }
+
+        function copyCipheredToClipboard() {
+            const cipheredOutput = document.getElementById("encryptedText").innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = cipheredOutput;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+            alert('Ciphered output copied to clipboard!');
+        }
+
+        function downloadCipheredOutput(filename) {
+            const cipheredOutput = document.getElementById("encryptedText").innerText;
+            const blob = new Blob([cipheredOutput], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = filename;
             link.click();
         }
     </script>
