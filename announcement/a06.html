@@ -61,6 +61,19 @@
         .copy-button:hover {
             background-color: #218838;
         }
+        .download-button {
+            position: absolute;
+            top: 10px;
+            right: 120px;
+            padding: 5px 10px;
+            background-color: #ffc107;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        .download-button:hover {
+            background-color: #e0a800;
+        }
     </style>
 </head>
 <body>
@@ -82,6 +95,7 @@
 
     <div class="output" id="output">
         <button class="copy-button" onclick="copyToClipboard()">Copy to Clipboard</button>
+        <button class="download-button" onclick="downloadAsFile()">Download as ciphered.txt</button>
         <pre id="outputContent"></pre>
     </div>
 </div>
@@ -141,6 +155,20 @@
         document.execCommand('copy');
         document.body.removeChild(tempTextArea);
         alert('Copied to clipboard!');
+    }
+
+    function downloadAsFile() {
+        const outputContent = document.getElementById('outputContent').innerText;
+        const blob = new Blob([outputContent], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'ciphered.txt';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     }
 </script>
 
