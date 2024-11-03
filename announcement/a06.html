@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Decipher File Example</title>
+    <title>Decipher Announcement</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <style>
         body { font-family: Arial, sans-serif; }
@@ -13,7 +13,7 @@
     </style>
 </head>
 <body>
-    <h1>Decipher File Example</h1>
+    <h1>Decipher Announcement</h1>
 
     <h2>Encrypt</h2>
     <textarea id="textToEncrypt" placeholder="Enter text to encrypt"></textarea>
@@ -51,14 +51,14 @@
 
         function decipherFile() {
             const keyHex = document.getElementById('key').value;
-            const defaultFilePath = './data_ciphered.txt'; // Ensure this path is correct based on your file structure
+            const defaultFilePath = "./data_ciphered.txt"; // Ensure this path is correct based on your file structure
 
             if (!keyHex) {
                 alert('Please provide the key.');
                 return;
             }
 
-            fetch(defaultFilePath)
+            fetch("./data_ciphered.txt") // defaultFilePath
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok: ' + response.statusText);
