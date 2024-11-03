@@ -49,40 +49,44 @@
             document.getElementById("encryptedText").innerText = result;
         }
 
-        function decipherFile() {
-            const keyHex = document.getElementById('key').value;
+function decipherFile() {
+    const keyHex = document.getElementById('key').value;
 
-            if (!keyHex) {
-                alert('Please provide the decryption key.');
-                return;
+    if (!keyHex) {
+        alert('Please provide the decryption key.');
+        return;
+    }
+
+    fetch("./data_ciphered.txt") // Ensure this path is correct
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok: ' + response.statusText);
             }
+            return response.text();
+        })
+        .then(cipheredData => {
+            // Ensure the data is treated as a string, then parse accordingly
+            const ivHex = cipheredData.slice(0, 32); // First 32 chars are IV
+            const encryptedHex = cipheredData.slice(32); // Remainder is encrypted text
 
-            fetch("./data_ciphered.txt") // Ensure this path is correct
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok: ' + response.statusText);
-                    }
-                    return response.text();
-                })
-                .then(cipheredData => {
-                    // Extract IV from the start of the ciphered data
-                    const iv = CryptoJS.enc.Hex.parse(cipheredData.slice(0, 32)); // Assuming the first 32 hex chars are the IV
-                    const encrypted = CryptoJS.enc.Hex.parse(cipheredData.slice(32));
+            const iv = CryptoJS.enc.Hex.parse(ivHex);
+            const encrypted = CryptoJS.enc.Hex.parse(encryptedHex);
 
-                    const key = CryptoJS.enc.Hex.parse(keyHex);
+            const key = CryptoJS.enc.Hex.parse(keyHex);
 
-                    // Decrypt the data
-                    const decrypted = CryptoJS.AES.decrypt({ ciphertext: encrypted }, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
-                    const plaintext = decrypted.toString(CryptoJS.enc.Utf8);
+            // Decrypt the data
+            const decrypted = CryptoJS.AES.decrypt({ ciphertext: encrypted }, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
+            const plaintext = decrypted.toString(CryptoJS.enc.Utf8);
 
-                    // Display the decrypted text
-                    document.getElementById('outputContent').innerText = plaintext || 'Decryption failed, invalid key or data.';
-                })
-                .catch(error => {
-                    console.error('Error deciphering the file:', error);
-                    document.getElementById('outputContent').innerText = 'Error deciphering the file: ' + error.message;
-                });
-        }
+            // Display the decrypted text
+            document.getElementById('outputContent').innerText = plaintext || 'Decryption failed, invalid key or data.';
+        })
+        .catch(error => {
+            console.error('Error deciphering the file:', error);
+            document.getElementById('outputContent').innerText = 'Error deciphering the file: ' + error.message;
+        });
+}
+
 
         function copyToClipboard() {
             const outputContent = document.getElementById('outputContent').innerText;
