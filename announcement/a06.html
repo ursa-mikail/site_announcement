@@ -51,14 +51,13 @@
 
         function decipherFile() {
             const keyHex = document.getElementById('key').value;
-            const defaultFilePath = "./data_ciphered.txt"; // Ensure this path is correct based on your file structure
 
             if (!keyHex) {
-                alert('Please provide the key.');
+                alert('Please provide the decryption key.');
                 return;
             }
 
-            fetch("./data_ciphered.txt") // defaultFilePath
+            fetch("./data_ciphered.txt") // Ensure this path is correct
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok: ' + response.statusText);
@@ -67,11 +66,11 @@
                 })
                 .then(cipheredData => {
                     // Extract IV from the start of the ciphered data
-                    const iv = CryptoJS.enc.Hex.parse(cipheredData.slice(0, 32)); // First 32 hex characters (16 bytes)
+                    const iv = CryptoJS.enc.Hex.parse(cipheredData.slice(0, 32)); // Assuming the first 32 hex chars are the IV
                     const encrypted = CryptoJS.enc.Hex.parse(cipheredData.slice(32));
 
                     const key = CryptoJS.enc.Hex.parse(keyHex);
-                    
+
                     // Decrypt the data
                     const decrypted = CryptoJS.AES.decrypt({ ciphertext: encrypted }, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
                     const plaintext = decrypted.toString(CryptoJS.enc.Utf8);
@@ -80,8 +79,8 @@
                     document.getElementById('outputContent').innerText = plaintext || 'Decryption failed, invalid key or data.';
                 })
                 .catch(error => {
-                    console.error('Error reading the file:', error);
-                    document.getElementById('outputContent').innerText = 'Error reading the file. Please ensure the file exists and the path is correct.';
+                    console.error('Error deciphering the file:', error);
+                    document.getElementById('outputContent').innerText = 'Error deciphering the file: ' + error.message;
                 });
         }
 
