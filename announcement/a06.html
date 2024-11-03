@@ -21,7 +21,8 @@
             margin-bottom: 5px;
         }
         input[type="text"],
-        textarea {
+        textarea,
+        input[type="file"] {
             width: 100%;
             padding: 8px;
             box-sizing: border-box;
@@ -47,7 +48,7 @@
             word-wrap: break-word;
             position: relative;
         }
-        .copy-button, .download-button {
+        .copy-button {
             position: absolute;
             top: 10px;
             right: 10px;
@@ -57,15 +58,19 @@
             border: none;
             cursor: pointer;
         }
-        .download-button {
-            right: 120px;
-            background-color: #ffc107;
-        }
         .copy-button:hover {
             background-color: #218838;
         }
+        .download-button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #17a2b8;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
         .download-button:hover {
-            background-color: #e0a800;
+            background-color: #138496;
         }
     </style>
 </head>
@@ -88,7 +93,7 @@
 
     <div class="output" id="output">
         <button class="copy-button" onclick="copyToClipboard()">Copy to Clipboard</button>
-        <button class="download-button" onclick="downloadAsFile()">Download as ciphered.txt</button>
+        <button class="download-button" onclick="downloadFile()">Download as ciphered.txt</button>
         <pre id="outputContent"></pre>
     </div>
 </div>
@@ -96,41 +101,35 @@
 <script>
     function decipherFile() {
         const keyHex = document.getElementById('key').value;
-        const defaultFilePath = './data_ciphered.txt'; // Path for the same directory
+        const defaultFilePath = './data_ciphered.txt';
 
         if (!keyHex) {
             alert('Please provide the key.');
             return;
         }
 
-        const responsePromise = fetch(defaultFilePath);
-        responsePromise
-            .then(response => {
+        fetch(defaultFilePath)
+            .then(function(response) {
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error('Network response was not ok.');
                 }
-                return response.text(); // Return the response as text
+                return response.text();
             })
-            .then(cipheredDataHex => {
+            .then(function(cipheredDataHex) {
                 const key = CryptoJS.enc.Hex.parse(keyHex);
                 const iv = CryptoJS.enc.Hex.parse(cipheredDataHex.slice(0, 32)); // IV is the first 32 hex characters (16 bytes)
                 const encrypted = CryptoJS.enc.Hex.parse(cipheredDataHex.slice(32));
 
-                const decrypted = CryptoJS.AES.decrypt(
-                    { ciphertext: encrypted },
-                    key,
-                    { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 }
-                );
+                const decrypted = CryptoJS.AES.decrypt({ ciphertext: encrypted }, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
                 const plaintext = decrypted.toString(CryptoJS.enc.Utf8);
 
                 document.getElementById('outputContent').innerText = plaintext || 'Decryption failed, invalid key or data.';
             })
-            .catch(error => {
+            .catch(function(error) {
                 console.error('Error reading the file:', error);
                 document.getElementById('outputContent').innerText = 'Error reading the file. Please ensure the file exists and the path is correct.';
             });
     }
-
 
     function cipherText() {
         const keyHex = document.getElementById('key').value;
@@ -161,18 +160,13 @@
         alert('Copied to clipboard!');
     }
 
-    function downloadAsFile() {
+    function downloadFile() {
         const outputContent = document.getElementById('outputContent').innerText;
         const blob = new Blob([outputContent], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'ciphered.txt';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = 'ciphered.txt';
+        link.click();
     }
 </script>
 
