@@ -96,32 +96,41 @@
 <script>
     function decipherFile() {
         const keyHex = document.getElementById('key').value;
-        const defaultFilePath = './data_ciphered.txt'; // Updated path for the same directory
+        const defaultFilePath = './data_ciphered.txt'; // Path for the same directory
 
         if (!keyHex) {
             alert('Please provide the key.');
             return;
         }
 
-        try {
-            const response = await fetch(defaultFilePath);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const cipheredDataHex = await response.text();
-            const key = CryptoJS.enc.Hex.parse(keyHex);
-            const iv = CryptoJS.enc.Hex.parse(cipheredDataHex.slice(0, 32)); // IV is the first 32 hex characters (16 bytes)
-            const encrypted = CryptoJS.enc.Hex.parse(cipheredDataHex.slice(32));
+        const responsePromise = fetch(defaultFilePath);
+        responsePromise
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text(); // Return the response as text
+            })
+            .then(cipheredDataHex => {
+                const key = CryptoJS.enc.Hex.parse(keyHex);
+                const iv = CryptoJS.enc.Hex.parse(cipheredDataHex.slice(0, 32)); // IV is the first 32 hex characters (16 bytes)
+                const encrypted = CryptoJS.enc.Hex.parse(cipheredDataHex.slice(32));
 
-            const decrypted = CryptoJS.AES.decrypt({ ciphertext: encrypted }, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
-            const plaintext = decrypted.toString(CryptoJS.enc.Utf8);
+                const decrypted = CryptoJS.AES.decrypt(
+                    { ciphertext: encrypted },
+                    key,
+                    { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 }
+                );
+                const plaintext = decrypted.toString(CryptoJS.enc.Utf8);
 
-            document.getElementById('outputContent').innerText = plaintext || 'Decryption failed, invalid key or data.';
-        } catch (error) {
-            console.error('Error reading the file:', error);
-            document.getElementById('outputContent').innerText = 'Error reading the file. Please ensure the file exists and the path is correct.';
-        }
+                document.getElementById('outputContent').innerText = plaintext || 'Decryption failed, invalid key or data.';
+            })
+            .catch(error => {
+                console.error('Error reading the file:', error);
+                document.getElementById('outputContent').innerText = 'Error reading the file. Please ensure the file exists and the path is correct.';
+            });
     }
+
 
     function cipherText() {
         const keyHex = document.getElementById('key').value;
