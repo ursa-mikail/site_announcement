@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../styles/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+    <title>QR Code Generator</title>
+    
+    <style>
+        #qrcode {
+            margin-top: 20px;
+            width: 128px; /* QR code size */
+            height: 128px; /* QR code size */
+        }
+    </style>
+    
+    <script>
+        $(document).ready(function() {
+            $('#generate-btn').click(function() {
+                const textToEncode = $('#text-input').val();
+                generateQRCode(textToEncode);
+            });
+        });
+
+        function generateQRCode(message) {
+            $('#qrcode').empty(); // Clear previous QR code
+            $('#qrcode').qrcode({
+                width: 128,
+                height: 128,
+                text: message
+            });
+        }
+    </script>
+</head>
+<body>
+
+<h1>Generate QR Code</h1>
+<p>Enter text below to generate a QR code:</p>
+
+<input type="text" id="text-input" placeholder="Enter text here">
+<button id="generate-btn">Generate QR Code</button>
+
+<div id="qrcode"></div> <!-- QR Code will be generated here -->
+
+</body>
+</html>
