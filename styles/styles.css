@@ -20,6 +20,11 @@
             font-family: Arial, sans-serif;
             margin: 20px;
         }
+
+        .profile-info {
+            margin-bottom: 10px;
+        }
+
         .container {
             max-width: 600px;
             margin: auto;
