@@ -41,18 +41,68 @@ setInterval(updateClock, 1000);
 updateClock(); // Initial call to set the clock immediately
 
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const selectElement = document.getElementById('content-select');
-            selectElement.addEventListener('change', (event) => {
-                const file = event.target.value;
-                loadContent(file);
+
+document.addEventListener('DOMContentLoaded', () => {
+    const selectElementHTML = document.getElementById('content-select');
+    const selectElementXML = document.getElementById('content-select-xml');
+
+    selectElementHTML.addEventListener('change', (event) => {
+        const file = event.target.value;
+        loadContent(file, 'html');
+    });
+
+    selectElementXML.addEventListener('change', (event) => {
+        const file = event.target.value;
+        loadContent(file, 'xml');
+    });
+
+    // Load default content
+    if (selectElementHTML.value) {
+        loadContent(selectElementHTML.value, 'html');
+    } else if (selectElementXML.value) {
+        loadContent(selectElementXML.value, 'xml');
+    }
+});
+
+function loadContent(file, type) {
+    const iframe = document.getElementById('content-iframe');
+    if (type === 'html') {
+        iframe.src = `./announcement/${file}.${type}`;
+    } else if (type === 'xml') {
+        fetch(`./announcement/${file}.xml`)
+            .then(response => response.text())
+            .then(xmlText => {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
+                const xsltProcessor = new XSLTProcessor();
+
+                // Fetch and apply XSLT transformation
+                fetch('./announcement/transform.xslt')
+                    .then(response => response.text())
+                    .then(xsltText => {
+                        const xsltDoc = parser.parseFromString(xsltText, 'application/xml');
+                        xsltProcessor.importStylesheet(xsltDoc);
+                        
+                        const resultDocument = xsltProcessor.transformToDocument(xmlDoc);
+                        const resultHtml = new XMLSerializer().serializeToString(resultDocument);
+
+                        // Open iframe document and write the transformed content
+                        iframe.contentDocument.open();
+                        iframe.contentDocument.write(resultHtml);
+                        iframe.contentDocument.close();
+                    })
+                    .catch(error => {
+                        console.error("XSLT Error:", error);
+                        iframe.contentDocument.open();
+                        iframe.contentDocument.write("Error loading XSLT");
+                        iframe.contentDocument.close();
+                    });
+            })
+            .catch(error => {
+                console.error("XML Error:", error);
+                iframe.contentDocument.open();
+                iframe.contentDocument.write("Error loading XML");
+                iframe.contentDocument.close();
             });
-            loadContent(selectElement.value);  // Load default content
-        });
-
-        function loadContent(file) {
-            document.getElementById('content-iframe').src = `./announcement/${file}.html`;
-        }
-
-
-
+    }
+}
