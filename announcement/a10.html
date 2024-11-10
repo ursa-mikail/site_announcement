@@ -1,16 +1,342 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Autocomplete and Autocorrect Textbox</title>
-    <link rel="stylesheet" type="text/css" href="../styles/styles.css">
-    <script src="../js/scripts.js" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A10 Autocomplete & Autocorrect</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      line-height: 1.5;
+      padding: 2rem;
+      max-width: 800px;
+      margin: 0 auto;
+      background: #f5f5f5;
+    }
+
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .autocomplete {
+      position: relative;
+      display: block;
+      width: 100%;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border: 2px solid #ddd;
+      border-radius: 4px;
+      background: #fff;
+      margin-bottom: 0.5rem;
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #0066ff;
+    }
+
+    .autocomplete-items {
+      position: absolute;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background: #fff;
+      width: 100%;
+      max-height: 300px;
+      overflow-y: auto;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      z-index: 999;
+    }
+
+    .autocomplete-items div {
+      padding: 0.75rem;
+      cursor: pointer;
+      border-bottom: 1px solid #f4f4f4;
+    }
+
+    .autocomplete-items div:hover,
+    .autocomplete-active {
+      background: #f0f7ff;
+    }
+
+    .suggestion {
+      color: #666;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+
+    .suggestion strong {
+      color: #0066ff;
+    }
+
+    .error {
+      color: #dc3545;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+
+    .loading {
+      text-align: center;
+      color: #666;
+      padding: 1rem;
+    }
+
+    .button {
+      background: #0066ff;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .button:hover {
+      background: #0052cc;
+    }
+
+    .button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .status {
+      margin-top: 0.5rem;
+      color: #666;
+    }
+  </style>
 </head>
 <body>
-    <h1>Autocomplete and Autocorrect Textbox</h1>
-    <label for="autocomplete-input">Start typing:</label>
-    <input type="text" id="autocomplete-input" autocomplete="off">
-    <div id="autocomplete-suggestions" class="autocomplete-suggestions"></div>
+  <div class="container">
+    <h1>A10 Form</h1>
+    <div id="loadingMessage" class="loading">Loading word list...</div>
+    <div class="form-group" id="formGroup" style="display: none;">
+      <label for="a10Input">Enter Text:</label>
+      <div class="autocomplete">
+        <textarea
+          id="a10Input"
+          placeholder="Start typing..."
+          aria-label="Enter text"
+          role="textbox"
+          aria-multiline="true"
+          disabled
+        ></textarea>
+        <div id="suggestion" class="suggestion"></div>
+        <div id="error" class="error"></div>
+      </div>
+      <button id="copyButton" class="button" disabled>Copy to Clipboard</button>
+      <div id="status" class="status"></div>
+    </div>
+  </div>
+
+  <script>
+    class AutocompleteAutocorrect {
+      constructor(input, wordList) {
+        this.input = input;
+        this.wordList = wordList;
+        this.currentFocus = -1;
+        this.listId = 'suggestion-list';
+        this.suggestionDiv = document.getElementById('suggestion');
+        this.errorDiv = document.getElementById('error');
+        this.copyButton = document.getElementById('copyButton');
+        this.statusDiv = document.getElementById('status');
+        this.lastWord = '';
+        this.setupEventListeners();
+        this.debounceTimer = null;
+      }
+
+      setupEventListeners() {
+        this.input.addEventListener("input", () => {
+          clearTimeout(this.debounceTimer);
+          this.debounceTimer = setTimeout(() => this.handleInput(), 150);
+        });
+
+        this.input.addEventListener("keydown", (e) => this.handleKeyDown(e));
+        document.addEventListener("click", (e) => this.closeAllLists(e.target));
+        
+        this.copyButton.addEventListener("click", () => this.copyToClipboard());
+      }
+
+      getCurrentWord() {
+        const text = this.input.value;
+        const cursorPosition = this.input.selectionStart;
+        
+        // Get the text up to the cursor
+        const textUpToCursor = text.substring(0, cursorPosition);
+        
+        // Find the last word being typed
+        const words = textUpToCursor.split(/\s+/);
+        const currentWord = words[words.length - 1].toLowerCase();
+        
+        return currentWord;
+      }
+
+      handleInput() {
+        this.copyButton.disabled = !this.input.value.trim();
+        
+        const currentWord = this.getCurrentWord();
+        if (!currentWord || currentWord === this.lastWord) {
+          this.closeAllLists();
+          this.clearMessages();
+          return;
+        }
+        
+        this.lastWord = currentWord;
+        this.closeAllLists();
+        this.clearMessages();
+
+        const matches = this.findMatches(currentWord);
+        if (matches.length > 0) {
+          this.showAutocompleteList(matches.slice(0, 10));
+          return;
+        }
+
+        const suggestion = this.findClosestMatch(currentWord);
+        if (suggestion) {
+          this.showSuggestion(suggestion);
+        }
+      }
+
+      async copyToClipboard() {
+        try {
+          await navigator.clipboard.writeText(this.input.value);
+          this.statusDiv.textContent = "Text copied to clipboard!";
+          setTimeout(() => {
+            this.statusDiv.textContent = "";
+          }, 2000);
+        } catch (err) {
+          this.statusDiv.textContent = "Failed to copy text. Please try again.";
+        }
+      }
+
+      replaceCurrentWord(newWord) {
+        const text = this.input.value;
+        const cursorPosition = this.input.selectionStart;
+        
+        // Get the text before and after the cursor
+        const textBeforeCursor = text.substring(0, cursorPosition);
+        const textAfterCursor = text.substring(cursorPosition);
+        
+        // Find the start of the current word
+        const wordStart = textBeforeCursor.search(/\S+$/);
+        if (wordStart === -1) return;
+        
+        // Replace the current word
+        const newText = textBeforeCursor.substring(0, wordStart) + newWord + textAfterCursor;
+        this.input.value = newText;
+        
+        // Place cursor after the inserted word
+        const newCursorPosition = wordStart + newWord.length;
+        this.input.setSelectionRange(newCursorPosition, newCursorPosition);
+      }
+
+      // ... [Previous methods for findMatches, findClosestMatch, levenshteinDistance remain the same]
+
+      showAutocompleteList(matches) {
+        const list = document.createElement("DIV");
+        list.setAttribute("id", this.listId);
+        list.setAttribute("class", "autocomplete-items");
+        
+        matches.forEach((match, index) => {
+          const div = document.createElement("DIV");
+          const currentWord = this.getCurrentWord();
+          
+          const matchIndex = match.toLowerCase().indexOf(currentWord.toLowerCase());
+          const beforeMatch = match.slice(0, matchIndex);
+          const matchText = match.slice(matchIndex, matchIndex + currentWord.length);
+          const afterMatch = match.slice(matchIndex + currentWord.length);
+          
+          div.innerHTML = beforeMatch + "<strong>" + matchText + "</strong>" + afterMatch;
+          
+          div.addEventListener("click", () => {
+            this.replaceCurrentWord(match);
+            this.closeAllLists();
+            this.clearMessages();
+          });
+          
+          list.appendChild(div);
+        });
+
+        this.input.parentNode.appendChild(list);
+      }
+
+      showSuggestion(suggestion) {
+        this.suggestionDiv.innerHTML = `Did you mean: <strong>${suggestion}</strong>?`;
+        this.suggestionDiv.style.display = "block";
+        
+        // Make suggestion clickable
+        this.suggestionDiv.style.cursor = "pointer";
+        this.suggestionDiv.onclick = () => {
+          this.replaceCurrentWord(suggestion);
+          this.clearMessages();
+        };
+      }
+    }
+
+    // Initialize by loading the word list
+function init() {
+  const loadingMessage = document.getElementById('loadingMessage');
+  const formGroup = document.getElementById('formGroup');
+  const a10Input = document.getElementById("a10Input");
+  const copyButton = document.getElementById("copyButton");
+
+  function loadWordList() {
+    return fetch("../data/wordlist.small.txt")  // Adjust path as needed
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok: ' + response.statusText);
+        }
+        return response.text();
+      })
+      .then(data => {
+        const words = data.split('\n')
+          .map(word => word.trim())
+          .filter(word => word.length > 0);
+        
+        return words;
+      });
+  }
+
+  try {
+    const words = loadWordList();
+    
+    // Update UI elements
+    loadingMessage.style.display = 'none';
+    formGroup.style.display = 'block';
+    a10Input.disabled = false;
+    copyButton.disabled = true;
+    
+    // Initialize autocomplete
+    new AutocompleteAutocorrect(a10Input, words);
+    
+  } catch (error) {
+    console.error('Error loading word list:', error);
+    loadingMessage.textContent = `Failed to load word list: ${error.message}. Please refresh the page.`;
+    loadingMessage.style.color = '#dc3545';  // Red color for error
+  }
+}
+
+// Start initialization when page loads
+document.addEventListener('DOMContentLoaded', init);
+
+  </script>
 </body>
 </html>

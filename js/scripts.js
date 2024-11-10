@@ -111,62 +111,85 @@ function loadContent(file, type) {
 
 // Autocomplete and Autocorrect
 document.addEventListener('DOMContentLoaded', function() {
-    const input = document.getElementById('autocomplete-input');
-    const suggestionsBox = document.getElementById('autocomplete-suggestions');
-    let suggestions = [];
-
-    // Load suggestions from a text file
-    //fetch('../data/wordlist.100000.txt')
-    fetch('../data/wordlist.small.txt')
-        .then(response => response.text())
-        .then(text => {
-            suggestions = text.split('\n').map(item => item.trim()).filter(item => item);
-
-            // Now that suggestions are loaded, add event listeners
-            input.addEventListener('input', onInput);
-            input.addEventListener('blur', onBlur);
-            input.addEventListener('keyup', onKeyUp);
-        });
-
-    function onInput(event) {
-        const query = event.target.value.toLowerCase();
-        suggestionsBox.innerHTML = '';
-        if (query.length > 0) {
-            const filteredSuggestions = suggestions.filter(item => item.toLowerCase().includes(query));
-            filteredSuggestions.forEach(suggestion => {
-                const div = document.createElement('div');
-                div.className = 'autocomplete-suggestion';
-                div.textContent = suggestion;
-                div.addEventListener('click', function() {
-                    input.value = suggestion;
-                    suggestionsBox.innerHTML = '';
-                });
-                suggestionsBox.appendChild(div);
-            });
-        }
-
-        const autocorrectedValue = autoCorrect(query, suggestions);
-        input.value = autocorrectedValue;
-    }
-
-    function onBlur() {
-        setTimeout(() => {
-            suggestionsBox.innerHTML = '';
-        }, 100); // Close suggestions after a short delay to allow click event
-    }
-
-    function onKeyUp(event) {
-        if (event.key === 'Enter' && suggestionsBox.firstChild) {
-            input.value = suggestionsBox.firstChild.textContent;
-            suggestionsBox.innerHTML = '';
-        }
-    }
-
-    function autoCorrect(input, suggestions) {
-        // Example autocorrect logic: Find the closest match based on the start of the word
-        if (!input) return input;
-        const regex = new RegExp(`^${input}`, 'i');
-        const match = suggestions.find(item => regex.test(item));
-        return match ? match : input;
-    }
+  fetch('../data/wordlist.small.txt')
+    .then(response => response.text())
+    .then(data => {
+      // Split the text file data into an array of words
+      var words = data.split(/\r?\n/);
+      // Initialize the autocomplete functionality with the words array
+      autocomplete(document.getElementById("myInput"), words);
+    })
+    .catch(error => console.error('Error loading word list:', error));
 });
+
+function autocomplete(input, arr) {
+  var currentFocus;
+  input.addEventListener("input", function(e) {
+    var a, b, i, val = this.value;
+    closeAllLists();
+    if (!val) return false;
+    currentFocus = -1;
+    a = document.createElement("DIV");
+    a.setAttribute("id", this.id + "autocomplete-list");
+    a.setAttribute("class", "autocomplete-items");
+    this.parentNode.appendChild(a);
+    for (i = 0; i < arr.length; i++) {
+      if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+        b = document.createElement("DIV");
+        b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+        b.innerHTML += arr[i].substr(val.length);
+        b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+        b.addEventListener("click", function(e) {
+          input.value = this.getElementsByTagName("input")[0].value;
+          closeAllLists();
+        });
+        a.appendChild(b);
+      }
+    }
+  });
+
+  input.addEventListener("keydown", function(e) {
+    var x = document.getElementById(this.id + "autocomplete-list");
+    if (x) x = x.getElementsByTagName("div");
+    if (e.keyCode == 40) {
+      currentFocus++;
+      addActive(x);
+    } else if (e.keyCode == 38) { //up
+      currentFocus--;
+      addActive(x);
+    } else if (e.keyCode == 13) {
+      e.preventDefault();
+      if (currentFocus > -1) {
+        if (x) x[currentFocus].click();
+      }
+    }
+  });
+
+  function addActive(x) {
+    if (!x) return false;
+    removeActive(x);
+    if (currentFocus >= x.length) currentFocus = 0;
+    if (currentFocus < 0) currentFocus = (x.length - 1);
+    x[currentFocus].classList.add("autocomplete-active");
+  }
+
+  function removeActive(x) {
+    for (var i = 0; i < x.length; i++) {
+      x[i].classList.remove("autocomplete-active");
+    }
+  }
+
+  function closeAllLists(elmnt) {
+    var x = document.getElementsByClassName("autocomplete-items");
+    for (var i = 0; i < x.length; i++) {
+      if (elmnt != x[i] && elmnt != input) {
+        x[i].parentNode.removeChild(x[i]);
+      }
+    }
+  }
+
+  document.addEventListener("click", function (e) {
+    closeAllLists(e.target);
+  });
+}
+
