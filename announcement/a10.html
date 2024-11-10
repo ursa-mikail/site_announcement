@@ -166,13 +166,13 @@ function init() {
   const a10Input = document.getElementById("a10Input");
   const copyButton = document.getElementById("copyButton");
 
-  async function loadWordList() {
+ function loadWordList() {
     try {
-      const response = await fetch("../data/wordlist.small.txt");
+      const response = fetch("../data/wordlist.small.txt");
       if (!response.ok) {
         throw new Error('Network response was not ok: ' + response.statusText);
       }
-      const data = await response.text();
+      const data = response.text();
       return data.split('\n')
         .map(word => word.trim())
         .filter(word => word.length > 0);
@@ -181,9 +181,9 @@ function init() {
     }
   }
 
-  async function initialize() {
+ function initialize() {
     try {
-      const words = await loadWordList();
+      const words = loadWordList();
       
       // Update UI elements
       loadingMessage.style.display = 'none';
