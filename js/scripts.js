@@ -116,7 +116,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let suggestions = [];
 
     // Load suggestions from a text file
-    fetch('../data/wordlist.100000.txt')
+    //fetch('../data/wordlist.100000.txt')
+    fetch('../data/wordlist.small.txt')
         .then(response => response.text())
         .then(text => {
             suggestions = text.split('\n').map(item => item.trim()).filter(item => item);
