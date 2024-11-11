@@ -1,125 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" type="text/css" href="../styles/styles.css">
-<script src="../js/words_load_static.js" defer></script>
-
-</head>     
-<body>
-
-<h2>Autocomplete</h2>
-
-<p>Start typing:</p>
-
-<!--Make sure the form has the autocomplete function switched off:-->
-<form autocomplete="off" action="#">
-  <div class="autocomplete" style="width:300px;">
-    <input id="myInput" type="text" name="myWord" placeholder="Word">
-  </div>
-  <button type="button" onclick="copyToClipboard()">Copy to Clipboard</button>
-</form>
-
-<script>
-function autocomplete(inp, arr) {
-  /*the autocomplete function takes two arguments,
-  the text field element and an array of possible autocompleted values:*/
-  var currentFocus;
-  /*execute a function when someone writes in the text field:*/
-  inp.addEventListener("input", function(e) {
-      var a, b, i, val = this.value;
-      /*close any already open lists of autocompleted values*/
-      closeAllLists();
-      if (!val) { return false;}
-      currentFocus = -1;
-      /*create a DIV element that will contain the items (values):*/
-      a = document.createElement("DIV");
-      a.setAttribute("id", this.id + "autocomplete-list");
-      a.setAttribute("class", "autocomplete-items");
-      /*append the DIV element as a child of the autocomplete container:*/
-      this.parentNode.appendChild(a);
-      /*for each item in the array...*/
-      for (i = 0; i < arr.length; i++) {
-        /*check if the item starts with the same letters as the text field value:*/
-        if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
-          /*create a DIV element for each matching element:*/
-          b = document.createElement("DIV");
-          /*make the matching letters bold:*/
-          b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
-          b.innerHTML += arr[i].substr(val.length);
-          /*insert an input field that will hold the current array item's value:*/
-          b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
-          /*execute a function when someone clicks on the item value (DIV element):*/
-          b.addEventListener("click", function(e) {
-              /*insert the value for the autocomplete text field:*/
-              inp.value = this.getElementsByTagName("input")[0].value;
-              /*close the list of autocompleted values,
-              (or any other open lists of autocompleted values:*/
-              closeAllLists();
-          });
-          a.appendChild(b);
-        }
-      }
-  });
-  /*execute a function presses a key on the keyboard:*/
-  inp.addEventListener("keydown", function(e) {
-      var x = document.getElementById(this.id + "autocomplete-list");
-      if (x) x = x.getElementsByTagName("div");
-      if (e.keyCode == 40) {
-        /*If the arrow DOWN key is pressed,
-        increase the currentFocus variable:*/
-        currentFocus++;
-        /*and make the current item more visible:*/
-        addActive(x);
-      } else if (e.keyCode == 38) { //up
-        /*If the arrow UP key is pressed,
-        decrease the currentFocus variable:*/
-        currentFocus--;
-        /*and make the current item more visible:*/
-        addActive(x);
-      } else if (e.keyCode == 13) {
-        /*If the ENTER key is pressed, prevent the form from being submitted,*/
-        e.preventDefault();
-        if (currentFocus > -1) {
-          /*and simulate a click on the "active" item:*/
-          if (x) x[currentFocus].click();
-        }
-      }
-  });
-  function addActive(x) {
-    /*a function to classify an item as "active":*/
-    if (!x) return false;
-    /*start by removing the "active" class on all items:*/
-    removeActive(x);
-    if (currentFocus >= x.length) currentFocus = 0;
-    if (currentFocus < 0) currentFocus = (x.length - 1);
-    /*add class "autocomplete-active":*/
-    x[currentFocus].classList.add("autocomplete-active");
-  }
-  function removeActive(x) {
-    /*a function to remove the "active" class from all autocomplete items:*/
-    for (var i = 0; i < x.length; i++) {
-      x[i].classList.remove("autocomplete-active");
-    }
-  }
-  function closeAllLists(elmnt) {
-    /*close all autocomplete lists in the document,
-    except the one passed as an argument:*/
-    var x = document.getElementsByClassName("autocomplete-items");
-    for (var i = 0; i < x.length; i++) {
-      if (elmnt != x[i] && elmnt != inp) {
-        x[i].parentNode.removeChild(x[i]);
-      }
-    }
-  }
-  /*execute a function when someone clicks in the document:*/
-  document.addEventListener("click", function (e) {
-      closeAllLists(e.target);
-  });
-}
-
-
-// load words from ../js/words_load_static.js
 
 /*An array containing all the words:*/
 var words = ["aardvark", "aba", "aback", "abacus", "abalone", "abandon", "abandoned", "abandonment", "abate", "abatement", "abattoir", "abb", "abbas", "abbey", "abbot", "abbreviate", "abbreviation", "abdicate", "abdication", "abdomen", "abdominal", "abduct", "abduction", "abed", "aberrant", "aberration", "abet", "abeyance", "abhor", "abhorrent", "abide", "abiding", "abigail", "ability", "abiotic", "abject", "ablation", "ablaze", "able", "ablution", "ably", "abnormal", "abnormality", "abnormally", "aboard", "abode", "abolish", "abolition", "abolitionist", "abominable", "abomination", "aboriginal", "abort", "aborted", "abortion", "abortive", "abound", "abounding", "about", "abouts", "above", "aboveground", "abracadabra", "abrasion", "abrasive", "abraxas", "abreast", "abridged", "abroad", "abrogate", "abrogation", "abrupt", "abruptly", "abscess", "absence", "absent", "absentee", "absenteeism", "absinthe", "absolute", "absolutely", "absolution", "absolutism", "absolutist", "absolve", "absorb", "absorbable", "absorbed", "absorbent", "absorber", "absorbing", "absorption", "absorptive", "abstain", "abstention", "abstinence", "abstract", "abstracted", "abstraction", "absurd", "absurdity", "absurdly", "abu", "abundance", "abundant", "abundantly", "abuse", "abuser", "abusive", "abut", "abutment", "abutting", "aby", "abysmal", "abyss", "academe", "academic", "academically", "academician", "academy", "acanthus", "acapulco", "acca", "accede", "accelerate", "accelerated", "acceleration", "accelerator", "accelerometer", "accent", "accentuate", "accept", "acceptability", "acceptable", "acceptably", "acceptance", "accepted", "acceptor", "access", "accessibility", "accessible", "accession", "accessory", "accident", "accidental", "accidentally", "accidently", "acclaim", "acclamation", "acclimation", "accolade", "accommodate", "accommodating", "accommodation", "accompaniment", "accompanist", "accompany", "accomplice", "accomplish", "accomplished", "accomplishment", "accord", "accordance", "according", "accordingly", "accordion", "accosted", "account", "accountability", "accountable", "accountancy", "accountant", "accounting", "accredit", "accreditation", "accredited", "accretion", "accrual", "accrue", "acculturation", "accumulate", "accumulation", "accumulator", "accuracy", "accurate", "accurately", "accursed", "accusation", "accusative", "accuse", "accused", "accuser", "accustomed", "ace", "acetal", "acetaldehyde", "acetate", "acetic", "acetone", "acetonitrile", "acetyl", "acetylation", "acetylcholine", "acetylene", "ach", "ache", "achievable", "achieve", "achievement", "achiever", "aching", "achromatic", "achy", "acid", "acidic", "acidification", "acidity", "acidosis", "acker", "acknowledge", "acknowledged", "acme", "acne", "acolyte", "acoma", "acorn", "acoustic", "acoustical", "acoustically", "acoustics", "acquaint", "acquaintance", "acquainted", "acquiesce", "acquiescence", "acquire", "acquired", "acquirer", "acquisition", "acquit", "acquittal", "acre", "acreage", "acrobat", "acrobatic", "acrobatics", "acronym", "acropolis", "across", "acrylate", "acrylic", "acrylonitrile", "act", "acta", "actin", "acting", "actinic", "action", "actionable", "activate", "activation", "activator", "active", "actively", "activin", "activism", "activist", "activity", "acton", "actor", "actress", "actu", "actual", "actuality", "actualization", "actually", "actuarial", "actuary", "actuation", "actuator", "acuity", "acumen", "acupressure", "acupuncture", "acute", "acutely", "acyclic", "acyl", "ad", "adage", "adagio", "adamant", "adapt", "adaptability", "adaptable", "adaptation", "adapter", "adaption", "adaptive", "adaptor", "adat", "add", "adda", "added", "addenda", "addendum", "adder", "addict", "addicted", "addiction", "addition", "additional", "additionally", "additive", "address", "addressee", "adduct", "ade", "adenine", "adenocarcinoma", "adenoma", "adenosine", "adept", "adequacy", "adequate", "adequately", "adhere", "adherence", "adherent", "adhesion", "adhesive", "adiabatic", "adieu", "adipose", "adjacency", "adjacent", "adjective", "adjoining", "adjoint", "adjourn", "adjournment", "adjudicate", "adjudication", "adjudicative", "adjudicator", "adjunct", "adjunctive", "adjust", "adjustable", "adjuster", "adjustment", "adjutant", "adjuvant", "administer", "administrate", "administration", "administrative", "administratively", "administrator", "admirable", "admirably", "admiral", "admiralty", "admiration", "admire", "admired", "admirer", "admiring", "admissibility", "admissible", "admission", "admit", "admittance", "admitted", "admittedly", "admixture", "admonish", "admonition", "ado", "adobe", "adolescence", "adolescent", "adopt", "adoptable", "adopted", "adoptee", "adopter", "adoption", "adoptive", "adorable", "adoration", "adore", "adorn", "adornment", "adrenal", "adrenaline", "adrenergic", "adrift", "adroit", "adsorption", "adulation", "adult", "adulteration", "adulterous", "adultery", "adulthood", "advance", "advanced", "advancement", "advancing", "advantage", "advantageous", "advantageously", "advection", "adventure", "adventurer", "adventurous", "adverb", "adversary", "adverse", "adversely", "adversity", "advert", "advertise", "advertisement", "advertiser", "advertising", "advice", "advisability", "advisable", "advise", "advised", "advisement", "adviser", "advisor", "advisory", "advocacy", "advocate", "ady", "ae", "aegis", "aeon", "aer", "aeration", "aerator", "aerial", "aerie", "aero", "aerobatic", "aerobatics", "aerobic", "aerodrome", "aerodynamic", "aerodynamics", "aeronautical", "aeronautics", "aeroplane", "aerosol", "aes", "aesthetic", "aesthetically", "aesthetics", "afar", "affable", "affair", "affect", "affectation", "affected", "affecting", "affection", "affectionate", "affectionately", "affective", "afferent", "affidavit", "affiliate", "affiliation", "affine", "affinity", "affirm", "affirmation", "affirmative", "affirmatively", "affix", "afflict", "afflicted", "affliction", "affluence", "affluent", "afford", "affordable", "afforestation", "affront", "affy", "afghani", "afield", "afire", "aflame", "afloat", "afoot", "afore", "aforesaid", "afoul", "afraid", "afresh", "aft", "after", "afterburner", "aftercare", "afterglow", "afterhours", "afterimage", "afterlife", "aftermath", "afternoon", "afternoons", "afterschool", "aftershock", "aftertaste", "afterthought", "afterward", "afterwards", "aga", "again", "against", "agape", "agar", "agarwal", "agate", "age", "aged", "agee", "ageless", "agen", "agency", "agenda", "agent", "ager", "agglomeration", "agglutination", "aggravate", "aggravating", "aggravation", "aggregate", "aggregation", "aggregator", "aggression", "aggressive", "aggressively", "aggressiveness", "aggressor", "aggrieved", "agha", "aghast", "agile", "agility", "aging", "agitate", "agitation", "agitator", "agitprop", "aglow", "agnostic", "agnosticism", "agnus", "ago", "agonist", "agony", "agora", "agoraphobia", "agrarian", "agree", "agreeable", "agreed", "agreeing", "agreement", "agricole", "agricultural", "agriculture", "agronomic", "agronomist", "agronomy", "aground", "agua", "agy", "ah", "aha", "ahead", "ahem", "aho", "ahoy", "ahu", "ai", "aid", "aidable", "aide", "aider", "ail", "aileron", "ailing", "ailment", "aim", "aiming", "aimless", "aimlessly", "air", "airbrush", "aircraft", "aircrew", "aire", "airedale", "airfield", "airfoil", "airframe", "airfreight", "airhead", "airing", "airless", "airlift", "airliner", "airmail", "airman", "airpark", "airplane", "airport", "airship", "airstrip", "airtight", "airway", "airworthiness", "airy", "aisle", "aisling", "ait", "ajar", "ak", "aka", "akaroa", "akasa", "ake", "akimbo", "akin", "ako", "aku", "al", "ala", "alabaster", "alacrity", "alameda", "alamo", "alan", "aland", "alanine", "alarm", "alarmed", "alarming", "alarmingly", "alarmist", "alas", "alb", "alba", "albacore", "alban", "albatross", "albe", "albedo", "albee", "albeit", "albicans", "albino", "album", "albumen", "albumin", "albus", "alcazar", "alchemical", "alchemist", "alchemy", "alco", "alcohol", "alcoholic", "alcoholism", "alcove", "aldehyde", "alder", "alderman", "aldine", "ale", "alec", "alef", "alen", "aleph", "alert", "alertness", "alexandrite", "alexia", "alf", "alfa", "alfalfa", "alfonso", "alfresco", "alga", "algae", "algal", "algebra", "algebraic", "algebraically", "alginate", "algorithm", "algorithmic", "alias", "alibi", "alien", "alienate", "alienation", "alight", "align", "aligner", "alignment", "alike", "alimentary", "alimentation", "alimony", "aliphatic", "aliquot", "aliso", "alison", "alist", "alive", "aliyah", "alk", "alkali", "alkaline", "alkalinity", "alkaloid", "alkyl", "alkylation", "all", "allan", "allay", "allegation", "allege", "allegedly", "allegiance", "allegorical", "allegory", "allegretto", "allegro", "allele", "allelic", "alleluia", "allemand", "aller", "allergen", "allergenic", "allergic", "allergy", "alleviate", "alleviation", "alley", "alleyway", "alliance", "allied", "allies", "alligator", "alliteration", "allocable", "allocate", "allocation", "allocator", "allopathic", "allot", "allotment", "allover", "allow", "allowable", "allowance", "alloy", "allspice", "allude", "allure", "alluring", "allusion", "alluvial", "alluvium", "ally", "allyl", "alma", "almanac", "almighty", "almond", "almost", "alms", "aln", "alo", "aloe", "aloft", "alone", "along", "alongside", "aloof", "alopecia", "aloud", "alp", "alpaca", "alpha", "alphabet", "alphabetic", "alphabetical", "alphabetically", "alpine", "already", "alright", "also", "alt", "altar", "alter", "alteration", "altercation", "alternate", "alternately", "alternating", "alternation", "alternative", "alternatively", "alternator", "althea", "altho", "although", "altimeter", "altimetry", "altitude", "alto", "altogether", "altruism", "altruistic", "alum", "alumina", "aluminium", "aluminum", "alumna", "alumnae", "alumni", "alumnus", "alvar", "alveolar", "alveoli", "alway", "always", "aly", "am", "ama", "amadou", "amalgam", "amalgamation", "amani", "amar", "amaranth", "amarillo", "amass", "amateur", "amateurish", "amaze", "amazed", "amazement", "amazing", "amazingly", "amba", "ambassador", "amber", "ambergris", "ambidextrous", "ambience", "ambient", "ambiguity", "ambiguous", "ambit", "ambition", "ambitious", "ambivalence", "ambivalent", "amble", "ambler", "amblyopia", "ambos", "ambrose", "ambrosia", "ambulance", "ambulatory", "ambush", "ame", "amelia", "ameliorate", "amelioration", "amen", "amenable", "amend", "amendatory", "amendment", "amends", "amenity", "amenorrhea", "amethyst", "ami", "amiable", "amicable", "amicably", "amid", "amide", "amidst", "amin", "amine", "amino", "amir", "amiss", "amity", "amma", "amman", "ammeter", "ammo", "ammonia", "ammonium", "ammunition", "amnesia", "amnesty", "amniocentesis", "amniotic", "amoeba", "amok", "among", "amongst", "amor", "amoral", "amorous", "amorphous", "amortization", "amortize", "amount", "amour", "amperage", "ampere", "ampersand", "amphetamine", "amphibian", "amphibious", "amphitheater", "amphora", "ample", "amplification", "amplifier", "amplify", "amplitude", "amply", "amputation", "amputee", "amrita", "amt", "amulet", "amuse", "amused", "amusement", "amusing", "amy", "amygdala", "amyl", "amylase", "amyloid", "amyloidosis", "amyotrophic", "an", "ana", "anabolic", "anachronism", "anachronistic", "anaconda", "anadromous", "anaemia", "anaerobic", "anaesthesia", "anagram", "anagrams", "anal", "analgesia", "analgesic", "anally", "analogic", "analogical", "analogous", "analogously", "analogue", "analogy", "analyse", "analyser", "analyses", "analysis", "analyst", "analytic", "analytical", "analytically", "analytics", "analyze", "analyzer", "anamorphic", "anan", "ananda", "anaphase", "anaphylactic", "anaphylaxis", "anaplastic", "anarchic", "anarchism", "anarchist", "anarchy", "anastomosis", "anathema", "anatomic", "anatomical", "anatomically", "anatomy", "ancestor", "ancestral", "ancestry", "anchor", "anchorage", "anchored", "anchoress", "anchovy", "ancient", "ancillary", "ancora", "and", "anda", "andante", "androgen", "androgynous", "android", "anecdotal", "anecdote", "anemia", "anemic", "anemometer", "anemone", "anes", "anesthesia", "anesthesiologist", "anesthesiology", "anesthetic", "anesthetist", "aneurysm", "anew", "angel", "angelfish", "angelic", "angelica", "angeline", "angelique", "anger", "angina", "angiogenesis", "angiogenic", "angiography", "angioplasty", "anglaise", "angle", "angled", "angler", "angling", "angrily", "angry", "angst", "angstrom", "anguish", "anguished", "angular", "anhydride", "anhydrous", "ani", "anil", "aniline", "anima", "animal", "animate", "animated", "animating", "animation", "animator", "anime", "animism", "animosity", "animus", "anion", "anionic", "anis", "anise", "anisotropic", "anisotropy", "anker", "ankh", "ankle", "anklet", "ann", "anna", "annals", "annex", "annexation", "annexure", "annihilate", "annihilation", "annihilator", "anniversary", "annotate", "annotation", "announce", "announcement", "announcer", "annoy", "annoyance", "annoying", "annoyingly", "annual", "annually", "annuitant", "annuity", "annul", "annular", "annulment", "annulus", "annunciation", "anode", "anoint", "anomalous", "anomaly", "anon", "anonym", "anonymity", "anonymous", "anonymously", "anorak", "anorexia", "another", "anoxia", "anoxic", "ansa", "ansar", "answer", "answerable", "answerer", "ant", "anta", "antacid", "antagonism", "antagonist", "antagonistic", "antal", "antarctic", "antarctica", "ante", "antecedent", "antelope", "antenatal", "antenna", "antennae", "anterior", "antes", "anthem", "anther", "anthill", "anthology", "anthracene", "anthracite", "anthrax", "anthropogenic", "anthropological", "anthropologist", "anthropology", "anthropometric", "anthropomorphic", "anti", "antibacterial", "antibiotic", "antibody", "antic", "anticancer", "antichrist", "anticipate", "anticipation", "anticipatory", "anticoagulant", "antidote", "antidumping", "antifreeze", "antigen", "antigenic", "antihero", "antihistamine", "antimalarial", "antimony", "antioxidant", "antipathy", "antiplatelet", "antiqua", "antiquarian", "antiquated", "antique", "antiquity", "antiseptic", "antiserum", "antisocial", "antithesis", "antithetical", "antitrust", "antitrypsin", "antiviral", "antivirus", "antiwar", "antler", "anus", "anvil", "anxiety", "anxious", "anxiously", "any", "anybody", "anyhow", "anyone", "anyplace", "anything", "anyway", "anyways", "anywhere", "aorta", "aortic", "apa", "apace", "apache", "apar", "apart", "apartheid", "apartment", "apathetic", "apathy", "apatite", "ape", "aper", "aperture", "apex", "aphasia", "aphid", "aphrodisiac", "apical", "apiece", "aplastic", "aplenty", "aplomb", "apnea", "apocalypse", "apocalyptic", "apocryphal", "apogee", "apologetic", "apologetics", "apologia", "apologist", "apologize", "apology", "apostasy", "apostate", "apostle", "apostolate", "apostolic", "apostrophe", "apothecary", "appalling", "apparatus", "apparel", "apparent", "apparently", "apparition", "appeal", "appealable", "appealing", "appear", "appearance", "appease", "appeasement", "appellant", "appellate", "appellation", "appellee", "append", "appendage", "appendices", "appendicitis", "appendix", "appetite", "appetizer", "applaud", "applause", "apple", "applesauce", "appliance", "applicability", "applicable", "applicant", "application", "applicator", "applied", "applique", "apply", "appoint", "appointee", "appointment", "apportion", "apportionment", "appraisal", "appraise", "appraiser", "appraising", "appreciable", "appreciably", "appreciate", "appreciation", "appreciative", "apprehend", "apprehension", "apprehensive", "apprentice", "apprenticeship", "approach", "approachable", "approaching", "approbation", "appropriate", "appropriately", "appropriateness", "appropriation", "approval", "approve", "approver", "approximate", "approximately", "approximation", "apricot", "apron", "apropos", "apse", "apt", "aptitude", "aptly", "aqua", "aquaculture", "aquamarine", "aquaria", "aquarian", "aquarium", "aquatic", "aqueduct", "aqueous", "aquifer", "ar", "ara", "arabesque", "arable", "arachidonic", "arachnid", "arad", "arar", "arba", "arbiter", "arbitral", "arbitrarily", "arbitrariness", "arbitrary", "arbitrate", "arbitration", "arbitrator", "arbor", "arboretum", "arboriculture", "arborist", "arbutus", "arc", "arca", "arcade", "arcadian", "arcana", "arcane", "arcanum", "arch", "archaeological", "archaeologist", "archaeology", "archaic", "archangel", "archbishop", "archdeacon", "archdiocese", "archduke", "arche", "arched", "archer", "archery", "arches", "archetypal", "archetype", "arching", "archipelago", "architect", "architectural", "architecturally", "architecture", "archival", "archive", "archivist", "archon", "archway", "archy", "arcing", "arctic", "ardent", "ardently", "ardor", "arduous", "are", "area", "areal", "arena", "arent", "areola", "arete", "argent", "argentine", "arginine", "argo", "argon", "argosy", "arguable", "argue", "argument", "argumentation", "argumentative", "aria", "arid", "ariel", "aright", "arise", "arisen", "arista", "aristocracy", "aristocrat", "aristocratic", "arithmetic", "arithmetical", "arjun", "ark", "arles", "arm", "armada", "armadillo", "armament", "armature", "armchair", "armed", "arming", "armistice", "armoire", "armor", "armored", "armorial", "armory", "armpit", "armrest", "arms", "army", "arn", "arnica", "aroma", "aromatic", "arose", "around", "arousal", "arouse", "arraignment", "arrange", "arrangement", "arranger", "arras", "array", "arrest", "arresting", "arrhythmia", "arriba", "arrival", "arrive", "arrogance", "arrogant", "arrow", "arrowhead", "arrowsmith", "arroyo", "arse", "arsenal", "arsenic", "arson", "art", "artefact", "arterial", "arteriosclerosis", "arteriovenous", "arteritis", "artery", "artesian", "artful", "artfully", "arthritic", "arthritis", "arthroplasty", "arthropod", "artichoke", "article", "articular", "articulate", "articulated", "articulation", "artifact", "artifice", "artificial", "artificially", "artillery", "artisan", "artist", "artiste", "artistic", "artistically", "artistry", "arty", "aru", "arusha", "arx", "ary", "aryl", "as", "asana", "asbestos", "asbestosis", "ascend", "ascendancy", "ascendant", "ascender", "ascending", "ascension", "ascent", "ascertain", "ascetic", "asci", "ascii", "ascites", "ascorbic", "ascot", "ascribe", "ase", "asem", "aseptic", "asexual", "ash", "ashamed", "ashen", "ashes", "ashman", "ashore", "ashraf", "aside", "asinine", "ask", "asker", "askew", "asleep", "asp", "asparagine", "asparagus", "aspartate", "aspartic", "aspect", "aspen", "asperger", "aspergillosis", "aspergillus", "asphalt", "asphyxia", "asphyxiation", "aspirant", "aspirate", "aspiration", "aspire", "aspirin", "aspiring", "ass", "assail", "assailant", "assassin", "assassinate", "assassination", "assault", "assay", "asse", "assemblage", "assemble", "assembler", "assembly", "assemblyman", "assent", "assented", "assert", "assertion", "assertive", "assertiveness", "assess", "assessable", "assessed", "assessment", "assessor", "asset", "assets", "assi", "assign", "assignable", "assigned", "assignee", "assignment", "assignor", "assimilate", "assimilation", "assis", "assist", "assistance", "assistant", "assistantship", "assistive", "associate", "associated", "association", "associative", "assorted", "assortment", "assuage", "assume", "assumed", "assuming", "assumption", "assurance", "assurant", "assure", "assured", "assuredly", "assuring", "ast", "asta", "aster", "asterisk", "asteroid", "asthma", "asthmatic", "astigmatism", "astonish", "astonishing", "astonishingly", "astonishment", "astor", "astound", "astounding", "astragalus", "astral", "astray", "astride", "astringent", "astrocytoma", "astrodome", "astrologer", "astrological", "astrology", "astrometry", "astronaut", "astronautics", "astronomer", "astronomical", "astronomy", "astrophotography", "astrophysical", "astrophysics", "astute", "asunder", "aswell", "asylum", "asymmetric", "asymmetrical", "asymmetry", "asymptomatic", "asymptotic", "asymptotically", "asynchronous", "at", "atavistic", "ataxia", "atchison", "ate", "atelier", "ates", "atheism", "atheist", "atheistic", "athenaeum", "atherosclerosis", "athlete", "athletic", "athleticism", "athletics", "atis", "atlantic", "atlas", "atma", "atman", "atmos", "atmosphere", "atmospheric", "atoll", "atom", "atomic", "atomizer", "atone", "atonement", "atop", "atopic", "atresia", "atria", "atrial", "atrioventricular", "atrium", "atrocious", "atrocity", "atrophy", "atropine", "atta", "attach", "attache", "attached", "attachment", "attack", "attacker", "attain", "attainable", "attainment", "attempt", "attend", "attendance", "attendant", "attender", "attention", "attentional", "attentive", "attentively", "attentiveness", "attenuate", "attenuation", "attenuator", "attest", "attestation", "attic", "attire", "attired", "attitude", "attitudinal", "attorney", "attract", "attractant", "attraction", "attractive", "attractively", "attractiveness", "attractor", "attributable", "attribute", "attribution", "attrition", "attunement", "atypical", "aube", "auburn", "aubusson", "auction", "auctioneer", "audacious", "audacity", "audible", "audibly", "audience", "audio", "audiologist", "audiology", "audiophile", "audit", "audition", "auditor", "auditorium", "auditory", "augen", "auger", "aught", "augment", "augmentation", "augmentative", "augmented", "augmenter", "augur", "august", "auk", "aula", "auld", "aum", "aunt", "auntie", "aura", "aural", "aurelia", "aureus", "auricular", "aurora", "auroral", "aurum", "auspices", "auspicious", "austere", "austerity", "austral", "autem", "authentic", "authentically", "authenticate", "authentication", "authenticator", "authenticity", "author", "authoritarian", "authoritarianism", "authoritative", "authority", "authorization", "authorize", "authorized", "authorship", "autism", "autistic", "auto", "autobahn", "autobiographical", "autobiography", "autobus", "autoclave", "autocracy", "autocratic", "autograph", "autoharp", "autoimmunity", "autologous", "automat", "automata", "automatic", "automatically", "automaton", "automobile", "automorphism", "automotive", "autonomic", "autonomous", "autonomously", "autonomy", "autopilot", "autopsy", "autoradiography", "autosite", "autosomal", "autumn", "autumnal", "auxiliary", "auxin", "ava", "avail", "availability", "available", "avalanche", "avarice", "avast", "ave", "avenge", "avenger", "avenging", "aventail", "aventurine", "avenue", "aver", "avera", "average", "averse", "aversion", "avert", "averted", "avian", "aviary", "aviation", "aviator", "avid", "avidly", "aviso", "avo", "avocado", "avocet", "avoid", "avoidable", "avoidance", "avowed", "await", "awake", "awaken", "awakening", "award", "aware", "awareness", "awash", "away", "awd", "awe", "awesome", "awesomeness", "awful", "awfully", "awhile", "awkward", "awkwardly", "awkwardness", "awl", "awn", "awning", "awoke", "awry", "ax", "axe", "axed", "axes", "axial", "axially", "axil", "axillary", "axiom", "axiomatic", "axion", "axis", "axisymmetric", "axle", "axon", "axonal", "ay", "ayah", "aye", "ayu", "azalea", "azide", "azimuth", "azimuthal", "azo", "azonic", "azteca", "azure", 
@@ -161,27 +39,53 @@ var words = ["aardvark", "aba", "aback", "abacus", "abalone", "abandon", "abando
 
 var words = ["apple", "banana", "cherry", "date", "fig", "grape", "kiwi", "lemon", "mango", "nectarine", "orange", "papaya", "quince", "raspberry", "strawberry", "tangerine", "ugli fruit", "vanilla", "watermelon", "xigua", "yellow passion fruit", "zucchini"];
 
-*/
 
 
-/*initiate the autocomplete function on the "myInput" element, and pass along the words array as possible autocomplete values:*/
-autocomplete(document.getElementById("myInput"), words);
+"""
+#!pip install nltk
 
-function copyToClipboard() {
-  /* Get the text field */
-  var copyText = document.getElementById("myInput");
+import requests
+import nltk
+from nltk.corpus import words
 
-  /* Select the text field */
-  copyText.select();
-  copyText.setSelectionRange(0, 99999); /* For mobile devices */
+# Ensure the NLTK words corpus is downloaded
+nltk.download('words')
 
-  /* Copy the text inside the text field */
-  navigator.clipboard.writeText(copyText.value);
+# Define the URL and output file path
+url = "https://raw.githubusercontent.com/ursa-mikail/site_announcement/refs/heads/main/data/wordlist.100000.txt"
+output_file_path = "./sample_data/out.txt"
 
-  /* Alert the copied text */
-  alert("Copied the text: " + copyText.value);
+# Fetch the content from the URL
+response = requests.get(url)
+response.raise_for_status()  # Ensure we raise an error for bad status codes
+
+# Split the content into words
+words_list = response.text.split()
+
+# Get the set of valid English words from NLTK
+valid_words = set(words.words())
+
+# Filter out words that are not in the dictionary
+filtered_words = [word for word in words_list if word.lower() in valid_words]
+
+# Format the words into a JavaScript array
+formatted_words = 'var words = ["' + '", "'.join(filtered_words) + '"];'
+
+# Write the formatted words to the output file
+with open(output_file_path, "w") as output_file:
+    output_file.write(formatted_words)
+
+print(f"Filtered JavaScript array has been written to {output_file_path}")
+
+
+"""
+
+function fetchWords() {
+  const response = fetch('../data/wordlist.small.txt');
+  const text = response.text();
+  var words = text.split('\n');
+  autocomplete(document.getElementById("myInput"), words);
 }
-</script>
 
-</body>
-</html>
+fetchWords();
+*/
