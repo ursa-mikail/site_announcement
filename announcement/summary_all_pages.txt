@@ -21,7 +21,10 @@ Summary of Content Options:
 7. **a07: I Ching Simulator**
    - Create a simulator for I Ching, explicitly stating that it has no connection to divinity or supernatural elements. The purpose of the I Ching simulator is to provide cues when people run out of ideas or wit, using the ancient Chinese text's wisdom and philosophy in a practical, secular manner.
 
-8. **ax_summary: Summary of All Pages**
+8. **a08: Autocompete dictionary**
+   - Find your words here.
+
+9. **ax_summary: Summary of All Pages**
    - The ax_summary provides an overarching overview of all the sections (a1 to a4). It synthesizes the key points and functionalities from each part, ensuring that users have a clear understanding of the tools and resources available across the different functionalities.
 
 

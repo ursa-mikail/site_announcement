@@ -42,7 +42,12 @@
         </description>
     </section>
 
-
+    <section id="a08">
+        <title>Autocompete Dictionary</title>
+        <description>
+            Find your words here.
+        </description>
+    </section>
 
     <section id="ax_summary">
         <title>Summary of All Pages</title>
