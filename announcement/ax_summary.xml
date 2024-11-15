@@ -1,56 +1,56 @@
 <summary>
     <section id="a01">
-        <title>Random Text Generator and SHA-256 Check</title>
+        <title>01. Random Text Generator and SHA-256 Check</title>
         <description>
             This section introduces a tool that allows users to generate random text and compute its SHA-256 hash. Users can click a link to generate random text and subsequently compute its hash, with the result displayed in the designated area.
         </description>
     </section>
     <section id="a02">
-        <title>Introduction to GitHub Code for Files</title>
+        <title>02. Introduction to GitHub Code for Files</title>
         <description>
             This page serves as an introductory guide to a GitHub repository focused on file formats, including YAML, SQL, JSON, and CSV. It outlines the functionality and significance of each format, guiding users on how to navigate the repository and utilize the code provided.
         </description>
     </section>
     <section id="a03">
-        <title>Speak To Your Friend</title>
+        <title>03. Speak To Your Friend</title>
         <description>
             This section provides various utilities including generating random hexadecimal values and random text. Users can specify the number of characters for both text and hex generation. Additionally, there are options for encrypting and decrypting text by entering the corresponding keys, as well as a clear function to reset all fields.
         </description>
     </section>
     <section id="a04">
-        <title>Get Your YouTube Embed with Current Time Link</title>
+        <title>04. Get Your YouTube Embed with Current Time Link</title>
         <description>
             In this part, users can embed a YouTube video and generate a link that includes the current playback time. Users can input a YouTube video URL, load the video, and copy a link that directs to the specific time. This section also includes a ciphered link feature with a tool to decipher Base64 encoded links.
         </description>
     </section>
     <section id="a05">
-        <title>Duration Calculator and YAML Generator</title>
+        <title>05. Duration Calculator and YAML Generator</title>
         <description>
             The Duration Calculator and YAML Generator is a simple web application designed to help users calculate the duration between two dates and generate a YAML configuration based on the input data. The tool allows users to input their name, a list of tasks, and start and end dates. It then calculates the number of days between the start and end dates and formats the information into a YAML format.
         </description>
     </section>
     <section id="a06">
-        <title>Decipher Announcement / Cipher Text</title>
+        <title>06. Decipher Announcement / Cipher Text</title>
         <description>
             Provide a tool to decipher a ciphered announcement file and cipher plain text.
         </description>
     </section>
     <section id="a07">
-        <title>I Ching Simulator</title>
+        <title>07. I Ching Simulator</title>
         <description>
             Create a simulator for I Ching, explicitly stating that it has no connection to divinity or supernatural elements. The purpose of the I Ching simulator is to provide cues when people run out of ideas or wit, using the ancient Chinese text's wisdom and philosophy in a practical, secular manner.
         </description>
     </section>
 
     <section id="a08">
-        <title>Autocompete Dictionary</title>
+        <title>08. Autocompete Dictionary</title>
         <description>
             Find your words here.
         </description>
     </section>
 
     <section id="a09">
-        <title>Get YouTube Embed with Time Link (Curtailed Start and End)</title>
+        <title>09. Get YouTube Embed with Time Link (Curtailed Start and End)</title>
         <description>
             This web tool allows users to generate a YouTube embed link with specific start and end times. Users can either load a video by providing a standard YouTube URL or by entering a custom embed URL with defined start and end times.
         </description>
