@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Your YouTube Embed with Time Link</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #player {
+            margin-bottom: 10px;
+        }
+        button {
+            margin-top: 10px;
+        }
+        #generated-link {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            width: 100%;
+            box-sizing: border-box;
+        }
+    </style>
+    <script src="https://www.youtube.com/iframe_api"></script>
+</head>
+<body>
+
+<h1>Get Your YouTube Embed with Time Link</h1>
+
+<label for="video-url">YouTube Video URL:</label>
+<input type="text" id="video-url" placeholder="Enter YouTube Video URL" value="https://www.youtube.com/watch?v=Q10_srZ-pbs">
+<button id="load-video-button">Load Video</button>
+
+<br>
+<label for="custom-embed-url">Custom Embed URL with Time:</label>
+<input type="text" id="custom-embed-url" placeholder="Enter custom embed URL" value="https://www.youtube.com/embed/Q10_srZ-pbs?start=346&end=935">
+<button id="load-custom-video-button">Load Custom Video</button>
+
+<hr>
+<div id="player"></div>
+<br>
+<button id="set-time-button">Set Start of Video</button>
+<p id="current-time">Current Time: <span id="current-time-display">0:00</span></p>
+<hr>
+
+<h2>Generated Embed Link:</h2>
+<input type="text" id="generated-link" readonly>
+<button id="copy-link-button">Copy to Clipboard</button>
+
+<script>
+    let player;
+    let startTime = 0;
+    let endTime = 0;
+    let isStartSet = false;
+
+    function onYouTubeIframeAPIReady() {
+        loadVideo(getVideoIdFromUrl(document.getElementById('video-url').value)); // Load the initial video
+    }
+
+    function loadVideo(videoId) {
+        if (player) {
+            player.destroy(); // Destroy the existing player if it exists
+        }
+        player = new YT.Player('player', {
+            height: '360',
+            width: '640',
+            videoId: videoId,
+            events: {
+                'onReady': onPlayerReady
+            }
+        });
+    }
+
+    function loadCustomVideo(embedUrl) {
+        if (player) {
+            player.destroy(); // Destroy the existing player if it exists
+        }
+        const urlParams = new URL(embedUrl);
+        const videoId = urlParams.pathname.split('/')[2];
+        const start = urlParams.searchParams.get('start');
+        const end = urlParams.searchParams.get('end');
+        
+        player = new YT.Player('player', {
+            height: '360',
+            width: '640',
+            videoId: videoId,
+            playerVars: {
+                start: parseInt(start),
+                end: parseInt(end)
+            },
+            events: {
+                'onReady': onPlayerReady
+            }
+        });
+    }
+
+    function onPlayerReady(event) {
+        // Player is ready
+    }
+
+    function getVideoIdFromUrl(url) {
+        const urlParams = new URL(url);
+        return urlParams.searchParams.get('v');
+    }
+
+    function setVideoTime() {
+        if (player) {
+            const currentTime = Math.floor(player.getCurrentTime());
+            if (!isStartSet) {
+                startTime = currentTime;
+                document.getElementById('set-time-button').textContent = "Set End of Video";
+                isStartSet = true;
+                alert(`Start time set at ${formatTime(startTime)}.`);
+            } else {
+                endTime = currentTime;
+                generateEmbedLink();
+                document.getElementById('set-time-button').textContent = "Set Start of Video";
+                isStartSet = false;
+                alert(`End time set at ${formatTime(endTime)}.`);
+            }
+        }
+    }
+
+    function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+    }
+
+    function generateEmbedLink() {
+        const videoId = getVideoIdFromUrl(document.getElementById('video-url').value);
+        const embedLink = `https://www.youtube.com/embed/${videoId}?start=${startTime}&end=${endTime}`;
+        document.getElementById('generated-link').value = embedLink;
+    }
+
+    function copyToClipboard() {
+        const embedLink = document.getElementById('generated-link').value;
+        navigator.clipboard.writeText(embedLink).then(() => {
+            alert('Embed link copied to clipboard!');
+        });
+    }
+
+    document.getElementById('set-time-button').addEventListener('click', setVideoTime);
+    document.getElementById('load-video-button').addEventListener('click', () => {
+        const videoUrl = document.getElementById('video-url').value;
+        const videoId = getVideoIdFromUrl(videoUrl);
+        if (videoId) {
+            loadVideo(videoId);
+        } else {
+            alert('Please enter a valid YouTube video URL.');
+        }
+    });
+    document.getElementById('load-custom-video-button').addEventListener('click', () => {
+        const customEmbedUrl = document.getElementById('custom-embed-url').value;
+        loadCustomVideo(customEmbedUrl);
+    });
+    document.getElementById('copy-link-button').addEventListener('click', copyToClipboard);
+</script>
+
+</body>
+</html>

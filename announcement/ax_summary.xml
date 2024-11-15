@@ -49,6 +49,13 @@
         </description>
     </section>
 
+    <section id="a09">
+        <title>Get YouTube Embed with Time Link (Curtailed Start and End)</title>
+        <description>
+            This web tool allows users to generate a YouTube embed link with specific start and end times. Users can either load a video by providing a standard YouTube URL or by entering a custom embed URL with defined start and end times.
+        </description>
+    </section>
+
     <section id="ax_summary">
         <title>Summary of All Pages</title>
         <description>
