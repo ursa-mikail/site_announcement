@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Keyboard Character Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #display {
+            margin-top: 10px;
+            padding: 10px;
+            border: 10px solid #ccc;
+            width: 100%;
+            height: 250px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            box-sizing: border-box;
+        }
+        #notification {
+            margin-top: 10px;
+            color: green;
+        }
+        button {
+            margin-top: 10px;
+            margin-right: 10px;
+        }
+        canvas {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Random Keyboard Character Generator</h1>
+<button id="generate-button">Generate Random Characters</button>
+<button id="full-speed-button">Full Speed Ahead (100,000 iterations)</button>
+<div id="display"></div>
+<p id="notification"></p>
+<canvas id="histogram" width="800" height="400"></canvas>
+
+<script>
+    const displayElement = document.getElementById('display');
+    const notificationElement = document.getElementById('notification');
+    const histogramCanvas = document.getElementById('histogram');
+    const generateButton = document.getElementById('generate-button');
+    const fullSpeedButton = document.getElementById('full-speed-button');
+    const ctx = histogramCanvas.getContext('2d');
+
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789`~!@#$%^&*()-_=+[]{}\\|;:\'",.<>?/';
+    const charCount = {};
+    characters.split('').forEach(char => charCount[char] = 0);
+
+    function generateRandomCharacter() {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        return characters[randomIndex];
+    }
+
+    function appendRandomCharacters(count = 100) {
+        let newChars = '';
+        for (let i = 0; i < count; i++) {
+            const char = generateRandomCharacter();
+            newChars += char;
+            charCount[char]++;
+        }
+        displayElement.textContent += newChars;
+        plotHistogram();
+        checkUniformDistribution();
+    }
+
+    function plotHistogram() {
+        ctx.clearRect(0, 0, histogramCanvas.width, histogramCanvas.height);
+        const barWidth = histogramCanvas.width / characters.length;
+        let maxCount = 0;
+        for (const char in charCount) {
+            if (charCount[char] > maxCount) {
+                maxCount = charCount[char];
+            }
+        }
+
+        characters.split('').forEach((char, index) => {
+            const barHeight = (charCount[char] / maxCount) * histogramCanvas.height;
+            ctx.fillStyle = '#007BFF';
+            ctx.fillRect(index * barWidth, histogramCanvas.height - barHeight, barWidth, barHeight);
+            ctx.fillStyle = '#000';
+            ctx.fillText(char, index * barWidth, histogramCanvas.height - barHeight - 5, barWidth);
+        });
+    }
+
+    function checkUniformDistribution() {
+        const values = Object.values(charCount);
+        const average = values.reduce((a, b) => a + b, 0) / values.length;
+        const isUniform = values.every(value => Math.abs(value - average) <= average * 0.1);
+
+        if (isUniform) {
+            notificationElement.textContent = 'The distribution is uniform.';
+        } else {
+            notificationElement.textContent = '';
+        }
+    }
+
+    generateButton.addEventListener('click', () => appendRandomCharacters());
+    fullSpeedButton.addEventListener('click', () => appendRandomCharacters(100000));
+</script>
+
+</body>
+</html>

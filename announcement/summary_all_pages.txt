@@ -27,7 +27,10 @@ Summary of Content Options:
 9. **a09: Get Your YouTube Embed with Time Link (Curtailed Start and End)
    - This web tool allows users to generate a YouTube embed link with specific start and end times. Users can either load a video by providing a standard YouTube URL or by entering a custom embed URL with defined start and end times.
 
-10. **ax_summary: Summary of All Pages**
+10. **a10: Generates a random series of keyboard characters distribution trying to be uniform**
+   - Generates a random series of keyboard characters, appends them to a display, and plots a histogram of the character distribution. It will notify the user when the distribution is uniform.
+
+11. **ax_summary: Summary of All Pages**
    - The ax_summary provides an overarching overview of all the sections (a1 to a4). It synthesizes the key points and functionalities from each part, ensuring that users have a clear understanding of the tools and resources available across the different functionalities.
 
 

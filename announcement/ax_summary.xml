@@ -56,11 +56,19 @@
         </description>
     </section>
 
+    <section id="a10">
+        <title>10. Generates a random series of keyboard characters distribution trying to be uniform</title>
+        <description>
+            Generates a random series of keyboard characters, appends them to a display, and plots a histogram of the character distribution. It will notify the user when the distribution is uniform.
+        </description>
+    </section>
+
     <section id="ax_summary">
         <title>Summary of All Pages</title>
         <description>
             The ax_summary provides an overarching overview of all the sections (a1 to a4). It synthesizes the key points and functionalities from each part, ensuring that users have a clear understanding of the tools and resources available across the different functionalities.
         </description>
+
     </section>
 </summary>
 
