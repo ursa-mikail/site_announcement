@@ -30,6 +30,9 @@
         canvas {
             margin-top: 20px;
         }
+        .highlight {
+            background-color: yellow;
+        }
     </style>
 </head>
 <body>
@@ -65,9 +68,27 @@
             newChars += char;
             charCount[char]++;
         }
-        displayElement.textContent += newChars;
+        highlightLastGenerated(newChars);
+        displayElement.innerHTML += `<span class="highlight">${newChars}</span>`;
         plotHistogram();
         checkUniformDistribution();
+    }
+
+    function highlightLastGenerated(newChars) {
+        // Remove previous highlight
+        const highlights = displayElement.getElementsByClassName('highlight');
+        while (highlights.length) {
+            const parent = highlights[0].parentNode;
+            while (highlights[0].firstChild) {
+                parent.insertBefore(highlights[0].firstChild, highlights[0]);
+            }
+            parent.removeChild(highlights[0]);
+        }
+        // Append new text with highlight
+        const span = document.createElement('span');
+        span.className = 'highlight';
+        span.textContent = newChars;
+        displayElement.appendChild(span);
     }
 
     function plotHistogram() {

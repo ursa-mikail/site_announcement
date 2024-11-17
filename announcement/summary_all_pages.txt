@@ -24,7 +24,7 @@ Summary of Content Options:
 8. **a08: Autocompete dictionary**
    - Find your words here.
 
-9. **a09: Get Your YouTube Embed with Time Link (Curtailed Start and End)
+9. **a09: Get Your YouTube Embed with Time Link (Curtailed Start and End)**
    - This web tool allows users to generate a YouTube embed link with specific start and end times. Users can either load a video by providing a standard YouTube URL or by entering a custom embed URL with defined start and end times.
 
 10. **a10: Generates a random series of keyboard characters distribution trying to be uniform**
