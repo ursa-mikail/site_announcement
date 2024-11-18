@@ -63,6 +63,13 @@
         </description>
     </section>
 
+    <section id="a11">
+        <title>11. Claim Verification Registry</title>
+        <description>
+            This tool computes SHA-256 hashes for input texts with appended random hex values and checks if the computed hash exists in a verification file, displaying the corresponding line if found in the record.
+        </description>
+    </section>
+
     <section id="ax_summary">
         <title>Summary of All Pages</title>
         <description>

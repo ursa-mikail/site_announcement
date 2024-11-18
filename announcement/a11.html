@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHA-256 Calculator and Verification</title>
+    <title>Claim Verification</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -27,7 +27,7 @@
 </head>
 <body>
 
-<h1>SHA-256 Calculator</h1>
+<h1>Claim Verification</h1>
 <label for="author-text">Claim Text:</label>
 <input type="text" id="author-text" value="Susana is the author of" required>
 <label for="url-input">URL:</label>
@@ -38,10 +38,30 @@
 <div id="output"></div>
 
 <h2>Check If Hash Exists</h2>
-<label for="verification-input">Text to Verify:</label>
+<label for="verification-input">Claim to Verify:</label>
 <input type="text" id="verification-input" placeholder="Enter text to verify">
 <button id="check-hash-button">Check Hash</button>
 <div id="verification"></div>
+
+<hr>
+
+<pre>
+    This tool computes sha256 hash, e.g.:
+    <code>
+    Susana is the author of {url}. {append N hex random: give option for N}
+    </code>
+
+    Another field [check if hash exists], the input field would be e.g. 
+    Susana is the author of py.txt www.me.com. 49b59c046c
+
+    It will compute and search if exist. If so, show the line in the file, e.g.
+    b13c5833368c5164ade38e016de44c54bc907d57e2a39732c02dce0340dfd39c:www.me.com
+
+    This verifies the claim:
+    {hash_sha256}:{url or any claims}
+</pre>
+
+<hr>
 
 <script>
     async function sha256(message) {
