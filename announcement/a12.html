@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AES File Cipher/Decipher</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #upload-section, #decipher-section {
+            margin-bottom: 20px;
+        }
+        #notification {
+            margin-top: 10px;
+            color: green;
+        }
+        iframe {
+            width: 100%;
+            height: 500px;
+            border: 1px solid #ccc;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<h1>AES File Cipher/Decipher Tool</h1>
+
+<div id="upload-section">
+    <h2>Upload and Cipher File</h2>
+    <input type="file" id="file-input">
+    <br>
+    <button id="generate-key-button">Generate Random AES Key</button>
+    <br>
+    <textarea id="aes-key" rows="4" cols="50" placeholder="Enter AES key here..."></textarea>
+    <br>
+    <button id="cipher-file-button">Cipher File</button>
+    <p id="upload-notification"></p>
+</div>
+
+<div id="decipher-section">
+    <h2>Decipher and Retrieve Announcement</h2>
+    <textarea id="decipher-key" rows="4" cols="50" placeholder="Enter AES key to decipher..."></textarea>
+    <br>
+    <button id="decipher-file-button">Decipher File</button>
+    <p id="decipher-notification"></p>
+    <iframe id="announcement-iframe"></iframe>
+</div>
+
+<script>
+    document.getElementById('generate-key-button').addEventListener('click', () => {
+        const randomKey = window.crypto.getRandomValues(new Uint8Array(16));
+        document.getElementById('aes-key').value = Array.from(randomKey).map(b => b.toString(16).padStart(2, '0')).join('');
+    });
+
+    document.getElementById('cipher-file-button').addEventListener('click', () => {
+        const fileInput = document.getElementById('file-input');
+        const aesKey = document.getElementById('aes-key').value;
+
+        if (!fileInput.files.length || !aesKey) {
+            document.getElementById('upload-notification').textContent = 'Please provide a file and an AES key.';
+            return;
+        }
+
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const fileContent = e.target.result;
+            encryptAES(fileContent, aesKey).then(cipherText => {
+                downloadFile(cipherText, 'a12.ciphered.html');
+                document.getElementById('upload-notification').textContent = 'File has been ciphered and downloaded as a12.ciphered.html.';
+            });
+        };
+        reader.readAsText(file);
+    });
+
+    document.getElementById('decipher-file-button').addEventListener('click', () => {
+        const aesKey = document.getElementById('decipher-key').value;
+
+        if (!aesKey) {
+            document.getElementById('decipher-notification').textContent = 'Please provide an AES key.';
+            return;
+        }
+
+        fetch('a12.ciphered.html')
+            .then(response => response.text())
+            .then(cipherText => {
+                decryptAES(cipherText, aesKey)
+                    .then(plainText => {
+                        const iframe = document.getElementById('announcement-iframe');
+                        iframe.srcdoc = plainText;
+                        iframe.style.display = 'block';
+                        document.getElementById('decipher-notification').textContent = 'Announcement retrieved successfully.';
+                    })
+                    .catch(error => {
+                        document.getElementById('decipher-notification').textContent = 'Unauthorized attempt.';
+                    });
+            })
+            .catch(error => {
+                document.getElementById('decipher-notification').textContent = 'Failed to load ciphered file.';
+            });
+    });
+
+    async function encryptAES(text, key) {
+        const keyBytes = new Uint8Array(key.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+        const iv = window.crypto.getRandomValues(new Uint8Array(16));
+        const encodedText = new TextEncoder().encode(text);
+        const importedKey = await window.crypto.subtle.importKey('raw', keyBytes, 'AES-CBC', false, ['encrypt']);
+        const encryptedBuffer = await window.crypto.subtle.encrypt({ name: 'AES-CBC', iv: iv }, importedKey, encodedText);
+        const ivStr = Array.from(iv).map(b => String.fromCharCode(b)).join('');
+        const encryptedStr = Array.from(new Uint8Array(encryptedBuffer)).map(b => String.fromCharCode(b)).join('');
+        return btoa(ivStr + encryptedStr);
+    }
+
+    async function decryptAES(cipherText, key) {
+        const keyBytes = new Uint8Array(key.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+        const decodedData = atob(cipherText);
+        const iv = new Uint8Array(Array.from(decodedData.slice(0, 16)).map(c => c.charCodeAt(0)));
+        const encryptedText = new Uint8Array(Array.from(decodedData.slice(16)).map(c => c.charCodeAt(0)));
+        const importedKey = await window.crypto.subtle.importKey('raw', keyBytes, 'AES-CBC', false, ['decrypt']);
+        const decryptedBuffer = await window.crypto.subtle.decrypt({ name: 'AES-CBC', iv: iv }, importedKey, encryptedText);
+        return new TextDecoder().decode(decryptedBuffer);
+    }
+
+    function downloadFile(content, fileName) {
+        const a = document.createElement('a');
+        const file = new Blob([content], { type: 'text/plain' });
+        a.href = URL.createObjectURL(file);
+        a.download = fileName;
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+</script>
+
+</body>
+</html>
