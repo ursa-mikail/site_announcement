@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Claim Verification</title>
+    <title>Claim Verification Registry</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -27,7 +27,7 @@
 </head>
 <body>
 
-<h1>Claim Verification</h1>
+<h1>Claim Verification Registry</h1>
 <label for="author-text">Claim Text:</label>
 <input type="text" id="author-text" value="Susana is the author of" required>
 <label for="url-input">URL:</label>
@@ -52,10 +52,22 @@
     </code>
 
     Another field [check if hash exists], the input field would be e.g. 
+
+    [Example 01]:
     Susana is the author of py.txt www.me.com. 49b59c046c
 
     It will compute and search if exist. If so, show the line in the file, e.g.
-    b13c5833368c5164ade38e016de44c54bc907d57e2a39732c02dce0340dfd39c:www.me.com
+
+    The Claim Verification Registry will attest:
+        b13c5833368c5164ade38e016de44c54bc907d57e2a39732c02dce0340dfd39c:www.me.com
+
+    [Example 02]:
+    % hash_message "Bruce Wayne is Batman 5581dd4cc6ff3b95ee7ea62f6ab5a4c7b86d933a3b0838b9861044151e5e4899b4a65c1d7e364ee5d3060b4c79f3ce2114ee"
+
+    > d3f46c475bfe92b7e30e3eb7bc09a1999627879abccb37621b9548c859e542fc
+
+    The Claim Verification Registry will attest:
+        d3f46c475bfe92b7e30e3eb7bc09a1999627879abccb37621b9548c859e542fc:Batman
 
     This verifies the claim:
     {hash_sha256}:{url or any claims}
