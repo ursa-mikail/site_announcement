@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHA-256 Calculator and Verification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        input, button, textarea {
+            margin-top: 10px;
+            display: block;
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        #output, #verification {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+
+<h1>SHA-256 Calculator</h1>
+<label for="author-text">Claim Text:</label>
+<input type="text" id="author-text" value="Susana is the author of" required>
+<label for="url-input">URL:</label>
+<input type="text" id="url-input" placeholder="Enter the URL" required>
+<label for="random-hex">Number of Hex Random Values to Append:</label>
+<input type="number" id="random-hex" placeholder="Enter N" required>
+<button id="calculate-button">Calculate SHA-256</button>
+<div id="output"></div>
+
+<h2>Check If Hash Exists</h2>
+<label for="verification-input">Text to Verify:</label>
+<input type="text" id="verification-input" placeholder="Enter text to verify">
+<button id="check-hash-button">Check Hash</button>
+<div id="verification"></div>
+
+<script>
+    async function sha256(message) {
+        const msgBuffer = new TextEncoder().encode(message);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        return hashHex;
+    }
+
+    function generateRandomHex(n) {
+        let hex = '';
+        for (let i = 0; i < n; i++) {
+            hex += Math.floor(Math.random() * 16).toString(16);
+        }
+        return hex;
+    }
+
+    document.getElementById('calculate-button').addEventListener('click', async () => {
+        const authorText = document.getElementById('author-text').value;
+        const url = document.getElementById('url-input').value;
+        const n = parseInt(document.getElementById('random-hex').value, 10);
+        const randomHex = generateRandomHex(n);
+        const text = `${authorText} ${url}. ${randomHex}`;
+        const hash = await sha256(text);
+        document.getElementById('output').textContent = `Text: ${text}\nSHA-256 Hash: ${hash}`;
+    });
+
+    document.getElementById('check-hash-button').addEventListener('click', async () => {
+        const verificationText = document.getElementById('verification-input').value;
+        const hash = await sha256(verificationText);
+        const response = await fetch('../data/contributors_verification.txt');
+        const textData = await response.text();
+        const lines = textData.split('\n');
+        let verificationResult = 'Hash does not exist in the file.';
+        for (let line of lines) {
+            if (line.startsWith(hash)) {
+                verificationResult = `Hash exists: ${line}`;
+                break;
+            }
+        }
+        document.getElementById('verification').textContent = verificationResult;
+    });
+</script>
+
+</body>
+</html>
