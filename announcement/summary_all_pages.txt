@@ -45,6 +45,9 @@ Summary of Content Options:
 15. **a15: Key Pair Generator**
    - Key pair generator with options for RSA, ECDSA, and EdDSA algorithms. It includes functionality for generating and exporting cryptographic key pairs, as well as generating test vectors with random bytes and signatures. The unit test section allows users to generate random bytes, create signatures using the private key, and verify the signatures with the public key, displaying results in real-time. Additionally, users can download or copy the generated test vectors. The unit test section is visually separated by 2 horizontal lines, and its functionality is placed before the test vectors mass generation section.
 
+16. **a16: RSA/ECDSA Key Management and Signing**
+   - Outlines a comprehensive tool for handling AES encryption and signing using ECDSA keys. Users can input their ECDSA private key in hexadecimal format, which is then encrypted using a randomly generated AES key. This AES key and the encrypted private key are displayed to the user, with options to copy to the clipboard or download. Additionally, users can load an encrypted private key file and input an AES key to decrypt it. The system verifies the correctness of the AES key by attempting to sign a message and verifying it with the public key. If successful, a timestamp is appended to the message in the format YYYY-MM-DD_HHmm_ss, and the user can input a text message to be signed. The signed message can also be copied to the clipboard or downloaded as a permit.signed.txt file. 
+
 Summary. **ax_summary: Summary of All Pages**
    - The ax_summary provides an overarching overview of all the sections (a1 to a4). It synthesizes the key points and functionalities from each part, ensuring that users have a clear understanding of the tools and resources available across the different functionalities.
 

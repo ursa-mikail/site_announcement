@@ -99,6 +99,13 @@
         </description>
     </section>    
 
+    <section id="a16">
+        <title>16. RSA/ECDSA Key Management and Signing</title>
+        <description>
+            Outlines a comprehensive tool for handling AES encryption and signing using ECDSA keys. Users can input their ECDSA private key in hexadecimal format, which is then encrypted using a randomly generated AES key. This AES key and the encrypted private key are displayed to the user, with options to copy to the clipboard or download. Additionally, users can load an encrypted private key file and input an AES key to decrypt it. The system verifies the correctness of the AES key by attempting to sign a message and verifying it with the public key. If successful, a timestamp is appended to the message in the format YYYY-MM-DD_HHmm_ss, and the user can input a text message to be signed. The signed message can also be copied to the clipboard or downloaded as a permit.signed.txt file. 
+        </description>
+    </section>   
+
     <section id="ax_summary">
         <title>Summary of All Pages</title>
         <description>
