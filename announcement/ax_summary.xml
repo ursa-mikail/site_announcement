@@ -78,6 +78,13 @@
         </description>
     </section>
 
+    <section id="a13">
+        <title>13. Distance Between Apples</title>
+        <description>
+            The provided code allows users to interactively move two red apple images on a map, displaying their coordinates and the distance between them in real time. As the apples are dragged, a line is drawn between them, with the distance shown both along the line and in the top-left corner. This solution offers a dynamic, visual way to measure and display the Euclidean distance between two draggable objects, with updates as the apples are repositioned.
+        </description>
+    </section>
+
     <section id="ax_summary">
         <title>Summary of All Pages</title>
         <description>

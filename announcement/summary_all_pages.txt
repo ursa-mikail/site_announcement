@@ -36,6 +36,10 @@ Summary of Content Options:
 12. **a12: File Cipher/Decipher**
    - This tool allows users to upload a file, cipher it with a provided or randomly generated AES key, and download the ciphered file as a12.ciphered.html. In another section, users can input an AES key to decipher the a12.ciphered.html file. If the key is correct, the decrypted announcement is displayed in an iframe within the page; otherwise, it announces an unauthorized attempt.
 
+13. **a13: Distance Between Apples**
+   - The provided code allows users to interactively move two red apple images on a map, displaying their coordinates and the distance between them in real time. As the apples are dragged, a line is drawn between them, with the distance shown both along the line and in the top-left corner. This solution offers a dynamic, visual way to measure and display the Euclidean distance between two draggable objects, with updates as the apples are repositioned.
+
+
 Summary. **ax_summary: Summary of All Pages**
    - The ax_summary provides an overarching overview of all the sections (a1 to a4). It synthesizes the key points and functionalities from each part, ensuring that users have a clear understanding of the tools and resources available across the different functionalities.
 
