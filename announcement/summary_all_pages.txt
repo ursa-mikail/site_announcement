@@ -42,6 +42,9 @@ Summary of Content Options:
 14. **a14: Online Mnemonic Key Generator**
    - The online mnemonic key generator allows users to create and derive cryptographic keys based on a mnemonic phrase, which is a series of words commonly used for securely storing private keys. Users can input their own mnemonic words or generate a random set of words, and they are prompted to enter a password. The generator then uses the PBKDF2 key derivation function with SHA-256 to derive a secure key, ensuring the process is consistent with best practices in cryptography. The derived key, displayed in hexadecimal format, can be used for secure applications such as wallets or encryption systems.
 
+15. **a15: Key Pair Generator**
+   - Key pair generator with options for RSA, ECDSA, and EdDSA algorithms. It includes functionality for generating and exporting cryptographic key pairs, as well as generating test vectors with random bytes and signatures. The unit test section allows users to generate random bytes, create signatures using the private key, and verify the signatures with the public key, displaying results in real-time. Additionally, users can download or copy the generated test vectors. The unit test section is visually separated by 2 horizontal lines, and its functionality is placed before the test vectors mass generation section.
+
 Summary. **ax_summary: Summary of All Pages**
    - The ax_summary provides an overarching overview of all the sections (a1 to a4). It synthesizes the key points and functionalities from each part, ensuring that users have a clear understanding of the tools and resources available across the different functionalities.
 

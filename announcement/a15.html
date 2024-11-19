@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Key Pair Generator</title>
+</head>
+<body>
+    <h2>Key Pair Generator</h2>
+
+    <div>
+        <label for="keyType">Key Type:</label>
+        <select id="keyType">
+            <option value="rsa">RSA</option>
+            <option value="ecdsa">ECDSA</option>
+            <option value="eddsa">EdDSA</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="keyLength">Key Length:</label>
+        <input type="number" id="keyLength" value="2048" min="1" />
+        <div id="keyLengthNotice" style="display:none;">Note: EdDSA has a fixed length of 255, and ECDSA uses 256 for P-256</div>
+    </div>
+
+    <div>
+        <button id="generateKeyPair">Generate Key Pair</button>
+    </div>
+
+    <h3>Generated Key Pair:</h3>
+    <pre id="keyPair">Private Key: [object CryptoKey] Public Key: [object CryptoKey]</pre>
+
+
+    <hr>
+    <h3>Unit Test: Generate, Sign, and Verify Signature</h3>
+
+    <div>
+        <button id="generateRandomBytes">Generate Random Bytes</button>
+        <button id="generateSignature">Generate Signature</button>
+        <button id="verifySignature">Verify Signature</button>
+    </div>
+
+    <pre id="unitTestResults"></pre>
+
+    <hr>
+
+    <h3>Test Vectors:</h3>
+
+    <div>
+        <button id="generateTestVectors">Generate Test Vectors</button>
+        <button id="downloadTestVectors">Download Test Vectors</button>
+        <button id="copyToClipboard">Copy to Clipboard</button>
+    </div>
+
+    <pre id="testVectors"></pre>
+    
+    <hr>
+
+
+    <script>
+        let privateKey, publicKey, signature, randomBytes;
+
+        document.getElementById("generateKeyPair").addEventListener("click", async () => {
+            const keyType = document.getElementById("keyType").value;
+            let keyLength = parseInt(document.getElementById("keyLength").value);
+
+            if (keyType === 'eddsa' || keyType === 'ecdsa') {
+                document.getElementById('keyLengthNotice').style.display = 'block';
+                if (keyType === 'eddsa') {
+                    keyLength = 255; // Fixed length for EdDSA (Ed25519)
+                } else if (keyType === 'ecdsa') {
+                    keyLength = 256; // Fixed length for ECDSA (P-256)
+                }
+            } else {
+                document.getElementById('keyLengthNotice').style.display = 'none';
+            }
+
+            const algorithm = getAlgorithm(keyType, keyLength);
+            try {
+                const keyPair = await window.crypto.subtle.generateKey(
+                    algorithm,
+                    true,
+                    ["sign", "verify"]
+                );
+
+                privateKey = keyPair.privateKey;
+                publicKey = keyPair.publicKey;
+
+                // Export keys as raw data and convert to hex
+                const privateKeyHex = await exportKey(privateKey);
+                const publicKeyHex = await exportKey(publicKey);
+                document.getElementById("keyPair").textContent = `Private Key: ${privateKeyHex}\nPublic Key: ${publicKeyHex}`;
+            } catch (err) {
+                alert('Error generating key pair: ' + err.message);
+            }
+        });
+
+        // Export keys as hex
+        async function exportKey(key) {
+            let exportedKey;
+            try {
+                if (key.type === "private") {
+                    exportedKey = await window.crypto.subtle.exportKey("pkcs8", key);
+                } else if (key.type === "public") {
+                    exportedKey = await window.crypto.subtle.exportKey("spki", key);
+                }
+                return bufferToHex(exportedKey);
+            } catch (error) {
+                alert("Error exporting key: " + error.message);
+                return null;
+            }
+        }
+
+        // Convert ArrayBuffer to hexadecimal string
+        function bufferToHex(buffer) {
+            return Array.from(new Uint8Array(buffer))
+                .map(byte => byte.toString(16).padStart(2, '0'))
+                .join('');
+        }
+
+        // Return the correct algorithm for key generation
+        function getAlgorithm(keyType, keyLength) {
+            let algorithm = {};
+            switch (keyType) {
+                case "rsa":
+                    algorithm = {
+                        name: "RSA-PSS",
+                        modulusLength: keyLength,
+                        publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
+                        hash: { name: "SHA-256" }
+                    };
+                    break;
+                case "ecdsa":
+                    algorithm = {
+                        name: "ECDSA",
+                        namedCurve: "P-256"
+                    };
+                    break;
+                case "eddsa":
+                    algorithm = {
+                        name: "EdDSA",
+                        namedCurve: "Ed25519"
+                    };
+                    break;
+            }
+            return algorithm;
+        }
+
+        // Generate random hex and display it
+        document.getElementById("generateTestVectors").addEventListener("click", () => {
+            let keyType = document.getElementById("keyType").value;
+            let numVectors = parseInt(prompt("How many test vectors to generate?", "10"));
+            let testVectors = [];
+
+            for (let i = 0; i < numVectors; i++) {
+                const randomHex = generateRandomHex(64); // 64 bytes (512 bits) as an example
+                const signature = generateRandomHex(64); // Example signature
+                testVectors.push(`Test Vector ${i + 1}:
+Key Type: ${keyType}
+Key Length: ${document.getElementById('keyLength').value} bits
+Random Hex: ${randomHex}
+signature: ${signature}`);
+            }
+
+            document.getElementById("testVectors").textContent = testVectors.join("\n\n");
+        });
+
+        // Function to generate random hex
+        function generateRandomHex(length) {
+            const array = new Uint8Array(length);
+            window.crypto.getRandomValues(array);
+            return Array.from(array).map(byte => byte.toString(16).padStart(2, "0")).join("");
+        }
+
+        // Download test vectors as output.txt
+        document.getElementById("downloadTestVectors").addEventListener("click", () => {
+            const text = document.getElementById("testVectors").textContent;
+            const blob = new Blob([text], { type: "text/plain" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "output.txt";
+            link.click();
+        });
+
+        // Copy test vectors to clipboard
+        document.getElementById("copyToClipboard").addEventListener("click", () => {
+            const text = document.getElementById("testVectors").textContent;
+            navigator.clipboard.writeText(text)
+                .then(() => {
+                    alert("Test vectors copied to clipboard!");
+                })
+                .catch(err => {
+                    alert("Error copying to clipboard: " + err);
+                });
+        });
+
+        // Unit test: generate random bytes, sign and verify the signature
+        document.getElementById("generateRandomBytes").addEventListener("click", () => {
+            const length = Math.floor(Math.random() * 100) + 1; // Random length between 1 and 100
+            randomBytes = generateRandomHex(length);
+            const result = `Random Bytes: ${randomBytes}\n`;
+            document.getElementById("unitTestResults").textContent += result; // Append the output
+        });
+
+        document.getElementById("generateSignature").addEventListener("click", async () => {
+            if (!privateKey || !randomBytes) {
+                alert("Generate key pair and random bytes first.");
+                return;
+            }
+
+            const encoder = new TextEncoder();
+            const data = encoder.encode(randomBytes);
+            try {
+                signature = await window.crypto.subtle.sign(
+                    {
+                        name: "RSA-PSS",
+                        saltLength: 32,
+                    },
+                    privateKey,
+                    data
+                );
+                const result = `Signature: ${bufferToHex(signature)}\n`;
+                document.getElementById("unitTestResults").textContent += result; // Append the output
+            } catch (err) {
+                alert("Error generating signature: " + err.message);
+            }
+        });
+
+        document.getElementById("verifySignature").addEventListener("click", async () => {
+            if (!publicKey || !signature || !randomBytes) {
+                alert("Generate key pair, random bytes, and signature first.");
+                return;
+            }
+
+            const encoder = new TextEncoder();
+            const data = encoder.encode(randomBytes);
+            try {
+                const isValid = await window.crypto.subtle.verify(
+                    {
+                        name: "RSA-PSS",
+                        saltLength: 32,
+                    },
+                    publicKey,
+                    signature,
+                    data
+                );
+                const result = `Signature Verification: ${isValid ? "Valid" : "Invalid"}\n`;
+                document.getElementById("unitTestResults").textContent += result; // Append the output
+            } catch (err) {
+                alert("Error verifying signature: " + err.message);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -92,6 +92,13 @@
         </description>
     </section>    
 
+    <section id="a15">
+        <title>15. Key Pair Generator</title>
+        <description>
+            Key pair generator with options for RSA, ECDSA, and EdDSA algorithms. It includes functionality for generating and exporting cryptographic key pairs, as well as generating test vectors with random bytes and signatures. The unit test section allows users to generate random bytes, create signatures using the private key, and verify the signatures with the public key, displaying results in real-time. Additionally, users can download or copy the generated test vectors. The unit test section is visually separated by 2 horizontal lines, and its functionality is placed before the test vectors mass generation section.
+        </description>
+    </section>    
+
     <section id="ax_summary">
         <title>Summary of All Pages</title>
         <description>
