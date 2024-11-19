@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mnemonic Key Generator</title>
+</head>
+<body>
+    <h2>Mnemonic Key Generator</h2>
+
+    <div>
+        <label for="numWordsInput">How many words in the mnemonic (default is 12):</label>
+        <input type="number" id="numWordsInput" value="12" min="1" />
+    </div>
+
+    <div>
+        <label for="mnemonicInput">Enter mnemonic words (comma-separated) or leave blank to generate randomly:</label>
+        <textarea id="mnemonicInput" rows="4" cols="50"></textarea>
+    </div>
+
+    <div>
+        <label for="passwordInput">Enter password:</label>
+        <input type="text" id="passwordInput" value="password" />
+    </div>
+
+    <button id="generateButton">Generate Key</button>
+    
+    <h3>Derived Key:</h3>
+    <pre id="derivedKey"></pre>
+
+    <h3>Chosen Words:</h3>
+    <pre id="chosenWords"></pre>
+
+    <script>
+        // URL to fetch the word list
+        const url = "https://raw.githubusercontent.com/bitcoin/bips/master/bip-0039/english.txt";
+
+        document.getElementById("generateButton").addEventListener("click", async () => {
+            let mnemonicList = document.getElementById("mnemonicInput").value.trim();
+
+            if (mnemonicList === "") {
+                const numWords = parseInt(document.getElementById("numWordsInput").value, 10);
+                mnemonicList = await fetchMnemonicWords(numWords);
+            } else {
+                mnemonicList = mnemonicList.split(",").map(word => word.trim());
+            }
+
+            // Get the password entered by the user
+            const password = document.getElementById("passwordInput").value.trim();
+            if (!password) {
+                alert("Please enter a password.");
+                return;
+            }
+
+            // Join mnemonic words into a phrase
+            const mnemonicPhrase = mnemonicList.join(" ");
+            const mnemonicBytes = new TextEncoder().encode(mnemonicPhrase);
+
+            // Derive the key using PBKDF2 with SHA-256
+            const key = await deriveKey(mnemonicBytes, password);
+            
+            // Display the derived key
+            document.getElementById("derivedKey").textContent = key;
+
+            // Display the chosen words
+            document.getElementById("chosenWords").textContent = "Chosen words: " + mnemonicList.join(", ");
+        });
+
+        // Fetch mnemonic words from the URL
+        async function fetchMnemonicWords(numWords) {
+            const response = await fetch(url);
+            const words = await response.text();
+            const wordList = words.split("\n").map(word => word.trim());
+            return getRandomMnemonic(wordList, numWords);
+        }
+
+        // Get a random selection of words from the list
+        function getRandomMnemonic(wordList, numWords) {
+            let mnemonic = [];
+            for (let i = 0; i < numWords; i++) {
+                const randomWord = wordList[Math.floor(Math.random() * wordList.length)];
+                mnemonic.push(randomWord);
+            }
+            return mnemonic;
+        }
+
+        // Derive key using PBKDF2 with SHA-256
+        async function deriveKey(mnemonicBytes, password) {
+            // Ensure the password is treated as b"password" in Python terms
+            const passwordBytes = new TextEncoder().encode(password);
+            const salt = new Uint8Array(mnemonicBytes.length + passwordBytes.length);
+            salt.set(mnemonicBytes);
+            salt.set(passwordBytes, mnemonicBytes.length); // Append password
+
+            const iterations = 2048;
+            const dklen = 64; // 64 bytes (512 bits)
+
+            const key = await window.crypto.subtle.importKey(
+                "raw",
+                mnemonicBytes,
+                { name: "PBKDF2" },
+                false,
+                ["deriveBits"]
+            );
+
+            // Derive the key
+            const derivedBits = await window.crypto.subtle.deriveBits(
+                { name: "PBKDF2", salt: salt, iterations: iterations, hash: "SHA-256" },
+                key,
+                dklen * 8 // Length in bits, 64 bytes * 8 = 512 bits
+            );
+            
+            // Convert derived bits to hex string
+            const keyHex = bufferToHex(derivedBits);
+            return keyHex;
+        }
+
+        // Convert ArrayBuffer to hexadecimal string
+        function bufferToHex(buffer) {
+            const byteArray = new Uint8Array(buffer);
+            return Array.from(byteArray).map(byte => byte.toString(16).padStart(2, "0")).join("");
+        }
+    </script>
+
+<hr>
+    <pre>
+# Python sample code:        
+words = ['blue', 'tiger', 'feel', 'human', 'fantasy', 'live', 'gloom', 'palace', 'foster', 'sad', 'race', 'friend']
+
+# blue, tiger, feel, human, fantasy, live, gloom, palace, foster, sad, race, friend
+
+import hashlib
+import hmac
+
+mnemonic_list = words
+print("Mnemonic phrase:", mnemonic_list)
+
+# Convert the mnemonic to bytes using UTF-8 encoding
+mnemonic_phrase = " ".join(mnemonic_list)
+mnemonic_bytes = mnemonic_phrase.encode('utf-8')
+
+# Define the salt and iteration count
+salt = mnemonic_bytes + b"password"
+iteration_count = 2048
+
+# Derive the key using PBKDF2
+key = hashlib.pbkdf2_hmac(
+    hash_name='sha256',
+    password=mnemonic_bytes,
+    salt=salt,
+    iterations=iteration_count,
+    dklen=64
+)
+
+print("Derived Key:", key.hex())
+
+    </pre>
+
+<hr>
+    <pre>
+[Sample output]
+
+Mnemonic phrase: ['blue', 'tiger', 'feel', 'human', 'fantasy', 'live', 'gloom', 'palace', 'foster', 'sad', 'race', 'friend']
+Derived Key: 7876dc1f969c9cb3744b6cc3de59cdea66f950104574d76a5f55ab41751f1722f597b65b3bce2fafc98ac9a6f62a3eb93dd7a4726645cac4ebbc7bbeb43932fe
+    </pre>
+
+<hr>    
+</body>
+</html>

@@ -85,6 +85,13 @@
         </description>
     </section>
 
+    <section id="a14">
+        <title>14. Online Mnemonic Key Generator</title>
+        <description>
+            The online mnemonic key generator allows users to create and derive cryptographic keys based on a mnemonic phrase, which is a series of words commonly used for securely storing private keys. Users can input their own mnemonic words or generate a random set of words, and they are prompted to enter a password. The generator then uses the PBKDF2 key derivation function with SHA-256 to derive a secure key, ensuring the process is consistent with best practices in cryptography. The derived key, displayed in hexadecimal format, can be used for secure applications such as wallets or encryption systems.
+        </description>
+    </section>    
+
     <section id="ax_summary">
         <title>Summary of All Pages</title>
         <description>
