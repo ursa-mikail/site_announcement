@@ -113,4 +113,5 @@ verify_signature
 # Display keys in hexadecimal
 echo "================================================================"
 display_keys_in_hex $key_type
+echo ""
 echo "================================================================"
