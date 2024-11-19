@@ -99,7 +99,9 @@
                 <input type="file" id="encrypted-key-file" accept=".pem" onchange="loadEncryptedKeyFile()">
             </div>
             <textarea id="encrypted-key-input" rows="4" placeholder="Or paste encrypted private key here"></textarea>
+            <button onclick="autoloadEncryptedKey()">Or ... Autoload Encrypted Key from private_key.ciphered.pem</button>
             
+            <br>
             <label for="aes-key">Enter AES Key:</label>
             <input type="text" id="aes-key" placeholder="Enter your AES key">
             <button onclick="decryptAndVerify()">Decrypt and Verify</button>
@@ -222,6 +224,17 @@
             }
         }
 
+        async function autoloadEncryptedKey() {
+            try {
+                const response = await fetch('private_key.ciphered.pem');
+                const text = await response.text();
+                document.getElementById('encrypted-key-input').value = text;
+            } catch (error) {
+                console.error('Failed to autoload encrypted key:', error);
+                showMessage('decrypt-error');
+            }
+        }
+
         async function decryptAndVerify() {
             try {
                 const aesKeyBase64 = document.getElementById('aes-key').value;
@@ -296,15 +309,8 @@
             document.body.removeChild(element);
         }
 
-        // Autoload the files on page load
+        // Autoload the public key on page load
         window.onload = function() {
-            fetch('private_key.ciphered.pem')
-                .then(response => response.text())
-                .then(text => {
-                    document.getElementById('encrypted-key-input').value = text;
-                })
-                .catch(error => console.error('Failed to load private key:', error));
-
             fetch('public_key.pem')
                 .then(response => response.text())
                 .then(text => {
