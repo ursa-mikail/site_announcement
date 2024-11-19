@@ -7,6 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/10.9.0/jsrsasign-all-min.js"></script>
     <style>
+        /* Previous styles remain the same */
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             max-width: 800px;
@@ -59,8 +60,14 @@
             margin: 0.5rem 0;
             display: none;
         }
-        .file-input {
-            margin: 1rem 0;
+        #debug-output {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+            font-family: monospace;
+            white-space: pre-wrap;
+            display: none;
         }
     </style>
 </head>
@@ -72,11 +79,11 @@
             <h3>Step 1: Load and Encrypt Private Key</h3>
             <div class="file-input">
                 <label for="private-key-file">Load Private Key (PEM):</label><br>
-                <input type="file" id="private-key-file" accept=".pem" onchange="loadPrivateKeyFile()">
+                <input type="file" id="private-key-file" accept=".pem">
             </div>
             <div class="file-input">
                 <label for="public-key-file">Load Public Key (PEM):</label><br>
-                <input type="file" id="public-key-file" accept=".pem" onchange="loadPublicKeyFile()">
+                <input type="file" id="public-key-file" accept=".pem">
             </div>
             <button onclick="encryptPrivateKey()">Generate AES Key and Encrypt</button>
             
@@ -87,7 +94,7 @@
             <h4>Encrypted Private Key:</h4>
             <textarea id="encrypted-private-key" rows="4" readonly></textarea>
             <button onclick="copyToClipboard('encrypted-private-key')">Copy Encrypted Key</button>
-            <button onclick="downloadText('encrypted-private-key', 'private_key.ciphered.pem')">Download</button>
+            <button onclick="downloadEncryptedKey()">Download Ciphered Key</button>
             <div id="encrypt-success" class="success">Encryption successful!</div>
             <div id="encrypt-error" class="error">Encryption failed. Please check your input.</div>
         </div>
@@ -96,37 +103,49 @@
             <h3>Step 2: Load and Decrypt Private Key</h3>
             <div class="file-input">
                 <label for="encrypted-key-file">Load Encrypted Private Key:</label><br>
-                <input type="file" id="encrypted-key-file" accept=".pem" onchange="loadEncryptedKeyFile()">
+                <input type="file" id="encrypted-key-file">
             </div>
             <textarea id="encrypted-key-input" rows="4" placeholder="Or paste encrypted private key here"></textarea>
+            <button onclick="autoloadEncryptedKey()">Autoload Encrypted Key</button>
             
+            <br>
             <label for="aes-key">Enter AES Key:</label>
             <input type="text" id="aes-key" placeholder="Enter your AES key">
-            <button onclick="decryptAndVerify()">Decrypt and Verify</button>
-            <div id="decrypt-success" class="success">Decryption and verification successful!</div>
-            <div id="decrypt-error" class="error">Decryption failed or verification failed. Please check your keys.</div>
+            <button onclick="decryptPrivateKey()">Decrypt Key</button>
+            <div id="decrypt-success" class="success">Decryption successful!</div>
+            <div id="decrypt-error" class="error">Decryption failed. Please check your keys.</div>
         </div>
 
         <div class="section">
             <h3>Step 3: Sign Message</h3>
-            <label for="message">Enter Message to Sign:</label>
             <textarea id="message" rows="4" placeholder="Enter your message here"></textarea>
             <button onclick="signMessage()">Sign Message</button>
             
-            <h4>Signed Message:</h4>
-            <textarea id="signed-message" rows="6" readonly></textarea>
-            <button onclick="copyToClipboard('signed-message')">Copy Signed Message</button>
-            <button onclick="downloadText('signed-message', 'permit.signed.txt')">Download</button>
+            <h4>Signature:</h4>
+            <textarea id="signature" rows="4" readonly></textarea>
+            <button onclick="copyToClipboard('signature')">Copy Signature</button>
+            <button onclick="downloadSignature()">Download Signature</button>
             <div id="sign-success" class="success">Message signed successfully!</div>
             <div id="sign-error" class="error">Signing failed. Please ensure private key is loaded.</div>
         </div>
+
+        <div id="debug-output"></div>
     </div>
 
     <script>
         let currentPrivateKey = null;
         let currentPublicKey = null;
-        let keyType = null; // 'RSA' or 'ECDSA'
+        let decryptedPrivateKey = null;
 
+        // Debug logging function
+        function debugLog(message, data = '') {
+            console.log(`[Debug] ${message}`, data);
+            const debugOutput = document.getElementById('debug-output');
+            debugOutput.style.display = 'block';
+            debugOutput.textContent += `[Debug] ${message} ${data}\n`;
+        }
+
+        // Show/hide message function
         function showMessage(elementId, show = true) {
             const element = document.getElementById(elementId);
             element.style.display = show ? 'block' : 'none';
@@ -135,207 +154,227 @@
             }
         }
 
-        function generateSecureRandomBytes(length) {
-            return CryptoJS.lib.WordArray.random(length);
-        }
-
-        async function loadPrivateKeyFile() {
-            const fileInput = document.getElementById('private-key-file');
-            const file = fileInput.files[0];
+        // File loading event listeners
+        document.getElementById('private-key-file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    try {
-                        const pemContent = e.target.result;
-                        // Determine key type
-                        if (pemContent.includes('BEGIN RSA PRIVATE KEY')) {
-                            keyType = 'RSA';
-                        } else if (pemContent.includes('BEGIN EC PRIVATE KEY')) {
-                            keyType = 'ECDSA';
-                        } else {
-                            throw new Error('Unsupported key type');
-                        }
-                        currentPrivateKey = pemContent;
-                    } catch (error) {
-                        console.error('Error loading private key:', error);
-                        showMessage('encrypt-error');
-                    }
+                    currentPrivateKey = e.target.result;
+                    debugLog('Private key loaded');
                 };
                 reader.readAsText(file);
             }
-        }
+        });
 
-        async function loadPublicKeyFile() {
-            const fileInput = document.getElementById('public-key-file');
-            const file = fileInput.files[0];
+        document.getElementById('public-key-file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     currentPublicKey = e.target.result;
+                    debugLog('Public key loaded');
                 };
                 reader.readAsText(file);
             }
-        }
+        });
 
-        async function encryptPrivateKey() {
-            try {
-                if (!currentPrivateKey || !currentPublicKey) {
-                    throw new Error("Please load both private and public keys");
-                }
-
-                // Generate a secure random 256-bit AES key
-                const aesKey = generateSecureRandomBytes(32);
-                const aesKeyBase64 = aesKey.toString(CryptoJS.enc.Base64);
-                const iv = generateSecureRandomBytes(16);
-
-                // Encrypt the private key
-                const encrypted = CryptoJS.AES.encrypt(currentPrivateKey, aesKey, {
-                    iv: iv,
-                    padding: CryptoJS.pad.Pkcs7,
-                    mode: CryptoJS.mode.CBC
-                });
-
-                // Combine IV and ciphertext
-                const encryptedMessage = iv.concat(encrypted.ciphertext).toString(CryptoJS.enc.Base64);
-
-                document.getElementById('aes-key-display').value = aesKeyBase64;
-                document.getElementById('encrypted-private-key').value = encryptedMessage;
-
-                showMessage('encrypt-success');
-                showMessage('encrypt-error', false);
-            } catch (error) {
-                console.error('Encryption failed:', error);
-                showMessage('encrypt-success', false);
-                showMessage('encrypt-error');
-            }
-        }
-
-        async function loadEncryptedKeyFile() {
-            const fileInput = document.getElementById('encrypted-key-file');
-            const file = fileInput.files[0];
+        document.getElementById('encrypted-key-file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     document.getElementById('encrypted-key-input').value = e.target.result;
+                    debugLog('Encrypted key file loaded');
                 };
                 reader.readAsText(file);
             }
-        }
+        });
 
-        async function decryptAndVerify() {
+        // Encryption function
+        function encryptPrivateKey() {
             try {
-                const aesKeyBase64 = document.getElementById('aes-key').value.trim();
-                const encryptedData = document.getElementById('encrypted-key-input').value.trim();
-
-                if (!aesKeyBase64 || !encryptedData) {
-                    throw new Error("AES key and encrypted data required");
+                if (!currentPrivateKey) {
+                    throw new Error('Please load a private key first');
                 }
 
+                // Generate random AES key and IV
+                const aesKey = CryptoJS.lib.WordArray.random(32);
+                const iv = CryptoJS.lib.WordArray.random(16);
+                debugLog('Generated new AES key and IV');
+
+                // Encrypt the private key
+                const encrypted = CryptoJS.AES.encrypt(currentPrivateKey, aesKey, {
+                    iv: iv,
+                    mode: CryptoJS.mode.CBC,
+                    padding: CryptoJS.pad.Pkcs7
+                });
+
+                // Combine IV and ciphertext and convert to Base64
+                const encryptedMessage = iv.toString(CryptoJS.enc.Base64) + 
+                                       encrypted.ciphertext.toString(CryptoJS.enc.Base64);
+
+                // Display results
+                document.getElementById('aes-key-display').value = aesKey.toString(CryptoJS.enc.Base64);
+                document.getElementById('encrypted-private-key').value = encryptedMessage;
+                
+                showMessage('encrypt-success');
+                debugLog('Encryption completed successfully');
+            } catch (error) {
+                console.error('Encryption failed:', error);
+                debugLog('Encryption error:', error.message);
+                showMessage('encrypt-error');
+            }
+        }
+
+        // Download encrypted key function
+        function downloadEncryptedKey() {
+            const encryptedKey = document.getElementById('encrypted-private-key').value;
+            if (!encryptedKey) {
+                debugLog('No encrypted key to download');
+                return;
+            }
+
+            const blob = new Blob([encryptedKey], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'private_key.ciphered.pem';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            debugLog('Downloaded encrypted key file');
+        }
+
+        // Autoload encrypted key function
+        async function autoloadEncryptedKey() {
+            try {
+                const response = await fetch('private_key.ciphered.pem');
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const content = await response.text();
+                document.getElementById('encrypted-key-input').value = content;
+                debugLog('Autoloaded encrypted key file');
+                showMessage('decrypt-success');
+            } catch (error) {
+                console.error('Autoload failed:', error);
+                debugLog('Autoload error:', error.message);
+                showMessage('decrypt-error');
+            }
+        }
+
+        // Decryption function
+        function decryptPrivateKey() {
+            try {
+                const encryptedKeyB64 = document.getElementById('encrypted-key-input').value;
+                const aesKeyB64 = document.getElementById('aes-key').value;
+
+                if (!encryptedKeyB64 || !aesKeyB64) {
+                    throw new Error('Please provide both encrypted key and AES key');
+                }
+
+                // Split the combined Base64 string into IV and ciphertext
+                const ivB64 = encryptedKeyB64.substring(0, 24); // IV is 16 bytes = 24 Base64 chars
+                const ciphertextB64 = encryptedKeyB64.substring(24);
+
                 // Convert from Base64
-                const encryptedWords = CryptoJS.enc.Base64.parse(encryptedData);
-                const iv = CryptoJS.lib.WordArray.create(encryptedWords.words.slice(0, 4));
-                const ciphertext = CryptoJS.lib.WordArray.create(encryptedWords.words.slice(4));
+                const iv = CryptoJS.enc.Base64.parse(ivB64);
+                const ciphertext = CryptoJS.enc.Base64.parse(ciphertextB64);
+                const aesKey = CryptoJS.enc.Base64.parse(aesKeyB64);
+
+                debugLog('Decryption parameters prepared');
 
                 // Decrypt
                 const decrypted = CryptoJS.AES.decrypt(
                     { ciphertext: ciphertext },
-                    CryptoJS.enc.Base64.parse(aesKeyBase64),
-                    { iv: iv, padding: CryptoJS.pad.Pkcs7, mode: CryptoJS.mode.CBC }
+                    aesKey,
+                    {
+                        iv: iv,
+                        mode: CryptoJS.mode.CBC,
+                        padding: CryptoJS.pad.Pkcs7
+                    }
                 );
 
-                const decryptedPem = decrypted.toString(CryptoJS.enc.Utf8);
-
-                // Verify key pair
-                const sig = new KJUR.crypto.Signature({ "alg": keyType === "RSA" ? "SHA256withRSA" : "SHA256withECDSA" });
-                sig.init(decryptedPem);
-                sig.updateString("test");
-                const testSig = sig.sign();
-
-                // Verify with public key
-                const verifier = new KJUR.crypto.Signature({ "alg": keyType === "RSA" ? "SHA256withRSA" : "SHA256withECDSA" });
-                verifier.init(currentPublicKey);
-                verifier.updateString("test");
-                const isValid = verifier.verify(testSig);
-
-                if (isValid) {
-                    currentPrivateKey = decryptedPem;
-                    showMessage('decrypt-success');
-                    showMessage('decrypt-error', false);
-                } else {
-                    throw new Error("Key verification failed");
+                decryptedPrivateKey = decrypted.toString(CryptoJS.enc.Utf8);
+                
+                if (!decryptedPrivateKey.includes('PRIVATE KEY')) {
+                    throw new Error('Invalid decryption result');
                 }
+
+                debugLog('Decryption successful');
+                showMessage('decrypt-success');
             } catch (error) {
-                console.error('Decryption/verification failed:', error);
-                showMessage('decrypt-success', false);
+                console.error('Decryption failed:', error);
+                debugLog('Decryption error:', error.message);
                 showMessage('decrypt-error');
-                currentPrivateKey = null;
+                decryptedPrivateKey = null;
             }
         }
 
-        function getTimestamp() {
-            const now = new Date();
-            const pad = (n) => n.toString().padStart(2, '0');
-            return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}_` +
-                   `${pad(now.getHours())}${pad(now.getMinutes())}_${pad(now.getSeconds())}`;
-        }
-
-        async function signMessage() {
+        // Signing function
+        function signMessage() {
             try {
-                if (!currentPrivateKey) {
-                    throw new Error("Private key not loaded");
+                if (!decryptedPrivateKey) {
+                    throw new Error('Please decrypt private key first');
                 }
-                
-                const message = document.getElementById('message').value.trim();
+
+                const message = document.getElementById('message').value;
                 if (!message) {
-                    throw new Error("Message is required");
+                    throw new Error('Please enter a message to sign');
                 }
 
-                const timestamp = getTimestamp();
-                const messageToSign = `${message}\nTimestamp: ${timestamp}`;
+                debugLog('Preparing to sign message');
 
-                // Sign the message
-                const sig = new KJUR.crypto.Signature({ "alg": keyType === "RSA" ? "SHA256withRSA" : "SHA256withECDSA" });
-                sig.init(currentPrivateKey);
-                sig.updateString(messageToSign);
+                // Create signature
+                const key = KJUR.KEYUTIL.getKey(decryptedPrivateKey);
+                const sig = new KJUR.crypto.Signature({ alg: 'SHA256withRSA' });
+                sig.init(key);
+                sig.updateString(message);
                 const signature = sig.sign();
 
-                // Format the signed message
-                const signedMessage = `Message: ${message}\nTimestamp: ${timestamp}\nSignature: ${signature}`;
-                
-                document.getElementById('signed-message').value = signedMessage;
+                // Convert to base64
+                document.getElementById('signature').value = KJUR.crypto.hex2b64(signature);
+                debugLog('Message signed successfully');
                 showMessage('sign-success');
-                showMessage('sign-error', false);
             } catch (error) {
                 console.error('Signing failed:', error);
-                showMessage('sign-success', false);
+                debugLog('Signing error:', error.message);
                 showMessage('sign-error');
             }
         }
 
+        // Download signature function
+        function downloadSignature() {
+            const signature = document.getElementById('signature').value;
+            if (!signature) {
+                debugLog('No signature to download');
+                return;
+            }
+
+            const blob = new Blob([signature], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'signature.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            debugLog('Downloaded signature file');
+        }
+
+        // Copy to clipboard function
         function copyToClipboard(elementId) {
             const element = document.getElementById(elementId);
             element.select();
             document.execCommand('copy');
-            
-            const originalBg = element.style.backgroundColor;
-            element.style.backgroundColor = '#e8f0fe';
-            setTimeout(() => {
-                element.style.backgroundColor = originalBg;
-            }, 200);
+            debugLog(`Copied ${elementId} to clipboard`);
         }
 
-        function downloadText(elementId, filename) {
-            const text = document.getElementById(elementId).value;
-            const blob = new Blob([text], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-        }
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            debugLog('Application initialized');
+        });
     </script>
 </body>
 </html>
