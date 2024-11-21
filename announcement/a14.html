@@ -125,13 +125,19 @@
 <hr>
     <pre>
 # Python sample code:        
-words = ['blue', 'tiger', 'feel', 'human', 'fantasy', 'live', 'gloom', 'palace', 'foster', 'sad', 'race', 'friend']
-
-# blue, tiger, feel, human, fantasy, live, gloom, palace, foster, sad, race, friend
-
 import hashlib
-import hmac
 
+# Function to convert a string to a list of words
+def string_to_list(input_string):
+    return input_string.split(", ")
+
+# Input string with chosen words
+chosen_words_string = "ghost, tool, buzz, nominee, creek, belt, tell, labor, file, legal, lazy, birth"
+
+# Convert the string to a list of words
+words = string_to_list(chosen_words_string)
+
+# Display the mnemonic phrase
 mnemonic_list = words
 print("Mnemonic phrase:", mnemonic_list)
 
@@ -154,14 +160,15 @@ key = hashlib.pbkdf2_hmac(
 
 print("Derived Key:", key.hex())
 
+
     </pre>
 
 <hr>
     <pre>
 [Sample output]
 
-Mnemonic phrase: ['blue', 'tiger', 'feel', 'human', 'fantasy', 'live', 'gloom', 'palace', 'foster', 'sad', 'race', 'friend']
-Derived Key: 7876dc1f969c9cb3744b6cc3de59cdea66f950104574d76a5f55ab41751f1722f597b65b3bce2fafc98ac9a6f62a3eb93dd7a4726645cac4ebbc7bbeb43932fe
+Mnemonic phrase: ['ghost', 'tool', 'buzz', 'nominee', 'creek', 'belt', 'tell', 'labor', 'file', 'legal', 'lazy', 'birth']
+Derived Key: 1314e956bc3fe9748ec367046104d25f6e20ab352a17a1feab1f2350ade5aa9949fb42a59bd9959fde5516760771e51d27908eff2dd68f72a74b8a28b4f2171c
     </pre>
 
 <hr>    
