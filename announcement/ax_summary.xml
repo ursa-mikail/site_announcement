@@ -104,7 +104,14 @@
         <description>
             Outlines a comprehensive tool for handling AES encryption and signing using ECDSA keys. Users can input their ECDSA private key in hexadecimal format, which is then encrypted using a randomly generated AES key. This AES key and the encrypted private key are displayed to the user, with options to copy to the clipboard or download. Additionally, users can load an encrypted private key file and input an AES key to decrypt it. The system verifies the correctness of the AES key by attempting to sign a message and verifying it with the public key. If successful, a timestamp is appended to the message in the format YYYY-MM-DD_HHmm_ss, and the user can input a text message to be signed. The signed message can also be copied to the clipboard or downloaded as a permit.signed.txt file. 
         </description>
-    </section>   
+    </section> 
+
+    <section id="a17">
+        <title>17. Web-Based Hex Key Derivation Tool</title>
+        <description>
+            This web-based tool allows users to input an initial hex key and specify a desired key length to generate a derived key using the PBKDF2 key derivation function with HMAC-SHA256. The tool provides an intuitive interface with input fields for the hex key and key length, a button to generate the derived key, and a feature to copy the derived key to the clipboard for convenience. Implemented with HTML, CSS, and JavaScript, it utilizes the Web Crypto API for secure key derivation and conversion between hex strings and byte arrays.
+        </description>
+    </section>     
 
     <section id="ax_summary">
         <title>Summary of All Pages</title>

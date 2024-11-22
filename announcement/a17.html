@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Key Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        label, input {
+            display: block;
+            margin-bottom: 10px;
+        }
+        #result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Key Generator</h1>
+    <label for="initialKey">Initial Hex Key:</label>
+    <input type="text" id="initialKey" placeholder="Enter initial hex key">
+    
+    <label for="keyLength">Desired Key Length (bytes):</label>
+    <input type="number" id="keyLength" placeholder="Enter key length in bytes" min="1">
+    
+    <button onclick="generateKey()">Generate Key</button>
+    
+    <div id="result">
+        <p>Derived Key: <span id="derivedKey"></span></p>
+        <button onclick="copyToClipboard()">Copy to Clipboard</button>
+    </div>
+    
+    <script>
+        async function generateKey() {
+            const initialHexKey = document.getElementById('initialKey').value;
+            const keyLength = parseInt(document.getElementById('keyLength').value);
+            
+            if (!initialHexKey || !keyLength) {
+                alert('Please provide both the initial hex key and desired key length.');
+                return;
+            }
+            
+            // Convert hex string to byte array
+            const initialKeyBytes = hexStringToByteArray(initialHexKey);
+            
+            // Use the initial key bytes as the salt
+            const salt = initialKeyBytes;
+            
+            // Derive the key using PBKDF2
+            const derivedKey = await deriveKey(initialKeyBytes, salt, keyLength);
+            
+            // Convert derived key to hex string and display it
+            document.getElementById('derivedKey').textContent = byteArrayToHexString(derivedKey);
+        }
+        
+        function hexStringToByteArray(hexString) {
+            const byteArray = new Uint8Array(hexString.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+            return byteArray;
+        }
+        
+        function byteArrayToHexString(byteArray) {
+            return Array.from(byteArray, byte => ('0' + byte.toString(16)).slice(-2)).join('');
+        }
+        
+        async function deriveKey(passwordBytes, salt, keyLength) {
+            const keyMaterial = await crypto.subtle.importKey(
+                'raw',
+                passwordBytes,
+                { name: 'PBKDF2' },
+                false,
+                ['deriveBits', 'deriveKey']
+            );
+            
+            const derivedBits = await crypto.subtle.deriveBits(
+                {
+                    name: 'PBKDF2',
+                    salt: salt,
+                    iterations: 2048,
+                    hash: 'SHA-256'
+                },
+                keyMaterial,
+                keyLength * 8
+            );
+            
+            return new Uint8Array(derivedBits);
+        }
+        
+        function copyToClipboard() {
+            const derivedKey = document.getElementById('derivedKey').textContent;
+            navigator.clipboard.writeText(derivedKey).then(() => {
+                alert('Derived key copied to clipboard!');
+            }, (err) => {
+                alert('Failed to copy key: ', err);
+            });
+        }
+    </script>
+
+
+<pre><code>
+
+import hashlib
+
+def generate_key(initial_hex_key, key_length_bytes, iterations=2048):
+    # Convert the initial hex key to bytes
+    initial_key_bytes = bytes.fromhex(initial_hex_key)
+    
+    # Define a salt (for simplicity, using the initial key bytes as the salt, but in practice, you should use a random salt)
+    salt = initial_key_bytes
+    
+    # Derive the key using PBKDF2
+    derived_key = hashlib.pbkdf2_hmac(
+        hash_name='sha256',
+        password=initial_key_bytes,
+        salt=salt,
+        iterations=iterations,
+        dklen=key_length_bytes
+    )
+    
+    return derived_key.hex()
+
+# Example usage
+initial_hex_key = "7876dc1f969c9cb3744b6cc3de59cdea66f950104574d76a5f55ab41751f1722f597b65b3bce2fafc98ac9a6f62a3eb93dd7a4726645cac4ebbc7bbeb43932fe"
+initial_hex_key = "ff"
+
+key_length_bytes = 100  # Desired length of the derived key in bytes
+
+derived_key = generate_key(initial_hex_key, key_length_bytes)
+print("Derived Key:", derived_key)
+
+"""
+Derived Key: 1bd75d74f871287b1a381c0e8206f9f396c39aba9d6f99fb03b88bbfeb86eb124d2d3dd8c16894b364ad18cee83ee55a9ee6c001bf0e1ee2c1b9e849c41cc049340ddf6053aee7fc2dc2d33194015ce0bb4d97f60fa58c9585e29bc971ece5de810874e8
+"""
+</code></pre>    
+
+</body>
+</html>
+
