@@ -51,6 +51,11 @@ Summary of Content Options:
 17. **Web-Based Hex Key Derivation Tool**
    - This web-based tool allows users to input an initial hex key and specify a desired key length to generate a derived key using the PBKDF2 key derivation function with HMAC-SHA256. The tool provides an intuitive interface with input fields for the hex key and key length, a button to generate the derived key, and a feature to copy the derived key to the clipboard for convenience. Implemented with HTML, CSS, and JavaScript, it utilizes the Web Crypto API for secure key derivation and conversion between hex strings and byte arrays.
 
+18. **Periodic Table Word Generator**
+   - The Periodic Table Word Generator is a web-based tool that converts a given word or statement into images of periodic table elements. Each letter of the input is mapped to its corresponding element symbol (e.g., "H" for Hydrogen, "O" for Oxygen). The tool handles multi-character element symbols by prioritizing two-letter element combinations (e.g., "He" for Helium) before individual letters. Special characters, including spaces, are displayed as text, and the conversion of letters to element images ensures an engaging visual representation of the input text. This interactive tool provides a fun way to explore the periodic table while generating a visually interesting word display.
+
+
+
 Summary. **ax_summary: Summary of All Pages**
    - The ax_summary provides an overarching overview of all the sections (a1 to a4). It synthesizes the key points and functionalities from each part, ensuring that users have a clear understanding of the tools and resources available across the different functionalities.
 

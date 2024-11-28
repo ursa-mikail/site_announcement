@@ -113,6 +113,14 @@
         </description>
     </section>     
 
+    <section id="a18">
+        <title>18. Periodic Table Word Generator</title>
+        <description>
+            The Periodic Table Word Generator is an interactive web tool that converts a given input text into images of elements from the periodic table. Each letter in the word or phrase is mapped to the corresponding element's symbol (e.g., "H" for Hydrogen). For two-letter element symbols (e.g., "He" for Helium), the tool prioritizes combining two characters into an element symbol first, ensuring accurate matching. Special characters like spaces and punctuation remain as text. This tool provides an engaging and educational way to visualize text while learning about the elements of the periodic table.
+        </description>
+    </section>
+    
+
     <section id="ax_summary">
         <title>Summary of All Pages</title>
         <description>
