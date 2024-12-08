@@ -127,6 +127,14 @@
         </description>
     </section>
 
+    <section id="a20">
+        <title>20. Hyperlink Maker</title>
+        <description>
+            The Hyperlink Maker allows users to upload a text file with URLs and optional descriptions in the format `[url][description]`. The tool generates HTML hyperlinks from the file's contents, displays them in an enumerated list, and provides a copy-to-clipboard functionality for easy copying of all generated links.
+        </description>
+    </section>
+
+
     <section id="ax_summary">
         <title>Summary of All Pages</title>
         <description>

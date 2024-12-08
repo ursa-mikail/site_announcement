@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Links Hyperlink Generator</title>
+    <link rel="stylesheet" href="../styles/html_link_maker.css">
+</head>
+<body>
+    <div class="container">
+        <h1>HTML Links Hyperlink Generator</h1>
+        <input type="file" id="fileInput" accept=".txt">
+        <button onclick="generateLinks()">Generate Links</button>
+        <div id="linksContainer"></div>
+        <button id="copyButton" onclick="copyToClipboard()">Copy to Clipboard</button>
+    </div>
+    <script src="../js/html_link_maker.js"></script>
+    <hr>
+    <pre>
+        url.txt to upload is in the format:
+        [url][descriptions_optional]
+
+        Sample of url.txt you can use:
+        ```
+        [https://www.youtube.com/watch?v=Ejj-WjeHFM0&list=UUHnj59g7jezwTy5GeL8EA_g][MindYourDecisions (1103)]
+        [https://www.youtube.com/watch?v=Y6_qIv1Q9C0&list=UUSs4A6HYKmHA2MG_0z-F0xw][李永乐老师 (564)]
+        [https://www.youtube.com/watch?v=14K_a2kKTxU&list=UULFZgt6AzoyjslHTC9dz0UoTw][System design (110)]
+        [https://www.youtube.com/c/%E8%87%AA%E8%AF%B4%E8%87%AA%E8%AF%9D%E7%9A%84%E6%80%BB%E8%A3%81/videos][自说自话的总裁 (425)]
+        ```
+
+        You can copy-and-pastes to googledoc with linked the versions:
+        ```
+        MindYourDecisions (1103)
+        李永乐老师 (564)
+        System design (110)
+        自说自话的总裁 (425)
+        ```
+    </pre>
+
+</body>
+</html>
+
