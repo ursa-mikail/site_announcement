@@ -35,74 +35,76 @@
 <div id="fullList"></div>
 
 <script>
-    let statusCodesData = [];
+    document.addEventListener('DOMContentLoaded', (event) => {
+        let statusCodesData = [];
 
-    async function fetchCSV() {
-        try {
-            const response = await fetch('https://gist.githubusercontent.com/mikail-eliyah-00/48d6f7fc2f25bd03110e15affcd27679/raw/3ac926683112b9f70a8d7d6006d8eaf4e97cea9c/HTTP%2520response%2520status%2520codes.csv');
-            const csvText = await response.text();
-            statusCodesData = csvToArray(csvText);
-            console.log('Parsed CSV Data:', statusCodesData); // Debugging output
-        } catch (error) {
-            console.error('Error fetching CSV data:', error);
-            alert('Failed to fetch the CSV data. Please try again later.');
-        }
-    }
-
-    function csvToArray(str, delimiter = ",") {
-        const headers = str.slice(0, str.indexOf("\n")).split(delimiter);
-        const rows = str.slice(str.indexOf("\n") + 1).split("\n");
-
-        return rows.map(row => {
-            const values = row.split(delimiter);
-            return headers.reduce((object, header, index) => {
-                object[header.trim()] = values[index] ? values[index].trim() : "";
-                return object;
-            }, {});
-        });
-    }
-
-    function searchStatusCode() {
-        const code = document.getElementById('statusCode').value.trim();
-        const result = statusCodesData.find(item => item['status codes'] === code);
-
-        let resultDiv = document.getElementById('result');
-        resultDiv.innerHTML = '';
-
-        if (result) {
-            resultDiv.innerHTML = `
-                <h2>Result</h2>
-                <p><strong>Type:</strong> ${result.Type}</p>
-                <p><strong>Meaning:</strong> ${result.Meaning}</p>
-            `;
-        } else {
-            resultDiv.innerHTML = '<p>Status code not found.</p>';
-        }
-    }
-
-    function displayFullList() {
-        let fullListDiv = document.getElementById('fullList');
-        fullListDiv.innerHTML = '';
-
-        let table = '<table><tr><th>Status Code</th><th>Type</th><th>Meaning</th></tr>';
-
-        statusCodesData.forEach(item => {
-            if (item['status codes']) {
-                table += `
-                    <tr>
-                        <td>${item['status codes']}</td>
-                        <td>${item.Type}</td>
-                        <td>${item.Meaning}</td>
-                    </tr>
-                `;
+        async function fetchCSV() {
+            try {
+                const response = await fetch('https://gist.githubusercontent.com/mikail-eliyah-00/48d6f7fc2f25bd03110e15affcd27679/raw/3ac926683112b9f70a8d7d6006d8eaf4e97cea9c/HTTP%2520response%2520status%2520codes.csv');
+                const csvText = await response.text();
+                statusCodesData = csvToArray(csvText);
+                console.log('Parsed CSV Data:', statusCodesData); // Debugging output
+            } catch (error) {
+                console.error('Error fetching CSV data:', error);
+                alert('Failed to fetch the CSV data. Please try again later.');
             }
-        });
+        }
 
-        table += '</table>';
-        fullListDiv.innerHTML = table;
-    }
+        function csvToArray(str, delimiter = ",") {
+            const headers = str.slice(0, str.indexOf("\n")).split(delimiter);
+            const rows = str.slice(str.indexOf("\n") + 1).split("\n");
 
-    window.onload = fetchCSV;
+            return rows.map(row => {
+                const values = row.split(delimiter);
+                return headers.reduce((object, header, index) => {
+                    object[header.trim()] = values[index] ? values[index].trim() : "";
+                    return object;
+                }, {});
+            });
+        }
+
+        function searchStatusCode() {
+            const code = document.getElementById('statusCode').value.trim();
+            const result = statusCodesData.find(item => item['status codes'] === code);
+
+            let resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '';
+
+            if (result) {
+                resultDiv.innerHTML = `
+                    <h2>Result</h2>
+                    <p><strong>Type:</strong> ${result.Type}</p>
+                    <p><strong>Meaning:</strong> ${result.Meaning}</p>
+                `;
+            } else {
+                resultDiv.innerHTML = '<p>Status code not found.</p>';
+            }
+        }
+
+        function displayFullList() {
+            let fullListDiv = document.getElementById('fullList');
+            fullListDiv.innerHTML = '';
+
+            let table = '<table><tr><th>Status Code</th><th>Type</th><th>Meaning</th></tr>';
+
+            statusCodesData.forEach(item => {
+                if (item['status codes']) {
+                    table += `
+                        <tr>
+                            <td>${item['status codes']}</td>
+                            <td>${item.Type}</td>
+                            <td>${item.Meaning}</td>
+                        </tr>
+                    `;
+                }
+            });
+
+            table += '</table>';
+            fullListDiv.innerHTML = table;
+        }
+
+        fetchCSV();
+    });
 </script>
 
 </body>
