@@ -52,7 +52,7 @@
         return rows.map(row => {
             const values = row.split(delimiter);
             return headers.reduce((object, header, index) => {
-                object[header] = values[index];
+                object[header.trim()] = values[index] ? values[index].trim() : "";
                 return object;
             }, {});
         });
@@ -60,7 +60,7 @@
 
     // Search status code
     function searchStatusCode() {
-        const code = document.getElementById('statusCode').value;
+        const code = document.getElementById('statusCode').value.trim();
         const result = statusCodesData.find(item => item['status codes'] === code);
 
         let resultDiv = document.getElementById('result');
@@ -85,13 +85,15 @@
         let table = '<table><tr><th>Status Code</th><th>Type</th><th>Meaning</th></tr>';
 
         statusCodesData.forEach(item => {
-            table += `
-                <tr>
-                    <td>${item['status codes']}</td>
-                    <td>${item.Type}</td>
-                    <td>${item.Meaning}</td>
-                </tr>
-            `;
+            if (item['status codes']) {
+                table += `
+                    <tr>
+                        <td>${item['status codes']}</td>
+                        <td>${item.Type}</td>
+                        <td>${item.Meaning}</td>
+                    </tr>
+                `;
+            }
         });
 
         table += '</table>';
