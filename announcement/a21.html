@@ -35,13 +35,18 @@
 <div id="fullList"></div>
 
 <script>
-    let statusCodesData;
+    let statusCodesData = [];
 
     // Function to fetch CSV data
     async function fetchCSV() {
-        const response = await fetch('https://gist.githubusercontent.com/mikail-eliyah-00/48d6f7fc2f25bd03110e15affcd27679/raw/3ac926683112b9f70a8d7d6006d8eaf4e97cea9c/HTTP%2520response%2520status%2520codes.csv');
-        const csvText = await response.text();
-        statusCodesData = csvToArray(csvText);
+        try {
+            const response = await fetch('https://gist.githubusercontent.com/mikail-eliyah-00/48d6f7fc2f25bd03110e15affcd27679/raw/3ac926683112b9f70a8d7d6006d8eaf4e97cea9c/HTTP%2520response%2520status%2520codes.csv');
+            const csvText = await response.text();
+            statusCodesData = csvToArray(csvText);
+            console.log('CSV Data fetched successfully:', statusCodesData);
+        } catch (error) {
+            console.error('Error fetching CSV data:', error);
+        }
     }
 
     // Convert CSV text to an array of objects
