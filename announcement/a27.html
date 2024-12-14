@@ -3,295 +3,225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Text Animation</title>
+    <title>Skill Progress Bars</title>
     <style>
-        body {
-            margin: 0;
-            overflow: hidden;
+        /* SCSS/LESS Converted to CSS */
+
+        /* Variables */
+        :root {
+            --color: #FF6347;
+            --animation-delay: 0.7s;
         }
 
-        #instructions {
-            position: absolute;
-            color: #666;
-            bottom: 0;
-            padding-bottom: 6px;
-            font-family: sans-serif;
-            width: 100%;
+        /* Mixins are converted to regular CSS rules */
+        .development_title {
             text-align: center;
-            pointer-events: none;
+            font-size: 15px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            letter-spacing: 3px;
         }
 
-        #three-container {
-            width: 100%;
-            height: 100%;
+        h2 {
+            text-align: center;
         }
+
+        .skills-bar-container {
+            position: relative;
+            margin: 0 auto;
+            width: 40%;
+            min-width: 350px;
+            top: 40%;
+            transform: translate(-50%, -50%);
+            list-style: none;
+            margin-bottom: 25px;
+        }
+
+        .skills-bar-container li {
+            position: relative;
+            width: 100%;
+            padding: 2px 2px;
+        }
+
+        .progressbar-title {
+            color: var(--color);
+        }
+
+        .progressbar-title h3 {
+            display: inline-block;
+            position: relative;
+            top: 17px;
+            color: #888;
+        }
+
+        .percent {
+            position: absolute;
+            right: 2px;
+            top: 40px;
+        }
+
+        .bar-container {
+            background: #555;
+            position: relative;
+            width: 100%;
+            height: 10px;
+            display: block;
+            border-radius: 5px;
+            margin-bottom: -15px;
+        }
+
+        .progressbar {
+            position: absolute;
+            width: 0%;
+            height: 100%;
+            border-radius: 5px;
+            animation-duration: 2s;
+            animation-timing-function: ease-out;
+            animation-fill-mode: both;
+        }
+
+        .progresstomatoes {
+            background: var(--color);
+        }
+
+        /* Animation Keyframes */
+        @keyframes progress-html {
+            0% { width: 0%; }
+            100% { width: 90%; }
+        }
+
+        @keyframes progress-css {
+            0% { width: 0%; }
+            100% { width: 90%; }
+        }
+
+        @keyframes progress-javascript {
+            0% { width: 0%; }
+            100% { width: 70%; }
+        }
+
+        @keyframes progress-php {
+            0% { width: 0%; }
+            100% { width: 55%; }
+        }
+
+        @keyframes progress-bootstrap {
+            0% { width: 0%; }
+            100% { width: 75%; }
+        }
+
+        @keyframes progress-wordpress {
+            0% { width: 0%; }
+            100% { width: 65%; }
+        }
+
+        @keyframes progress-laravel {
+            0% { width: 0%; }
+            100% { width: 35%; }
+        }
+
+        /* Delay Application for Animations */
+        #progress-html { animation-name: progress-html; animation-delay: var(--animation-delay); }
+        #progress-css { animation-name: progress-css; animation-delay: calc(var(--animation-delay) * 2); }
+        #progress-javascript { animation-name: progress-javascript; animation-delay: calc(var(--animation-delay) * 3); }
+        #progress-php { animation-name: progress-php; animation-delay: calc(var(--animation-delay) * 4); }
+        #progress-wordpress { animation-name: progress-wordpress; animation-delay: calc(var(--animation-delay) * 5); }
+        #progress-bootstrap { animation-name: progress-bootstrap; animation-delay: calc(var(--animation-delay) * 6); }
+        #progress-laravel { animation-name: progress-laravel; animation-delay: calc(var(--animation-delay) * 7); }
     </style>
 </head>
 <body>
-    <div id="three-container"></div>
-
-    <div id="instructions">
-        click and drag to control the animation
+    <div class="development_title">
+        <h2>My Skills Progress</h2>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <div class="skills-bar-container">
+        <ul>
+            <li>
+                <div class="progressbar-title">
+                    <h3>HTML</h3>
+                    <span class="percent" id="html-pourcent"></span>
+                </div>
+                <div class="bar-container">
+                    <span class="progressbar progresstomatoes" id="progress-html"></span>
+                </div>
+            </li>
+            <li>
+                <div class="progressbar-title">
+                    <h3>CSS</h3>
+                    <span class="percent" id="css-pourcent"></span>
+                </div>
+                <div class="bar-container">
+                    <span class="progressbar progresstomatoes" id="progress-css"></span>
+                </div>
+            </li>
+            <li>
+                <div class="progressbar-title">
+                    <h3>JavaScript</h3>
+                    <span class="percent" id="javascript-pourcent"></span>
+                </div>
+                <div class="bar-container">
+                    <span class="progressbar progresstomatoes" id="progress-javascript"></span>
+                </div>
+            </li>
+            <li>
+                <div class="progressbar-title">
+                    <h3>PHP</h3>
+                    <span class="percent" id="php-pourcent"></span>
+                </div>
+                <div class="bar-container">
+                    <span class="progressbar progresstomatoes" id="progress-php"></span>
+                </div>
+            </li>
+            <li>
+                <div class="progressbar-title">
+                    <h3>Wordpress</h3>
+                    <span class="percent" id="wordpress-pourcent"></span>
+                </div>
+                <div class="bar-container">
+                    <span class="progressbar progresstomatoes" id="progress-wordpress"></span>
+                </div>
+            </li>
+            <li>
+                <div class="progressbar-title">
+                    <h3>Bootstrap</h3>
+                    <span class="percent" id="bootstrap-pourcent"></span>
+                </div>
+                <div class="bar-container">
+                    <span class="progressbar progresstomatoes" id="progress-bootstrap"></span>
+                </div>
+            </li>
+            <li>
+                <div class="progressbar-title">
+                    <h3>Laravel</h3>
+                    <span class="percent" id="laravel-pourcent"></span>
+                </div>
+                <div class="bar-container">
+                    <span class="progressbar progresstomatoes" id="progress-laravel"></span>
+                </div>
+            </li>
+        </ul>
+    </div>
+
     <script>
-        THREE.ShapeUtils.triangulateShape = (function () {
-            var pnlTriangulator = new PNLTRI.Triangulator();
-            return function triangulateShape(contour, holes) {
-                return pnlTriangulator.triangulate_polygon([contour].concat(holes));
-            };
-        })();
+        var lang = {
+            "python": "90%",
+            "machine learning": "70%",
+            "signal processing": "77%",
+            "cryptography": "75%",
+            "security": "80%",
+            "matlab": "75%",
+            "physics": "60%"
+        };
+        var multiply = 4;
 
-        window.onload = init;
-
-        function init() {
-            var root = new THREERoot({
-                createCameraControls: !true,
-                antialias: (window.devicePixelRatio === 1),
-                fov: 60
-            });
-
-            root.renderer.setClearColor(0x000000);
-            root.renderer.setPixelRatio(window.devicePixelRatio || 1);
-            root.camera.position.set(0, 0, 600);
-
-            var textAnimation = createTextAnimation();
-            root.scene.add(textAnimation);
-
-            var light = new THREE.DirectionalLight();
-            light.position.set(0, 0, 1);
-            root.scene.add(light);
-
-            var tl = new TimelineMax({
-                repeat: -1,
-                repeatDelay: 0.5,
-                yoyo: true
-            });
-            tl.fromTo(textAnimation, 4,
-                { animationProgress: 0.0 },
-                { animationProgress: 0.6, ease: Power1.easeInOut },
-                0
-            );
-            tl.fromTo(textAnimation.rotation, 4, { y: 0 }, { y: Math.PI * 2, ease: Power1.easeInOut }, 0);
-
-            createTweenScrubber(tl);
-        }
-
-        function createTextAnimation() {
-            var geometry = generateTextGeometry('AS THE WORLD TURNS', {
-                size: 40,
-                height: 12,
-                font: 'droid sans',
-                weight: 'bold',
-                style: 'normal',
-                curveSegments: 24,
-                bevelSize: 2,
-                bevelThickness: 2,
-                bevelEnabled: true,
-                anchor: { x: 0.5, y: 0.5, z: 0.0 }
-            });
-
-            THREE.BAS.Utils.tessellateRepeat(geometry, 1.0, 2);
-            THREE.BAS.Utils.separateFaces(geometry);
-
-            return new TextAnimation(geometry);
-        }
-
-        function generateTextGeometry(text, params) {
-            var geometry = new THREE.TextGeometry(text, params);
-            geometry.computeBoundingBox();
-
-            var size = geometry.boundingBox.size();
-            var anchorX = size.x * -params.anchor.x;
-            var anchorY = size.y * -params.anchor.y;
-            var anchorZ = size.z * -params.anchor.z;
-            var matrix = new THREE.Matrix4().makeTranslation(anchorX, anchorY, anchorZ);
-
-            geometry.applyMatrix(matrix);
-
-            return geometry;
-        }
-
-        function TextAnimation(textGeometry) {
-            var bufferGeometry = new THREE.BAS.ModelBufferGeometry(textGeometry);
-            var aAnimation = bufferGeometry.createAttribute('aAnimation', 2);
-            var aEndPosition = bufferGeometry.createAttribute('aEndPosition', 3);
-            var aAxisAngle = bufferGeometry.createAttribute('aAxisAngle', 4);
-
-            var faceCount = bufferGeometry.faceCount;
-            var maxDelay = 0.0;
-            var minDuration = 1.0;
-            var maxDuration = 1.0;
-            var stretch = 0.05;
-            var lengthFactor = 0.001;
-            var maxLength = textGeometry.boundingBox.max.length();
-
-            this.animationDuration = maxDuration + maxDelay + stretch + lengthFactor * maxLength;
-            this._animationProgress = 0;
-
-            var axis = new THREE.Vector3();
-            var angle;
-
-            for (var i = 0, i2 = 0, i3 = 0, i4 = 0; i < faceCount; i++, i2 += 6, i3 += 9, i4 += 12) {
-                var face = textGeometry.faces[i];
-                var centroid = THREE.BAS.Utils.computeCentroid(textGeometry, face);
-                var centroidN = new THREE.Vector3().copy(centroid).normalize();
-
-                // animation
-                var delay = (maxLength - centroid.length()) * lengthFactor;
-                var duration = THREE.Math.randFloat(minDuration, maxDuration);
-
-                for (var v = 0; v < 6; v += 2) {
-                    aAnimation.array[i2 + v] = delay + stretch * Math.random();
-                    aAnimation.array[i2 + v + 1] = duration;
-                }
-
-                // end position
-                var point = utils.fibSpherePoint(i, faceCount, 200);
-
-                for (var v = 0; v < 9; v += 3) {
-                    aEndPosition.array[i3 + v] = point.x;
-                    aEndPosition.array[i3 + v + 1] = point.y;
-                    aEndPosition.array[i3 + v + 2] = point.z;
-                }
-
-                // axis angle
-                axis.x = centroidN.x;
-                axis.y = -centroidN.y;
-                axis.z = -centroidN.z;
-                axis.normalize();
-
-                angle = Math.PI * THREE.Math.randFloat(0.5, 2.0);
-
-                for (var v = 0; v < 12; v += 4) {
-                    aAxisAngle.array[i4 + v] = axis.x;
-                    aAxisAngle.array[i4 + v + 1] = axis.y;
-                    aAxisAngle.array[i4 + v + 2] = axis.z;
-                    aAxisAngle.array[i4 + v + 3] = angle;
-                }
-            }
-
-            var material = new THREE.BAS.PhongAnimationMaterial({
-                shading: THREE.FlatShading,
-                side: THREE.DoubleSide,
-                transparent: true,
-                uniforms: {
-                    uTime: { type: 'f', value: 0 }
-                },
-                shaderFunctions: [
-                    THREE.BAS.ShaderChunk['cubic_bezier'],
-                    THREE.BAS.ShaderChunk['ease_out_cubic'],
-                    THREE.BAS.ShaderChunk['quaternion_rotation']
-                ],
-                shaderParameters: [
-                    'uniform float uTime;',
-                    'uniform vec3 uAxis;',
-                    'uniform float uAngle;',
-                    'attribute vec2 aAnimation;',
-                    'attribute vec3 aEndPosition;',
-                    'attribute vec4 aAxisAngle;'
-                ],
-                shaderVertexInit: [
-                    'float tDelay = aAnimation.x;',
-                    'float tDuration = aAnimation.y;',
-                    'float tTime = clamp(uTime - tDelay, 0.0, tDuration);',
-                    'float tProgress = ease(tTime, 0.0, 1.0, tDuration);'
-                ],
-                shaderTransformPosition: [
-                    'transformed = mix(transformed, aEndPosition, tProgress);',
-                    'float angle = aAxisAngle.w * tProgress;',
-                    'vec4 tQuat = quatFromAxisAngle(aAxisAngle.xyz, angle);',
-                    'transformed = rotateVector(tQuat, transformed);',
-                ]
-            }, {
-                diffuse: 0x444444,
-                specular: 0xcccccc,
-                shininess: 4
-            });
-
-            THREE.Mesh.call(this, bufferGeometry, material);
-
-            this.frustumCulled = false;
-        }
-
-        TextAnimation.prototype = Object.create(THREE.Mesh.prototype);
-        TextAnimation.prototype.constructor = TextAnimation;
-
-        Object.defineProperty(TextAnimation.prototype, 'animationProgress', {
-            get: function () {
-                return this._animationProgress;
-            },
-            set: function (v) {
-                this._animationProgress = v;
-                this.material.uniforms['uTime'].value = this.animationDuration * v;
-            }
+        $.each(lang, function(language, pourcent) {
+            var delay = 700;
+            setTimeout(function() {
+                $('#' + language + '-pourcent').html(pourcent);
+            }, delay * multiply);
+            multiply++;
         });
-
-        function THREERoot(params) {
-            params = utils.extend({
-                fov: 60,
-                zNear: 10,
-                zFar: 100000,
-                createCameraControls: true
-            }, params);
-
-            this.renderer = new THREE.WebGLRenderer({
-                antialias: params.antialias
-            });
-            this.renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
-            document.getElementById('three-container').appendChild(this.renderer.domElement);
-
-            this.camera = new THREE.PerspectiveCamera(
-                params.fov,
-                window.innerWidth / window.innerHeight,
-                params.zNear,
-                params.zfar
-            );
-
-            this.scene = new THREE.Scene();
-
-            if (params.createCameraControls) {
-                this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-            }
-
-            this.resize = this.resize.bind(this);
-            this.tick = this.tick.bind(this);
-
-            this.resize();
-            this.tick();
-
-            window.addEventListener('resize', this.resize, false);
-        }
-
-        THREERoot.prototype.resize = function () {
-            this.renderer.setSize(window.innerWidth, window.innerHeight);
-            this.camera.aspect = window.innerWidth / window.innerHeight;
-            this.camera.updateProjectionMatrix();
-        };
-
-        THREERoot.prototype.tick = function () {
-            requestAnimationFrame(this.tick);
-            this.controls.update();
-            this.renderer.render(this.scene, this.camera);
-        };
-
-        function createTweenScrubber(tl) {
-            var input = document.createElement('input');
-            input.type = 'range';
-            input.min = 0;
-            input.max = 1;
-            input.step = 0.01;
-            input.value = 0;
-
-            document.body.appendChild(input);
-
-            input.addEventListener('input', function (e) {
-                tl.progress(e.target.value);
-            });
-        }
-
     </script>
 </body>
 </html>
