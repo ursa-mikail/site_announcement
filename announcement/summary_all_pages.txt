@@ -72,6 +72,13 @@ Summary of Content Options:
 24. **403 Access Not Granted**
     - This page creates a 403 Access Not Granted error page with a playful design featuring animations. It includes a keyhole and key SVG illustrations and a ghost animation that moves across the screen, revealing the message "You know you're supposed to leave, right?" The page is designed to provide a timeless, visually engaging experience on both desktop and mobile devices.
 
+25. **Interactive SVG Animation**
+    - This page showcases an interactive SVG animation that generates colorful wave effects when the user clicks or touches anywhere on the screen. The page is designed to provide a seamless experience on both desktop and mobile devices, featuring a customizable SVG that animates based on user input. It includes dynamic elements like text, circles, and color transitions, all driven by JavaScript animations.
+
+26. **Tearable Cloth Simulation**
+   - This page features an interactive tearable cloth simulation where users can manipulate the cloth with their mouse. The user can click and drag to tear the cloth, or right-click and drag to cut it. The simulation uses a canvas element to render the cloth, with physics-based interactions like gravity and user influence. The cloth is made of points connected by constraints, and tearing is enabled by removing constraints when the distance between points exceeds a threshold. Users can interact with the cloth in real-time, and additional information and links to the GitHub repository are provided for further exploration.
+
+
 Summary. **ax_summary: Summary of All Pages**
    - The ax_summary provides an overarching overview of all the sections (a1 to a4). It synthesizes the key points and functionalities from each part, ensuring that users have a clear understanding of the tools and resources available across the different functionalities.
 
