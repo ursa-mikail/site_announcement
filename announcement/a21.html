@@ -14,15 +14,18 @@
             cursor: pointer;
             margin: 5px;
         }
-        pre {
-            white-space: pre-wrap;
-            word-wrap: break-word;
+        table {
+            width: 100%;
+            border-collapse: collapse;
             margin-top: 20px;
+        }
+        th, td {
             padding: 10px;
+            text-align: left;
             border: 1px solid #ddd;
-            background-color: #f9f9f9;
-            max-height: 500px;
-            overflow: auto;
+        }
+        th {
+            background-color: #f4f4f4;
         }
         input {
             padding: 5px;
@@ -39,7 +42,9 @@
 <button id="searchButton">Search</button>
 <button id="fullListButton">Display Full List</button>
 
-<pre id="content" style="display:none;"></pre>
+<div id="content" style="display:none;">
+    <table id="statusTable" style="width:100%;"></table>
+</div>
 
 <script>
     let csvData = [];
@@ -81,17 +86,43 @@
         const result = csvData.find(item => item.statusCode === code);
         const output = document.getElementById('content');
         if (result) {
-            output.textContent = `Type: ${result.type}\nMeaning: ${result.meaning}`;
+            output.innerHTML = `Type: ${result.type}<br>Meaning: ${result.meaning}`;
         } else {
-            output.textContent = `Status code ${code} not found.`;
+            output.innerHTML = `Status code ${code} not found.`;
         }
         output.style.display = 'block';
     }
 
     function displayFullList() {
-        const output = document.getElementById('content');
-        output.textContent = csvData.map(item => `Status Code: ${item.statusCode}, Type: ${item.type}, Meaning: ${item.meaning}`).join('\n');
-        output.style.display = 'block';
+        const table = document.getElementById('statusTable');
+        table.innerHTML = ''; // Clear any previous content
+        
+        // Create table header
+        const headerRow = document.createElement('tr');
+        const headers = ['Status Code', 'Type', 'Meaning'];
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            headerRow.appendChild(th);
+        });
+        table.appendChild(headerRow);
+
+        // Populate table rows with CSV data
+        csvData.forEach(item => {
+            const row = document.createElement('tr');
+            const cell1 = document.createElement('td');
+            const cell2 = document.createElement('td');
+            const cell3 = document.createElement('td');
+            cell1.textContent = item.statusCode;
+            cell2.textContent = item.type;
+            cell3.textContent = item.meaning;
+            row.appendChild(cell1);
+            row.appendChild(cell2);
+            row.appendChild(cell3);
+            table.appendChild(row);
+        });
+
+        document.getElementById('content').style.display = 'block';
     }
 </script>
 
