@@ -33,7 +33,9 @@
 <script>
     async function fetchAndDisplayContent() {
         try {
-            const response = await fetch('https://www.gutenberg.org/cache/epub/84/pg84-images.html#letter1');
+            const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+            const targetUrl = 'https://www.gutenberg.org/cache/epub/84/pg84-images.html#letter1';
+            const response = await fetch(proxyUrl + targetUrl);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
