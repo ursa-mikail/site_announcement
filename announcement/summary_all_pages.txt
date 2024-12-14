@@ -81,6 +81,10 @@ Summary of Content Options:
 27. **Interactive Skill Progress Bars**
     - This page displays interactive skill progress bars with animations for various technologies. The bars animate their progress. Each skill's progress is displayed with percentage values that are dynamically updated.
 
+28. **Gridworm Canvas Animation**
+    - This page features an interactive canvas displaying a Gridworm animation, where multiple gridworms move within a grid structure, following specific rules. The gridworms' movements are controlled by velocities and memory of junctions they encounter. The canvas dynamically adjusts to browser window size and allows users to refresh the animation by clicking. The gridworms' behavior is based on their interactions with grid points, and their paths are influenced by random velocities. The page provides a visually engaging experience with constant updates to the animation.
+
+
 Summary. **ax_summary: Summary of All Pages**
    - The ax_summary provides an overarching overview of all the sections (a1 to a4). It synthesizes the key points and functionalities from each part, ensuring that users have a clear understanding of the tools and resources available across the different functionalities.
 

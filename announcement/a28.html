@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gridworm Canvas</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: white;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gridwormCanvas" width="1350" height="620" style="background-color: white;"></canvas>
+    <script>
+        class GridWorm {
+            constructor(startPoint, interval, pointsList, screenWidth, screenHeight) {
+                this.xCoord = startPoint.x;
+                this.yCoord = startPoint.y;
+                this.interval = interval;
+                this.pointsList = pointsList;
+                this.screenWidth = screenWidth;
+                this.screenHeight = screenHeight;
+                this.radius = interval / 2;
+                this.velocity = {x: 0, y: 0};
+                this.junctionMemory = [];
+                this.junctionMemoryLength = 100;
+            }
+
+            update() {
+                this.yCoord += this.velocity.y;
+
+                if (this.xCoord <= this.interval) {
+                    this.xCoord = this.interval;
+                    this.velocity.x = -this.velocity.x;
+                    this.xCoord += this.velocity.x * 3;
+                }
+
+                if (this.xCoord >= this.screenWidth - this.interval) {
+                    this.xCoord = this.junctionMemory[this.junctionMemory.length - 1].point.x;
+                    this.velocity.x = -this.velocity.x;
+                    this.xCoord += this.velocity.x * 3;
+                }
+
+                if (this.yCoord <= this.interval) {
+                    this.yCoord = this.interval;
+                    this.velocity.y = -this.velocity.y;
+                    this.yCoord += this.velocity.y * 3;
+                }
+
+                if (this.yCoord >= this.screenHeight - this.interval) {
+                    this.yCoord = this.junctionMemory[this.junctionMemory.length - 1].point.y;
+                    this.velocity.y = -this.velocity.y;
+                    this.yCoord += this.velocity.y * 4;
+                }
+
+                let currentCoord = { x: this.xCoord, y: this.yCoord };
+                let latestJunction = this.getJunctionReached(currentCoord);
+
+                if (latestJunction !== currentCoord) {
+                    let originalVelocity = this.velocity;
+                    let newVelocity = this.getVelocity();
+
+                    if (originalVelocity.y === 0) {
+                        this.velocity = newVelocity;
+                        if (newVelocity.y === 0 && newVelocity.x === -originalVelocity.x) {
+                        } else {
+                            let memory = { point: latestJunction, velocity: this.velocity };
+                            if (!this.isInMemory(memory)) {
+                                this.junctionMemory.push(memory);
+                            }
+                        }
+                        this.xCoord += this.velocity.x * 3;
+                    } else {
+                        this.velocity = newVelocity;
+                        if (newVelocity.x === 0 && newVelocity.y === -originalVelocity.y) {
+                        } else {
+                            let memory = { point: latestJunction, velocity: this.velocity };
+                            if (!this.isInMemory(memory)) {
+                                this.junctionMemory.push(memory);
+                            }
+                        }
+                        this.yCoord += this.velocity.y * 3;
+                    }
+                }
+
+                if (this.junctionMemory.length > this.junctionMemoryLength) {
+                    this.junctionMemory.shift();
+                }
+            }
+
+            isInMemory(memory) {
+                return this.junctionMemory.some(function (mem) {
+                    return mem.point === memory.point;
+                });
+            }
+
+            getJunctionReached(currentCoord) {
+                for (let i = 0; i < this.pointsList.length; i++) {
+                    let point = this.pointsList[i];
+                    if (Math.abs(currentCoord.x - point.x) > 2 * this.interval || Math.abs(currentCoord.y - point.y) > 2 * this.interval) {
+                        continue;
+                    }
+                    let distance = this.getDistance(currentCoord, point);
+                    if (distance <= this.radius) {
+                        return point;
+                    }
+                }
+                return currentCoord;
+            }
+
+            getDistance(p1, p2) {
+                let dx = p1.x - p2.x;
+                let dy = p1.y - p2.y;
+                return Math.sqrt(dx * dx + dy * dy);
+            }
+
+            getVelocity() {
+                let velocities = [
+                    { x: 0, y: -1 }, { x: 0, y: 1 }, { x: 1, y: 0 }, { x: -1, y: 0 }
+                ];
+                return velocities[Math.floor(Math.random() * velocities.length)];
+            }
+        }
+
+        class Painter {
+            constructor(screenWidth, screenHeight) {
+                this.screenWidth = screenWidth;
+                this.screenHeight = screenHeight;
+                this.interval = 40;
+                this.points = this.createPoints();
+                this.gridWorms = this.createGridWorms();
+                this.color = this.getRandomColor(0.1);
+
+                document.addEventListener('click', (event) => {
+                    this.points = this.createPoints();
+                    this.gridWorms = this.createGridWorms();
+                    this.color = this.getRandomColor(0.1);
+                });
+            }
+
+            createGridWorms() {
+                let gridworms = [],
+                    numOfGridWorms = 30;
+                for (let i = 0; i < numOfGridWorms; i++) {
+                    let point = this.points[Math.floor(this.getRandomNumber(0, this.points.length - 1))];
+                    gridworms.push(new GridWorm(point, this.interval, this.points, this.screenWidth, this.screenHeight));
+                }
+                return gridworms;
+            }
+
+            createPoints() {
+                let points = [];
+                for (let y = this.interval; y < this.screenHeight; y += this.interval) {
+                    if (y + this.interval > this.screenHeight) {
+                        continue;
+                    }
+                    for (let x = this.interval; x < this.screenWidth; x += this.interval) {
+                        if (x + this.interval > this.screenWidth) {
+                            continue;
+                        }
+                        points.push({ x: x, y: y });
+                    }
+                }
+                return points;
+            }
+
+            getRandomColor(opacity) {
+                const colors = [
+                    `rgba(255,0,0,${opacity})`, `rgba(255, 242,0,${opacity})`, `rgba(0,0,255,${opacity})`,
+                    `rgba(255,255,0,${opacity})`, `rgba(0,255,255,${opacity})`, `rgba(255,0,255,${opacity})`,
+                    `rgba(192,192,192,${opacity})`, `rgba(128,128,128,${opacity})`, `rgba(128,0,0,${opacity})`,
+                    `rgba(128,128,0,${opacity})`, `rgba(0,128,0,${opacity})`, `rgba(128,0,128,${opacity})`,
+                    `rgba(0,128,128,${opacity})`, `rgba(0,0,128,${opacity})`, `rgba(0, 255, 0,${opacity})`
+                ];
+                return colors[Math.floor(this.getRandomNumber(0, colors.length))];
+            }
+
+            getRandomNumber(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            refreshScreenSize(screenHeight, screenWidth) {
+                if (this.screenHeight !== screenHeight || this.screenWidth !== screenWidth) {
+                    this.screenHeight = screenHeight;
+                    this.screenWidth = screenWidth;
+                    this.points = this.createPoints();
+                    this.gridWorms = this.createGridWorms();
+                }
+            }
+
+            update(deltaTime) {
+                this.gridWorms.forEach(gridworm => gridworm.update(deltaTime));
+            }
+
+            draw(ctx) {
+                this.gridWorms.forEach(gridworm => gridworm.draw(ctx));
+            }
+        }
+
+        function getBrowserWindowSize() {
+            let win = window,
+                doc = document,
+                offset = 20,
+                docElem = doc.documentElement,
+                body = doc.getElementsByTagName('body')[0],
+                browserWindowWidth = win.innerWidth || docElem.clientWidth || body.clientWidth,
+                browserWindowHeight = win.innerHeight || docElem.clientHeight || body.clientHeight;
+            return { x: browserWindowWidth - offset, y: browserWindowHeight - offset };
+        }
+
+        let browserWindowSize = getBrowserWindowSize(),
+            c = document.getElementById("gridwormCanvas"),
+            ctx = c.getContext("2d");
+
+        c.width = browserWindowSize.x;
+        c.height = browserWindowSize.y;
+
+        let SCREEN_WIDTH = browserWindowSize.x,
+            SCREEN_HEIGHT = browserWindowSize.y,
+            painter = new Painter(SCREEN_WIDTH, SCREEN_HEIGHT),
+            lastTime = 100,
+            windowSize;
+
+        function onWindowResize() {
+            windowSize = getBrowserWindowSize();
+            c.width = windowSize.x;
+            c.height = windowSize.y;
+            SCREEN_WIDTH = windowSize.x;
+            SCREEN_HEIGHT = windowSize.y;
+        }
+
+        window.addEventListener('resize', onWindowResize);
+
+        function updateCanvas() {
+            ctx.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+            painter.update();
+            painter.draw(ctx);
+            requestAnimationFrame(updateCanvas);
+        }
+
+        updateCanvas();
+    </script>
+</body>
+</html>

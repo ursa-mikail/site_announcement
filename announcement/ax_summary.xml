@@ -148,40 +148,47 @@
         </description>
     </section>
 
-<section id="a23">
-    <title>23. Timeline</title>
-    <description>
-        This page creates a timeline section with animation effects using ScrollReveal.js. It includes several timeline items, each describing a significant event or milestone. The timeline items fade in from the left or right as the user scrolls, creating a dynamic and engaging visual experience. The design is responsive, adjusting the animation effects based on the screen size to ensure a seamless experience on both desktop and mobile devices.
-    </description>
-</section>
+    <section id="a23">
+        <title>23. Timeline</title>
+        <description>
+            This page creates a timeline section with animation effects using ScrollReveal.js. It includes several timeline items, each describing a significant event or milestone. The timeline items fade in from the left or right as the user scrolls, creating a dynamic and engaging visual experience. The design is responsive, adjusting the animation effects based on the screen size to ensure a seamless experience on both desktop and mobile devices.
+        </description>
+    </section>
 
-<section id="a24">
-    <title>24. 403 Access Not Granted</title>
-    <description>
-        This page creates a 403 Access Not Granted error page with a playful design featuring animations. It includes a keyhole and key SVG illustrations and a ghost animation that moves across the screen, revealing the message "You know you're supposed to leave, right?" The page is designed to provide a timeless, visually engaging experience on both desktop and mobile devices.
-    </description>
-</section>
+    <section id="a24">
+        <title>24. 403 Access Not Granted</title>
+        <description>
+            This page creates a 403 Access Not Granted error page with a playful design featuring animations. It includes a keyhole and key SVG illustrations and a ghost animation that moves across the screen, revealing the message "You know you're supposed to leave, right?" The page is designed to provide a timeless, visually engaging experience on both desktop and mobile devices.
+        </description>
+    </section>
 
-<section id="a25">
-    <title>25. Interactive SVG Animation</title>
-    <description>
-        This page showcases an interactive SVG animation that generates colorful wave effects when the user clicks or touches anywhere on the screen. The page is designed to provide a seamless experience on both desktop and mobile devices, featuring a customizable SVG that animates based on user input. It includes dynamic elements like text, circles, and color transitions, all driven by JavaScript animations.
-    </description>
-</section>
+    <section id="a25">
+        <title>25. Interactive SVG Animation</title>
+        <description>
+            This page showcases an interactive SVG animation that generates colorful wave effects when the user clicks or touches anywhere on the screen. The page is designed to provide a seamless experience on both desktop and mobile devices, featuring a customizable SVG that animates based on user input. It includes dynamic elements like text, circles, and color transitions, all driven by JavaScript animations.
+        </description>
+    </section>
 
-<section id="a26">
-    <title>26. Tearable Cloth Simulation</title>
-    <description>
-        This page features an interactive tearable cloth simulation where users can manipulate the cloth with their mouse. The user can click and drag to tear the cloth, or right-click and drag to cut it. The simulation uses a canvas element to render the cloth, with physics-based interactions like gravity and user influence. The cloth is made of points connected by constraints, and tearing is enabled by removing constraints when the distance between points exceeds a threshold. Users can interact with the cloth in real-time, and additional information and links to the GitHub repository are provided for further exploration.
-    </description>
-</section>
+    <section id="a26">
+        <title>26. Tearable Cloth Simulation</title>
+        <description>
+            This page features an interactive tearable cloth simulation where users can manipulate the cloth with their mouse. The user can click and drag to tear the cloth, or right-click and drag to cut it. The simulation uses a canvas element to render the cloth, with physics-based interactions like gravity and user influence. The cloth is made of points connected by constraints, and tearing is enabled by removing constraints when the distance between points exceeds a threshold. Users can interact with the cloth in real-time, and additional information and links to the GitHub repository are provided for further exploration.
+        </description>
+    </section>
 
-<section id="a27">
-    <title>27. Interactive Skill Progress Bars</title>
-    <description>
-        This page displays interactive skill progress bars with animations for various technologies such as HTML, CSS, JavaScript, PHP, WordPress, Bootstrap, and Laravel. The bars animate their progress using CSS keyframes and JavaScript. Each skill's progress is displayed with percentage values that are dynamically updated by JavaScript, enhancing user experience with color transitions and smooth animations.
-    </description>
-</section>
+    <section id="a27">
+        <title>27. Interactive Skill Progress Bars</title>
+        <description>
+            This page displays interactive skill progress bars with animations for various technologies such as HTML, CSS, JavaScript, PHP, WordPress, Bootstrap, and Laravel. The bars animate their progress using CSS keyframes and JavaScript. Each skill's progress is displayed with percentage values that are dynamically updated by JavaScript, enhancing user experience with color transitions and smooth animations.
+        </description>
+    </section>
+
+    <section id="a28">
+        <title>28. Gridworm Canvas Animation</title>
+        <description>
+            This page features an interactive canvas displaying a Gridworm animation, where multiple gridworms move within a grid structure, following specific rules. The gridworms' movements are controlled by velocities and memory of junctions they encounter. The canvas dynamically adjusts to browser window size and allows users to refresh the animation by clicking. The gridworms' behavior is based on their interactions with grid points, and their paths are influenced by random velocities. The page provides a visually engaging experience with constant updates to the animation.
+        </description>
+    </section>
 
 
     <section id="ax_summary">
