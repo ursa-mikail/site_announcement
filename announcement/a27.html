@@ -3,349 +3,295 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Text Sparks Animation</title>
+    <title>3D Text Animation</title>
     <style>
-        body, html {
+        body {
             margin: 0;
-            padding: 0;
-            font-size: 0;
+            overflow: hidden;
         }
-        div {
-            display: none;
+
+        #instructions {
+            position: absolute;
+            color: #666;
+            bottom: 0;
+            padding-bottom: 6px;
+            font-family: sans-serif;
+            width: 100%;
+            text-align: center;
+            pointer-events: none;
         }
-        canvas {
-            width: 100vw;
-            height: 100vh;
+
+        #three-container {
+            width: 100%;
+            height: 100%;
         }
     </style>
 </head>
 <body>
-    <div>
-        <ul data-time="3000">
-            <li data-hue="197">D</li>
-            <li data-hue="0">E</li>
-            <li data-hue="197">V</li>
-            <li data-hue="197">I</li>
-            <li data-hue="45">L</li>
-        </ul>
+    <div id="three-container"></div>
+
+    <div id="instructions">
+        click and drag to control the animation
     </div>
-    <canvas></canvas>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
     <script>
-        const newParticlesPerFrame = 50;
+        THREE.ShapeUtils.triangulateShape = (function () {
+            var pnlTriangulator = new PNLTRI.Triangulator();
+            return function triangulateShape(contour, holes) {
+                return pnlTriangulator.triangulate_polygon([contour].concat(holes));
+            };
+        })();
 
-        const color = (hsl, o) => {
-            return `hsla(${hsl.h | 0}, ${hsl.s}%, ${hsl.l}%, ${o})`;
-        };
+        window.onload = init;
 
-        class TextSparks {
-            constructor() {
-                this.opa = 0;
-                this.tick = 0;
-                this.drawCB = null;
-                this.mask = null;
-                this.canvas = window.document.querySelector('canvas');
-                this.engine = this.canvas.getContext('2d');
-                this.maskTick = 0;
-                this.nextMaskCb = this.nextMask.bind(this);
-                this.maskCache = [];
-                this.resize();
-                this.fetchData();
-                this.buildStackCache();
-                this.particleMap = new Map();
-            }
+        function init() {
+            var root = new THREERoot({
+                createCameraControls: !true,
+                antialias: (window.devicePixelRatio === 1),
+                fov: 60
+            });
 
-            buildStackCache() {
-                this.maskCache = this.stack.map((stack) => {
-                    return this.buildTextMask(stack.texts);
-                });
-            }
+            root.renderer.setClearColor(0x000000);
+            root.renderer.setPixelRatio(window.devicePixelRatio || 1);
+            root.camera.position.set(0, 0, 600);
 
-            fetchData() {
-                this.stackId = -1;
-                this.stack = [...document.querySelectorAll('div > ul')].map(ul => {
-                    return {
-                        ticks: 0.05 * (ul.hasAttribute('data-time') ? ul.getAttribute('data-time') : 0),
-                        fadeIn: ul.hasAttribute('data-fade-in') ? 50 / Number(ul.getAttribute('data-fade-in')) : 0,
-                        fadeOut: ul.hasAttribute('data-fade-out') ? 50 / Number(ul.getAttribute('data-fade-out')) : 0,
-                        texts: [...ul.querySelectorAll('li')].map(li => {
-                            return {
-                                text: li.innerHTML.trim(),
-                                hsl: {
-                                    h: li.hasAttribute('data-hue') ? Number(li.getAttribute('data-hue')) : 0,
-                                    s: li.hasAttribute('data-saturation') ? Number(li.getAttribute('data-saturation')) : 100,
-                                    l: li.hasAttribute('data-lightness') ? Number(li.getAttribute('data-lightness')) : 50
-                                }
-                            };
-                        })
-                    };
-                });
-            }
+            var textAnimation = createTextAnimation();
+            root.scene.add(textAnimation);
 
-            resize() {
-                this.width = window.innerWidth;
-                this.height = window.innerHeight;
-                this.canvas.setAttribute('width', this.width);
-                this.canvas.setAttribute('height', this.height);
-            }
+            var light = new THREE.DirectionalLight();
+            light.position.set(0, 0, 1);
+            root.scene.add(light);
 
-            buildTextMask(texts) {
-                const mask = [];
-                const textAll = texts.reduce((all, textStack) => {
-                    return all.concat(textStack.text);
-                }, '');
+            var tl = new TimelineMax({
+                repeat: -1,
+                repeatDelay: 0.5,
+                yoyo: true
+            });
+            tl.fromTo(textAnimation, 4,
+                { animationProgress: 0.0 },
+                { animationProgress: 0.6, ease: Power1.easeInOut },
+                0
+            );
+            tl.fromTo(textAnimation.rotation, 4, { y: 0 }, { y: Math.PI * 2, ease: Power1.easeInOut }, 0);
 
-                const size = 0.8;
-                const width = 200;
-                const height = width / (this.width / this.height) | 0;
-                const baseFontSize = 20;
-
-                const canvas = document.createElement('canvas');
-                const engine = canvas.getContext('2d');
-
-                canvas.setAttribute('width', width);
-                canvas.setAttribute('height', height);
-
-                const font = (size) => {
-                    return `bold ${size}px Arial`;
-                };
-
-                engine.fillStyle = '#000';
-                engine.font = font(baseFontSize);
-                const m = engine.measureText(textAll);
-                const rel = m.width / (width * size);
-                const fSize = Math.min(height * 0.8, baseFontSize / rel | 0);
-
-                engine.font = font(fSize);
-                const fontWidth = engine.measureText(textAll).width;
-
-                engine.fillText(
-                    textAll,
-                    (width - fontWidth) / 2,
-                    height / 2 + fSize * 0.35
-                );
-
-                let left = (width - fontWidth) / 2;
-                const bot = height / 2 + fSize * 0.35;
-
-                Object.values(texts).forEach(textStack => {
-                    engine.clearRect(0, 0, width, height);
-                    engine.fillText(
-                        textStack.text,
-                        left,
-                        bot
-                    );
-
-                    left += engine.measureText(textStack.text).width;
-
-                    const data = engine.getImageData(0, 0, width, height);
-                    const subStack = [];
-
-                    for (let i = 0, max = data.width * data.height; i < max; i++) {
-                        if (data.data[i * 4 + 3]) {
-                            subStack.push({
-                                x: (i % data.width) / data.width,
-                                y: (i / data.width | 0) / data.height,
-                                o: Math.random(),
-                                t: Math.random()
-                            });
-                        }
-                    }
-
-                    mask.push({
-                        hsl: textStack.hsl,
-                        s: subStack
-                    });
-                });
-
-                return mask;
-            }
-
-            createNewParticle() {
-                for (let i = 0; i < newParticlesPerFrame; i++) {
-                    let main = Math.random() * this.mask.length | 0;
-                    let subMask = this.mask[main];
-                    let maskElement = this.mask[main].s[Math.random() * this.mask[main].s.length | 0];
-
-                    if (subMask && maskElement) {
-                        let particle = {
-                            x: maskElement.x,
-                            y: maskElement.y,
-                            hsl: subMask.hsl,
-                            c: this.prepareParticle
-                        };
-
-                        this.particleMap.set(particle, particle);
-                    }
-                }
-            }
-
-            secLog(log, timesPerFrame) {
-                if (Math.random() < 1 / 60 / timesPerFrame) {
-                    console.log(log);
-                }
-            }
-
-            clear() {
-                this.engine.fillStyle = '#111';
-                this.engine.fillRect(0, 0, this.width, this.height);
-            }
-
-            randFromList(...rands) {
-                return rands.reduce((acc, rand) => {
-                    return acc + rand;
-                }, 0) / rands.length;
-            }
-
-            prepareParticle(particle) {
-                const r1 = Math.random();
-                const r2 = Math.random();
-                const r3 = Math.random();
-
-                const rad = r3 * Math.PI * 2;
-
-                particle.x += (-0.5 + r1) / 300;
-                particle.y += (-0.5 + r2) / 300;
-                particle.si = 1 + Math.random() * 4 | 0;
-
-                particle.s = 0.003 + this.randFromList(r1, r2) / 10;
-                particle.l = 0;
-
-                particle.mx = Math.cos(rad) * (particle.s / (r1 < 0.05 ? 10 : 400));
-                particle.my = Math.sin(rad) * (particle.s / (r1 < 0.05 ? 10 : 400));
-
-                particle.c = this.drawParticle;
-            }
-
-            drawParticle(particle) {
-                if (particle.l >= 1) {
-                    particle.c = null;
-                    return;
-                }
-
-                particle.l += particle.s;
-                particle.x += particle.mx;
-                particle.y += particle.my;
-
-                this.engine.fillStyle = color(particle.hsl, this.opa * Math.sin(particle.l * Math.PI));
-                this.engine.fillRect(particle.x * this.width, particle.y * this.height, particle.si, particle.si);
-            }
-
-            renderParticles() {
-                this.particleMap.forEach((particle) => {
-                    particle.c.call(this, particle);
-
-                    if (!particle.c) {
-                        this.particleMap.delete(particle);
-                    }
-                });
-            }
-
-            drawStatic() {
-                let i = 0;
-                const step = 0.01;
-
-                this.mask.forEach(subMask => {
-                    subMask.s.forEach(pos => {
-                        i++;
-
-                        this.engine.fillStyle = color(subMask.hsl, (1 + Math.cos(pos.x * 5 * pos.y * 5 + this.tick / 10)) / 2 * this.opa * pos.t * 0.5);
-                        this.engine.fillRect(
-                            pos.x * this.width,
-                            pos.y * this.height,
-                            this.width / 150,
-                            this.width / 150
-                        );
-
-                        if (i % 2) {
-                            return;
-                        }
-
-                        pos.o += step;
-                        const opa = Math.max(0, Math.sin(pos.o * Math.PI * 2));
-                        const padding = opa * this.width / 200;
-
-                        this.engine.fillStyle = color(subMask.hsl, this.opa * opa * 0.2);
-
-                        if (pos.t < 0.5) {
-                            this.engine.beginPath();
-                            this.engine.arc(
-                                pos.x * this.width,
-                                pos.y * this.height,
-                                this.width / 500 + padding,
-                                0,
-                                Math.PI * 2
-                            );
-                            this.engine.fill();
-                        } else {
-                            this.engine.fillRect(
-                                pos.x * this.width - padding,
-                                pos.y * this.height - padding,
-                                this.width / 150 + padding * 2,
-                                this.width / 150 + padding * 2
-                            );
-                        }
-                    });
-                });
-            }
-
-            draw() {
-                this.tick++;
-
-                this.nextMaskCb();
-                this.createNewParticle();
-                this.clear();
-
-                this.engine.globalCompositeOperation = 'lighter';
-                this.drawStatic();
-                this.renderParticles();
-                this.engine.globalCompositeOperation = 'source-over';
-
-                requestAnimationFrame(this.drawCB);
-            }
-
-            nextMask() {
-                if (!this.stack[this.stackId]) {
-                    this.stackId = -1;
-                    this.buildStackCache();
-                }
-
-                const step = this.stack[this.stackId];
-                const max = this.stack.length;
-                const current = this.stackId;
-
-                this.mask = this.maskCache[current];
-
-                this.mask.forEach((mask) => {
-                    mask.s.forEach(sub => {
-                        sub.x = sub.x + (Math.random() - 0.5) / 20;
-                        sub.y = sub.y + (Math.random() - 0.5) / 20;
-                    });
-                });
-
-                this.opa = step.fadeIn / max;
-                if (this.mask && this.mask.length) {
-                    setTimeout(() => {
-                        this.opa = Math.max(0, this.opa);
-                    }, 500);
-                }
-
-                if (this.mask && this.mask.length) {
-                    this.stackId++;
-                } else {
-                    this.maskTick++;
-                }
-            }
-
-            static init() {
-                const main = new TextSparks();
-                main.drawCB = main.draw.bind(main);
-                main.draw();
-            }
+            createTweenScrubber(tl);
         }
 
-        TextSparks.init();
+        function createTextAnimation() {
+            var geometry = generateTextGeometry('AS THE WORLD TURNS', {
+                size: 40,
+                height: 12,
+                font: 'droid sans',
+                weight: 'bold',
+                style: 'normal',
+                curveSegments: 24,
+                bevelSize: 2,
+                bevelThickness: 2,
+                bevelEnabled: true,
+                anchor: { x: 0.5, y: 0.5, z: 0.0 }
+            });
+
+            THREE.BAS.Utils.tessellateRepeat(geometry, 1.0, 2);
+            THREE.BAS.Utils.separateFaces(geometry);
+
+            return new TextAnimation(geometry);
+        }
+
+        function generateTextGeometry(text, params) {
+            var geometry = new THREE.TextGeometry(text, params);
+            geometry.computeBoundingBox();
+
+            var size = geometry.boundingBox.size();
+            var anchorX = size.x * -params.anchor.x;
+            var anchorY = size.y * -params.anchor.y;
+            var anchorZ = size.z * -params.anchor.z;
+            var matrix = new THREE.Matrix4().makeTranslation(anchorX, anchorY, anchorZ);
+
+            geometry.applyMatrix(matrix);
+
+            return geometry;
+        }
+
+        function TextAnimation(textGeometry) {
+            var bufferGeometry = new THREE.BAS.ModelBufferGeometry(textGeometry);
+            var aAnimation = bufferGeometry.createAttribute('aAnimation', 2);
+            var aEndPosition = bufferGeometry.createAttribute('aEndPosition', 3);
+            var aAxisAngle = bufferGeometry.createAttribute('aAxisAngle', 4);
+
+            var faceCount = bufferGeometry.faceCount;
+            var maxDelay = 0.0;
+            var minDuration = 1.0;
+            var maxDuration = 1.0;
+            var stretch = 0.05;
+            var lengthFactor = 0.001;
+            var maxLength = textGeometry.boundingBox.max.length();
+
+            this.animationDuration = maxDuration + maxDelay + stretch + lengthFactor * maxLength;
+            this._animationProgress = 0;
+
+            var axis = new THREE.Vector3();
+            var angle;
+
+            for (var i = 0, i2 = 0, i3 = 0, i4 = 0; i < faceCount; i++, i2 += 6, i3 += 9, i4 += 12) {
+                var face = textGeometry.faces[i];
+                var centroid = THREE.BAS.Utils.computeCentroid(textGeometry, face);
+                var centroidN = new THREE.Vector3().copy(centroid).normalize();
+
+                // animation
+                var delay = (maxLength - centroid.length()) * lengthFactor;
+                var duration = THREE.Math.randFloat(minDuration, maxDuration);
+
+                for (var v = 0; v < 6; v += 2) {
+                    aAnimation.array[i2 + v] = delay + stretch * Math.random();
+                    aAnimation.array[i2 + v + 1] = duration;
+                }
+
+                // end position
+                var point = utils.fibSpherePoint(i, faceCount, 200);
+
+                for (var v = 0; v < 9; v += 3) {
+                    aEndPosition.array[i3 + v] = point.x;
+                    aEndPosition.array[i3 + v + 1] = point.y;
+                    aEndPosition.array[i3 + v + 2] = point.z;
+                }
+
+                // axis angle
+                axis.x = centroidN.x;
+                axis.y = -centroidN.y;
+                axis.z = -centroidN.z;
+                axis.normalize();
+
+                angle = Math.PI * THREE.Math.randFloat(0.5, 2.0);
+
+                for (var v = 0; v < 12; v += 4) {
+                    aAxisAngle.array[i4 + v] = axis.x;
+                    aAxisAngle.array[i4 + v + 1] = axis.y;
+                    aAxisAngle.array[i4 + v + 2] = axis.z;
+                    aAxisAngle.array[i4 + v + 3] = angle;
+                }
+            }
+
+            var material = new THREE.BAS.PhongAnimationMaterial({
+                shading: THREE.FlatShading,
+                side: THREE.DoubleSide,
+                transparent: true,
+                uniforms: {
+                    uTime: { type: 'f', value: 0 }
+                },
+                shaderFunctions: [
+                    THREE.BAS.ShaderChunk['cubic_bezier'],
+                    THREE.BAS.ShaderChunk['ease_out_cubic'],
+                    THREE.BAS.ShaderChunk['quaternion_rotation']
+                ],
+                shaderParameters: [
+                    'uniform float uTime;',
+                    'uniform vec3 uAxis;',
+                    'uniform float uAngle;',
+                    'attribute vec2 aAnimation;',
+                    'attribute vec3 aEndPosition;',
+                    'attribute vec4 aAxisAngle;'
+                ],
+                shaderVertexInit: [
+                    'float tDelay = aAnimation.x;',
+                    'float tDuration = aAnimation.y;',
+                    'float tTime = clamp(uTime - tDelay, 0.0, tDuration);',
+                    'float tProgress = ease(tTime, 0.0, 1.0, tDuration);'
+                ],
+                shaderTransformPosition: [
+                    'transformed = mix(transformed, aEndPosition, tProgress);',
+                    'float angle = aAxisAngle.w * tProgress;',
+                    'vec4 tQuat = quatFromAxisAngle(aAxisAngle.xyz, angle);',
+                    'transformed = rotateVector(tQuat, transformed);',
+                ]
+            }, {
+                diffuse: 0x444444,
+                specular: 0xcccccc,
+                shininess: 4
+            });
+
+            THREE.Mesh.call(this, bufferGeometry, material);
+
+            this.frustumCulled = false;
+        }
+
+        TextAnimation.prototype = Object.create(THREE.Mesh.prototype);
+        TextAnimation.prototype.constructor = TextAnimation;
+
+        Object.defineProperty(TextAnimation.prototype, 'animationProgress', {
+            get: function () {
+                return this._animationProgress;
+            },
+            set: function (v) {
+                this._animationProgress = v;
+                this.material.uniforms['uTime'].value = this.animationDuration * v;
+            }
+        });
+
+        function THREERoot(params) {
+            params = utils.extend({
+                fov: 60,
+                zNear: 10,
+                zFar: 100000,
+                createCameraControls: true
+            }, params);
+
+            this.renderer = new THREE.WebGLRenderer({
+                antialias: params.antialias
+            });
+            this.renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+            document.getElementById('three-container').appendChild(this.renderer.domElement);
+
+            this.camera = new THREE.PerspectiveCamera(
+                params.fov,
+                window.innerWidth / window.innerHeight,
+                params.zNear,
+                params.zfar
+            );
+
+            this.scene = new THREE.Scene();
+
+            if (params.createCameraControls) {
+                this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+            }
+
+            this.resize = this.resize.bind(this);
+            this.tick = this.tick.bind(this);
+
+            this.resize();
+            this.tick();
+
+            window.addEventListener('resize', this.resize, false);
+        }
+
+        THREERoot.prototype.resize = function () {
+            this.renderer.setSize(window.innerWidth, window.innerHeight);
+            this.camera.aspect = window.innerWidth / window.innerHeight;
+            this.camera.updateProjectionMatrix();
+        };
+
+        THREERoot.prototype.tick = function () {
+            requestAnimationFrame(this.tick);
+            this.controls.update();
+            this.renderer.render(this.scene, this.camera);
+        };
+
+        function createTweenScrubber(tl) {
+            var input = document.createElement('input');
+            input.type = 'range';
+            input.min = 0;
+            input.max = 1;
+            input.step = 0.01;
+            input.value = 0;
+
+            document.body.appendChild(input);
+
+            input.addEventListener('input', function (e) {
+                tl.progress(e.target.value);
+            });
+        }
+
     </script>
 </body>
 </html>
-
