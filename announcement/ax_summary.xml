@@ -184,9 +184,9 @@
     </section>
 
     <section id="a28">
-        <title>28. Gridworm Canvas Animation</title>
+        <title>28. ...</title>
         <description>
-            This page features an interactive canvas displaying a Gridworm animation, where multiple gridworms move within a grid structure, following specific rules. The gridworms' movements are controlled by velocities and memory of junctions they encounter. The canvas dynamically adjusts to browser window size and allows users to refresh the animation by clicking. The gridworms' behavior is based on their interactions with grid points, and their paths are influenced by random velocities. The page provides a visually engaging experience with constant updates to the animation.
+            This page ...
         </description>
     </section>
 
