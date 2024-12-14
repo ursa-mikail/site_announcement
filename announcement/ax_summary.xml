@@ -155,6 +155,14 @@
     </description>
 </section>
 
+<section id="a24">
+    <title>24. 403 Access Not Granted</title>
+    <description>
+        This page creates a 403 Access Not Granted error page with a playful design featuring animations. It includes a keyhole and key SVG illustrations and a ghost animation that moves across the screen, revealing the message "You know you're supposed to leave, right?" The page is designed to provide a timeless, visually engaging experience on both desktop and mobile devices.
+    </description>
+</section>
+
+
 
     <section id="ax_summary">
         <title>Summary of All Pages</title>
