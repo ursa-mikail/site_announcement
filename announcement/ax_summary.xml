@@ -148,6 +148,13 @@
         </description>
     </section>
 
+<section id="a23">
+    <title>23. Timeline</title>
+    <description>
+        This page creates a timeline section with animation effects using ScrollReveal.js. It includes several timeline items, each describing a significant event or milestone. The timeline items fade in from the left or right as the user scrolls, creating a dynamic and engaging visual experience. The design is responsive, adjusting the animation effects based on the screen size to ensure a seamless experience on both desktop and mobile devices.
+    </description>
+</section>
+
 
     <section id="ax_summary">
         <title>Summary of All Pages</title>

@@ -1,0 +1,25 @@
+// find all the elements with an animation property and add the sentence animation
+const animated = document.querySelectorAll('*[animation]');
+for (const el of animated) {
+  const sentence = el.getAttribute('animation');
+  const duration = el.getAttribute('animation-duration');
+  el.style.setProperty('--animation-sentence', `'${sentence}'`);
+  el.style.setProperty('--animation-duration', `${duration}`);
+}
+
+// find the keyhole, key and ghost, start their animations
+const keyhole = document.querySelector('svg.keyhole');
+const key = document.querySelector('svg.key');
+const ghost = document.querySelector('.ghost');
+
+// first the keyhole and ghost
+setTimeout(() => {
+  keyhole.style.animationPlayState = 'running';
+  ghost.style.animationPlayState = 'running';
+}, 100);
+
+// then the key
+setTimeout(() => {
+  key.style.animationPlayState = 'running';
+}, 1000);
+
