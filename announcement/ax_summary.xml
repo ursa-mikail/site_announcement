@@ -141,6 +141,14 @@
         </description>
     </section>
 
+    <section id="a22">
+        <title>22. Read and Display URL GitHub Raw Pages Content</title>
+        <description>
+            This page allows users to input a URL, fetch the content from that URL, and display it. After loading the content, a button is provided to remove all HTML tags from the fetched data, leaving only plain text. The user can load any page by entering its URL, and the page will be shown in a pre-formatted text block. The "Remove HTML Tags" button cleans the content by removing all HTML elements, providing a plain text version of the data.
+        </description>
+    </section>
+
+
     <section id="ax_summary">
         <title>Summary of All Pages</title>
         <description>
