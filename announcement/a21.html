@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fetch and Display Content</title>
+    <title>Display CSV in Iframe</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -14,43 +14,26 @@
             font-size: 16px;
             cursor: pointer;
         }
-        pre {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            margin-top: 20px;
-            padding: 10px;
+        iframe {
+            width: 100%;
+            height: 500px;
             border: 1px solid #ddd;
-            background-color: #f9f9f9;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
 
-<h1>Fetch and Display Content</h1>
-<button id="fetchButton">Fetch and Display Content</button>
-<pre id="content"></pre>
+<h1>Display CSV in Iframe</h1>
+<button id="loadButton">Load CSV</button>
+<iframe id="csvIframe" style="display:none;"></iframe>
 
 <script>
-    async function fetchAndDisplayContent() {
-        try {
-            const proxyUrl = 'https://cors.bridged.cc/';
-            const targetUrl = 'https://www.gutenberg.org/cache/epub/84/pg84-images.html#letter1';
-            const response = await fetch(proxyUrl + encodeURIComponent(targetUrl));
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            const htmlText = await response.text();
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(htmlText, 'text/html');
-            const textContent = doc.body.textContent || "";
-            document.getElementById('content').textContent = textContent;
-        } catch (error) {
-            console.error('Error fetching content:', error);
-            alert('Failed to fetch the content. Please try again later.');
-        }
-    }
-
-    document.getElementById('fetchButton').addEventListener('click', fetchAndDisplayContent);
+    document.getElementById('loadButton').addEventListener('click', function() {
+        const iframe = document.getElementById('csvIframe');
+        iframe.style.display = 'block';
+        iframe.src = 'https://gist.githubusercontent.com/mikail-eliyah-00/48d6f7fc2f25bd03110e15affcd27679/raw/3ac926683112b9f70a8d7d6006d8eaf4e97cea9c/HTTP%2520response%2520status%2520codes.csv';
+    });
 </script>
 
 </body>
