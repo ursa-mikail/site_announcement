@@ -134,6 +134,12 @@
         </description>
     </section>
 
+    <section id="a21">
+        <title>21. Status Code Display and Search</title>
+        <description>
+            The feature allows users to load a CSV file containing HTTP status codes, types, and meanings. It enables searching for a specific status code to display its type and meaning. Additionally, users can view the full list of status codes in a well-organized table format. This solution uses JavaScript to fetch the CSV content, parse it, and dynamically generate the table. The functionality includes buttons for loading data, searching by code, and displaying the full list.
+        </description>
+    </section>
 
     <section id="ax_summary">
         <title>Summary of All Pages</title>

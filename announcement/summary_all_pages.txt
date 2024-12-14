@@ -60,6 +60,9 @@ Summary of Content Options:
 20. **Hyperlink Maker**
     - The Hyperlink Maker allows users to upload a text file with URLs and optional descriptions in the format `[url][description]`. The tool generates HTML hyperlinks from the file's contents, displays them in an enumerated list, and provides a copy-to-clipboard functionality for easy copying of all generated links.
 
+21. **Status Code Display and Search**
+    - The feature allows users to load a CSV file containing HTTP status codes, types, and meanings. It enables searching for a specific status code to display its type and meaning. Additionally, users can view the full list of status codes in a well-organized table format. This solution uses JavaScript to fetch the CSV content, parse it, and dynamically generate the table. The functionality includes buttons for loading data, searching by code, and displaying the full list.
+
 Summary. **ax_summary: Summary of All Pages**
    - The ax_summary provides an overarching overview of all the sections (a1 to a4). It synthesizes the key points and functionalities from each part, ensuring that users have a clear understanding of the tools and resources available across the different functionalities.
 
