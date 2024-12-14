@@ -176,6 +176,13 @@
     </description>
 </section>
 
+<section id="a27">
+    <title>27. Interactive Skill Progress Bars</title>
+    <description>
+        This page displays interactive skill progress bars with animations for various technologies such as HTML, CSS, JavaScript, PHP, WordPress, Bootstrap, and Laravel. The bars animate their progress using CSS keyframes and JavaScript. Each skill's progress is displayed with percentage values that are dynamically updated by JavaScript, enhancing user experience with color transitions and smooth animations.
+    </description>
+</section>
+
 
     <section id="ax_summary">
         <title>Summary of All Pages</title>
