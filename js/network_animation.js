@@ -1,6 +1,7 @@
 var points = [],
     velocity2 = 5, // velocity squared
-    canvas = document.getElementById('container'),
+    canvas = 
+document.getElementById('container'),
   context = canvas.getContext('2d'),
   radius = 5,
   boundaryX = 200,
