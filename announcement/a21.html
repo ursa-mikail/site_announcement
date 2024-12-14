@@ -28,8 +28,8 @@
 <h1>Status Codes</h1>
 <label for="statusCode">Enter Status Code:</label>
 <input type="text" id="statusCode" placeholder="e.g., 100">
-<button onclick="searchStatusCode()">Search</button>
-<button onclick="displayFullList()">Display Full List</button>
+<button id="searchButton">Search</button>
+<button id="displayButton">Display Full List</button>
 
 <div id="result"></div>
 <div id="fullList"></div>
@@ -102,6 +102,9 @@
             table += '</table>';
             fullListDiv.innerHTML = table;
         }
+
+        document.getElementById('searchButton').addEventListener('click', searchStatusCode);
+        document.getElementById('displayButton').addEventListener('click', displayFullList);
 
         fetchCSV();
     });
