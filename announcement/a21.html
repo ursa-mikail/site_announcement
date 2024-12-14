@@ -37,31 +37,18 @@
 <script>
     let statusCodesData = [];
 
-    // Function to fetch CSV data
     async function fetchCSV() {
         try {
             const response = await fetch('https://gist.githubusercontent.com/mikail-eliyah-00/48d6f7fc2f25bd03110e15affcd27679/raw/3ac926683112b9f70a8d7d6006d8eaf4e97cea9c/HTTP%2520response%2520status%2520codes.csv');
             const csvText = await response.text();
-            console.log('CSV Text:', csvText); // Debugging output
             statusCodesData = csvToArray(csvText);
             console.log('Parsed CSV Data:', statusCodesData); // Debugging output
         } catch (error) {
             console.error('Error fetching CSV data:', error);
-            statusCodesData = [
-                { "status codes": "100", "Type": "Informational responses (100–199)", "Meaning": "Continue" },
-                { "status codes": "101", "Type": "Informational responses (100–199)", "Meaning": "Switching Protocols" },
-                { "status codes": "102", "Type": "Informational responses (100–199)", "Meaning": "Processing (WebDAV)" },
-                { "status codes": "103", "Type": "Informational responses (100–199)", "Meaning": "Early Hints" },
-                { "status codes": "200", "Type": "Successful responses (200–299)", "Meaning": "OK" },
-                { "status codes": "201", "Type": "Successful responses (200–299)", "Meaning": "Created" },
-                { "status codes": "202", "Type": "Successful responses (200–299)", "Meaning": "Accepted" }
-                // Add more entries as needed
-            ];
-            console.log('Fallback Data:', statusCodesData); // Debugging output
+            alert('Failed to fetch the CSV data. Please try again later.');
         }
     }
 
-    // Convert CSV text to an array of objects
     function csvToArray(str, delimiter = ",") {
         const headers = str.slice(0, str.indexOf("\n")).split(delimiter);
         const rows = str.slice(str.indexOf("\n") + 1).split("\n");
@@ -75,7 +62,6 @@
         });
     }
 
-    // Search status code
     function searchStatusCode() {
         const code = document.getElementById('statusCode').value.trim();
         const result = statusCodesData.find(item => item['status codes'] === code);
@@ -94,7 +80,6 @@
         }
     }
 
-    // Display full list
     function displayFullList() {
         let fullListDiv = document.getElementById('fullList');
         fullListDiv.innerHTML = '';
@@ -117,7 +102,6 @@
         fullListDiv.innerHTML = table;
     }
 
-    // Fetch CSV data on load
     window.onload = fetchCSV;
 </script>
 
