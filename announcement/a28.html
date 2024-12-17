@@ -13,7 +13,7 @@
     var myChart = echarts.init(document.getElementById('main'));
     myChart.showLoading();
 
-    $.getJSON('https://echarts.apache.org/examples/data/asset/data/les-miserables.json', function (graph) {
+    $.getJSON(ROOT_PATH + '/data/les-miserables.json', function (graph) {
       myChart.hideLoading();
       var option = {
         tooltip: {},
