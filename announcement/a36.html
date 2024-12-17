@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ECharts</title>
+    <!-- Import ECharts -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+</head>
+<body>
+    <!-- Create a div where the chart will be rendered -->
+    <div id="main" style="width: 600px;height:400px;"></div>
+    <script>
+        var ROOT_PATH = '.';
+
+        var chartDom = document.getElementById('main');
+        var myChart = echarts.init(chartDom);
+        var option;
+
+        myChart.showLoading();
+        $.get(ROOT_PATH + '/data/flare.json', function (data) {
+            myChart.hideLoading();
+            data.children.forEach(function (datum, index) {
+                index % 2 === 0 && (datum.collapsed = true);
+            });
+            myChart.setOption(
+                (option = {
+                    tooltip: {
+                        trigger: 'item',
+                        triggerOn: 'mousemove'
+                    },
+                    series: [
+                        {
+                            type: 'tree',
+                            data: [data],
+                            top: '1%',
+                            left: '7%',
+                            bottom: '1%',
+                            right: '20%',
+                            symbolSize: 7,
+                            label: {
+                                position: 'left',
+                                verticalAlign: 'middle',
+                                align: 'right',
+                                fontSize: 9
+                            },
+                            leaves: {
+                                label: {
+                                    position: 'right',
+                                    verticalAlign: 'middle',
+                                    align: 'left'
+                                }
+                            },
+                            emphasis: {
+                                focus: 'descendant'
+                            },
+                            expandAndCollapse: true,
+                            animationDuration: 550,
+                            animationDurationUpdate: 750
+                        }
+                    ]
+                })
+            );
+        });
+
+        option && myChart.setOption(option);
+    </script>
+</body>
+</html>
