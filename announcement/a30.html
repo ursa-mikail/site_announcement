@@ -21,13 +21,13 @@
         import 'echarts-gl';
         import 'echarts-graph-modularity';
 
-        var ROOT_PATH = 'https://echarts.apache.org/examples';
+        var ROOT_PATH = '.';
 
         var chartDom = document.getElementById('main');
         var myChart = echarts.init(chartDom, 'dark');
         var option;
 
-        $.getJSON(ROOT_PATH + '/data-gl/asset/data/npmdep.json', function (data) {
+        $.getJSON(ROOT_PATH + '/data/npmdep.json', function (data) {
             var nodes = data.nodes.map(function (nodeName, idx) {
                 return {
                     name: nodeName,
