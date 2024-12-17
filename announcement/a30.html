@@ -2,231 +2,137 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wind Data Visualization</title>
+    <title>ECharts Graph Modularity Example</title>
     <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/echarts-gl/dist/echarts-gl.min.js"></script>
-    
-    <script src="https://cdn.jsdelivr.net/npm/echarts/extension/bmap/bmap.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/extension/bmap/bmap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts-graph-modularity"></script>
     <style>
-        html, body, #main {
+        #main {
             width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
+            height: 600px;
         }
     </style>
 </head>
 <body>
     <div id="main"></div>
     <script>
-        var ROOT_PATH = '.';
+        import * as echarts from 'echarts';
+        import 'echarts-gl';
+        import 'echarts-graph-modularity';
+
+        var ROOT_PATH = 'https://echarts.apache.org/examples';
 
         var chartDom = document.getElementById('main');
-        var myChart = echarts.init(chartDom);
+        var myChart = echarts.init(chartDom, 'dark');
         var option;
 
-        $.getJSON(ROOT_PATH + '/data/winds.json', function (windData) {
-            var data = [];
-            var p = 0;
-            var maxMag = 0;
-            var minMag = Infinity;
-            for (var j = 0; j < windData.ny; j++) {
-                for (var i = 0; i <= windData.nx; i++) {
-                    // Continuous data.
-                    var p = (i % windData.nx) + j * windData.nx;
-                    var vx = windData.data[p][0];
-                    var vy = windData.data[p][1];
-                    var mag = Math.sqrt(vx * vx + vy * vy);
-                    // 数据是一个一维数组
-                    // [ [经度, 维度，向量经度方向的值，向量维度方向的值] ]
-                    data.push([
-                        (i / windData.nx) * 360 - 180,
-                        (j / windData.ny) * 180 - 90,
-                        vx,
-                        vy,
-                        mag
-                    ]);
-                    maxMag = Math.max(mag, maxMag);
-                    minMag = Math.min(mag, minMag);
-                }
+        $.getJSON(ROOT_PATH + '/data-gl/asset/data/npmdep.json', function (data) {
+            var nodes = data.nodes.map(function (nodeName, idx) {
+                return {
+                    name: nodeName,
+                    value: data.dependentsCount[idx]
+                };
+            });
+            var edges = [];
+            for (var i = 0; i < data.edges.length; ) {
+                var s = data.edges[i++];
+                var t = data.edges[i++];
+                edges.push({
+                    source: s,
+                    target: t
+                });
             }
-            myChart.setOption(
-                (option = {
-                    backgroundColor: '#001122',
-                    visualMap: {
-                        left: 'right',
-                        min: minMag,
-                        max: maxMag,
-                        dimension: 4,
-                        inRange: {
-                            // color: ['green', 'yellow', 'red']
-                            color: [
-                                '#313695',
-                                '#4575b4',
-                                '#74add1',
-                                '#abd9e9',
-                                '#e0f3f8',
-                                '#ffffbf',
-                                '#fee090',
-                                '#fdae61',
-                                '#f46d43',
-                                '#d73027',
-                                '#a50026'
-                            ]
+            nodes.forEach(function (node) {
+                node.emphasis = {
+                    label: {
+                        show: true
+                    }
+                };
+                if (node.value > 5000) {
+                    node.label = {
+                        show: true
+                    };
+                }
+            });
+            myChart.setOption({
+                backgroundColor: '#000',
+                series: [
+                    {
+                        color: [
+                            'rgb(203,239,15)',
+                            'rgb(73,15,239)',
+                            'rgb(15,217,239)',
+                            'rgb(30,15,239)',
+                            'rgb(15,174,239)',
+                            'rgb(116,239,15)',
+                            'rgb(239,15,58)',
+                            'rgb(15,239,174)',
+                            'rgb(239,102,15)',
+                            'rgb(239,15,15)',
+                            'rgb(15,44,239)',
+                            'rgb(239,145,15)',
+                            'rgb(30,239,15)',
+                            'rgb(239,188,15)',
+                            'rgb(159,239,15)',
+                            'rgb(159,15,239)',
+                            'rgb(15,239,44)',
+                            'rgb(15,239,87)',
+                            'rgb(15,239,217)',
+                            'rgb(203,15,239)',
+                            'rgb(239,15,188)',
+                            'rgb(239,15,102)',
+                            'rgb(239,58,15)',
+                            'rgb(239,15,145)',
+                            'rgb(116,15,239)',
+                            'rgb(15,131,239)',
+                            'rgb(73,239,15)',
+                            'rgb(15,239,131)',
+                            'rgb(15,87,239)',
+                            'rgb(239,15,231)'
+                        ],
+                        type: 'graphGL',
+                        nodes: nodes,
+                        edges: edges,
+                        modularity: {
+                            resolution: 2,
+                            sort: true
                         },
-                        realtime: false,
-                        calculable: true,
-                        textStyle: {
+                        lineStyle: {
+                            color: 'rgba(255,255,255,1)',
+                            opacity: 0.05
+                        },
+                        itemStyle: {
+                            opacity: 1
+                        },
+                        focusNodeAdjacency: false,
+                        focusNodeAdjacencyOn: 'click',
+                        symbolSize: function (value) {
+                            return Math.sqrt(value / 10);
+                        },
+                        label: {
                             color: '#fff'
-                        }
-                    },
-                    bmap: {
-                        center: [0, 0],
-                        zoom: 1,
-                        roam: true,
-                        mapStyle: {
-                            styleJson: [
-                                {
-                                    featureType: 'water',
-                                    elementType: 'all',
-                                    stylers: {
-                                        color: '#031628'
-                                    }
-                                },
-                                {
-                                    featureType: 'land',
-                                    elementType: 'geometry',
-                                    stylers: {
-                                        color: '#000102'
-                                    }
-                                },
-                                {
-                                    featureType: 'highway',
-                                    elementType: 'all',
-                                    stylers: {
-                                        visibility: 'off'
-                                    }
-                                },
-                                {
-                                    featureType: 'arterial',
-                                    elementType: 'geometry.fill',
-                                    stylers: {
-                                        color: '#000000'
-                                    }
-                                },
-                                {
-                                    featureType: 'arterial',
-                                    elementType: 'geometry.stroke',
-                                    stylers: {
-                                        color: '#0b3d51'
-                                    }
-                                },
-                                {
-                                    featureType: 'local',
-                                    elementType: 'geometry',
-                                    stylers: {
-                                        color: '#000000'
-                                    }
-                                },
-                                {
-                                    featureType: 'railway',
-                                    elementType: 'geometry.fill',
-                                    stylers: {
-                                        color: '#000000'
-                                    }
-                                },
-                                {
-                                    featureType: 'railway',
-                                    elementType: 'geometry.stroke',
-                                    stylers: {
-                                        color: '#08304b'
-                                    }
-                                },
-                                {
-                                    featureType: 'subway',
-                                    elementType: 'geometry',
-                                    stylers: {
-                                        lightness: -70
-                                    }
-                                },
-                                {
-                                    featureType: 'building',
-                                    elementType: 'geometry.fill',
-                                    stylers: {
-                                        color: '#000000'
-                                    }
-                                },
-                                {
-                                    featureType: 'all',
-                                    elementType: 'labels.text.fill',
-                                    stylers: {
-                                        color: '#857f7f'
-                                    }
-                                },
-                                {
-                                    featureType: 'all',
-                                    elementType: 'labels.text.stroke',
-                                    stylers: {
-                                        color: '#000000'
-                                    }
-                                },
-                                {
-                                    featureType: 'building',
-                                    elementType: 'geometry',
-                                    stylers: {
-                                        color: '#022338'
-                                    }
-                                },
-                                {
-                                    featureType: 'green',
-                                    elementType: 'geometry',
-                                    stylers: {
-                                        color: '#062032'
-                                    }
-                                },
-                                {
-                                    featureType: 'boundary',
-                                    elementType: 'all',
-                                    stylers: {
-                                        color: '#465b6c'
-                                    }
-                                },
-                                {
-                                    featureType: 'manmade',
-                                    elementType: 'all',
-                                    stylers: {
-                                        color: '#022338'
-                                    }
-                                },
-                                {
-                                    featureType: 'label',
-                                    elementType: 'all',
-                                    stylers: {
-                                        visibility: 'off'
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    series: [
-                        {
-                            type: 'flowGL',
-                            coordinateSystem: 'bmap',
-                            data: data,
-                            supersampling: 4,
-                            particleType: 'line',
-                            particleDensity: 128,
-                            particleSpeed: 1,
-                            // gridWidth: windData.nx,
-                            // gridHeight: windData.ny,
-                            itemStyle: {
-                                opacity: 0.7
+                        },
+                        emphasis: {
+                            label: {
+                                show: false
+                            },
+                            lineStyle: {
+                                opacity: 0.5,
+                                width: 4
                             }
+                        },
+                        forceAtlas2: {
+                            steps: 5,
+                            stopThreshold: 20,
+                            jitterTolerence: 10,
+                            edgeWeight: [0.2, 1],
+                            gravity: 5,
+                            edgeWeightInfluence: 0
                         }
-                    ]
-                })
-            );
+                    }
+                ]
+            });
         });
 
         option && myChart.setOption(option);
