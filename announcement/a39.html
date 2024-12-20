@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Error Status Code Search</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+</head>
+<body>
+  <h1>Error Status Code Search</h1>
+
+  <!-- Button to load CSV -->
+  <button id="loadButton">Load Full CSV</button>
+
+  <br><br>
+
+  <!-- Search input -->
+  <label for="search">Enter status code to search:</label>
+  <input type="text" id="search" placeholder="Search for code or description" />
+  
+  <br><br>
+
+  <!-- Category input -->
+  <label for="category">Select Category:</label>
+  <select id="category">
+    <option value="">Select a Category</option>
+    <option value="Object">Object</option>
+    <option value="Subject">Subject</option>
+    <option value="Interface">Interface</option>
+    <option value="Action">Action</option>
+    <option value="Attribute">Attribute</option>
+  </select>
+
+  <br><br>
+
+  <!-- Results container -->
+  <div id="results"></div>
+
+  <script>
+    // Path to your CSV file
+    const csvFilePath = '../data/codes_status.csv';
+    let loadedData = []; // Store parsed CSV data
+
+    // Function to load the CSV
+    function loadCSV(filePath) {
+      Papa.parse(filePath, {
+        download: true,
+        header: true,  // Assuming the CSV has headers
+        complete: function(results) {
+          console.log('CSV Loaded:', results);
+          loadedData = results.data; // Store the parsed CSV data
+          document.getElementById('loadButton').disabled = true; // Disable the button after loading
+        }
+      });
+    }
+
+    // Search function to find matching status codes or descriptions
+    function searchStatusCode(query, category) {
+      const lowerQuery = query.toLowerCase();
+      const filteredData = loadedData.filter(item => {
+        // Only include items that match the query and belong to the selected category
+        return (
+          (item.Code.toLowerCase().includes(lowerQuery) || item.Description.toLowerCase().includes(lowerQuery)) &&
+          (category === '' || item.Category === category) // Check category
+        );
+      });
+      displayResults(filteredData);
+    }
+
+    // Display the search results
+    function displayResults(results) {
+      const resultsContainer = document.getElementById('results');
+      resultsContainer.innerHTML = ''; // Clear previous results
+
+      if (results.length === 0) {
+        resultsContainer.innerHTML = 'No matches found.';
+      } else {
+        const list = document.createElement('ul');
+        results.forEach(result => {
+          const listItem = document.createElement('li');
+          listItem.textContent = `Code: ${result.Code}, Description: ${result.Description}, Category: ${result.Category}`;
+          list.appendChild(listItem);
+        });
+        resultsContainer.appendChild(list);
+      }
+    }
+
+    // Event listener for the search input
+    document.getElementById('search').addEventListener('input', function(event) {
+      const query = event.target.value;
+      const category = document.getElementById('category').value;
+      searchStatusCode(query, category); // Perform search with both query and selected category
+    });
+
+    // Event listener for the category dropdown
+    document.getElementById('category').addEventListener('change', function(event) {
+      const query = document.getElementById('search').value;
+      const category = event.target.value;
+      searchStatusCode(query, category); // Perform search with updated category filter
+    });
+
+    // Load the CSV when the "Load Full CSV" button is clicked
+    document.getElementById('loadButton').addEventListener('click', function() {
+      loadCSV(csvFilePath);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+Category,Code,Description
+Object,00,system
+Object,01,processor
+Object,02,Memory (processing): NVM, RAM, cache, etc
+Object,03,Memory (persistent): EEPROM
+Object,04,address
+Object,05,agent
+Object,06,function, class, method
+Object,07,data: byte, field, address, variable, parameter, file/folder/resource, input
+Object,08,options
+Object,09,state, status, flag
+Object,0a,output, result
+Object,0b,secrets: key, passcode, token, parameters for secrets, etc
+Object,0c,certificate
+Object,0d,signature, permit (signed)
+Object,0e,permission, condition
+Object,0f,algorithm, modes, etc
+Object,10,session
+Object,11,command/instruction (transmit)
+Object,12,response (reception)
+Object,13,RFU
+Subject,00,entity (human)
+Subject,01,entity (non-human agent)
+Subject,02,RFU
+Interface,00,access, control
+Interface,01,i/o
+Interface,02,RFU
+Action,00,command (generic)
+Action,01,execute
+Action,02,write
+Action,03,read
+Action,04,cipher, decipher
+Action,05,authentication (data)
+Action,06,authentication (entity)
+Action,07,RFU
+Attribute,00,on, open
+Attribute,01,off, close
+Attribute,02,success, valid, exist, correct, verified, true, OK
+Attribute,03,failure / incompatible, invalid, false, incorrect, impermissible, NOT OK [ERROR]
+Attribute,04,absent, unavailable, missing, [ERROR / RELIABILITY]
+Attribute,05,unrecoverable, [FATAL]
+Attribute,06,corrupted, disrupted [ERROR / FATAL]
+Attribute,07,undefined, not supported [ERROR]
+Attribute,08,active
+Attribute,09,inactive, block / lock / disabled
+Attribute,0a,unblock
+Attribute,0b,=, (match)
+Attribute,0c,>, (does not match)
+Attribute,0d,<, (does not match)
+Attribute,0e,from/to
+Attribute,0f,protocol
+Attribute,10,format, type
+Attribute,11,FATAL
+Attribute,12,WARNING
+Attribute,13,DEBUG/TRACE
+Attribute,14,SECURITY_FEATURE / SECURITY_COUNTERMEASURE
+Attribute,15,race_condition, already existed
+Attribute,16,space, size, boundary, limit, range
+Attribute,17,time / timing
+Attribute,18,energy
+Attribute,19,unchanged
+Attribute,1a,amend
+Attribute,1b,emend
+Attribute,1c,start
+Attribute,1d,end/terminate/aborted
+Attribute,1e,reset
+Attribute,1f,pause
+Attribute,20,continue
+Attribute,21,Waiting / unfinished / incomplete / More data or actions expected.
+Attribute,22,select, sort, etc.
+Attribute,23,loaded
+Attribute,24,referencing (pointer, index, identifier)
+Attribute,25,out of memory, out of time
+Attribute,26,NOP
+Attribute,27,RFU
+
