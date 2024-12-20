@@ -1,108 +1,262 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Error Status Code Search</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status Code Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        input, select {
+            padding: 5px;
+            font-size: 16px;
+        }
+    </style>
 </head>
 <body>
-  <h1>Error Status Code Search</h1>
 
-  <!-- Button to load CSV -->
-  <button id="loadButton">Load Full CSV</button>
+<h1>Status Code Search</h1>
 
-  <br><br>
+<!-- Button to load CSV -->
+<button id="loadButton">Load Full CSV</button>
 
-  <!-- Search input -->
-  <label for="search">Enter status code to search:</label>
-  <input type="text" id="search" placeholder="Search for code or description" />
-  
-  <br><br>
+<br><br>
 
-  <!-- Category input -->
-  <label for="category">Select Category:</label>
-  <select id="category">
+<!-- Search input -->
+<label for="search">Enter status code or description to search:</label>
+<input type="text" id="search" placeholder="Search for code or description" />
+
+<br><br>
+
+<!-- Category input -->
+<label for="category">Select Category:</label>
+<select id="category">
     <option value="">Select a Category</option>
-    <option value="Object">Object</option>
-    <option value="Subject">Subject</option>
-    <option value="Interface">Interface</option>
-    <option value="Action">Action</option>
-    <option value="Attribute">Attribute</option>
-  </select>
+    <option value="Informational">Informational</option>
+    <option value="Success">Success</option>
+    <option value="Redirection">Redirection</option>
+    <option value="Client Error">Client Error</option>
+    <option value="Server Error">Server Error</option>
+</select>
 
-  <br><br>
+<br><br>
 
-  <!-- Results container -->
-  <div id="results"></div>
+<!-- Results container -->
+<div id="results"></div>
 
-  <script>
-    // Path to your CSV file
-    const csvFilePath = '../data/codes_status.csv';
-    let loadedData = []; // Store parsed CSV data
+<script>
+    let csvData = [];
 
-    // Function to load the CSV
-    function loadCSV(filePath) {
-      Papa.parse(filePath, {
-        download: true,
-        header: true,  // Assuming the CSV has headers
-        complete: function(results) {
-          console.log('CSV Loaded:', results);
-          loadedData = results.data; // Store the parsed CSV data
-          document.getElementById('loadButton').disabled = true; // Disable the button after loading
-        }
-      });
+    // Load CSV content from the provided URL
+    function loadCSV() {
+        const url = 'https://raw.githubusercontent.com/ursa-mikail/site_announcement/refs/heads/main/data/codes_status.csv';
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(data => {
+                csvData = parseCSV(data);
+                document.getElementById('loadButton').disabled = true; // Disable the button after loading
+            })
+            .catch(error => {
+                console.error('Error fetching content:', error);
+                alert('Failed to fetch the content. Please try again later.');
+            });
     }
 
-    // Search function to find matching status codes or descriptions
+    // Parse CSV data into structured format
+    function parseCSV(data) {
+        const rows = data.trim().split('\n');
+        const parsedData = rows.map(row => {
+            const [statusCode, category, meaning] = row.split(',').map(item => item.trim().replace(/^"|"$/g, ''));
+            return { statusCode, category, meaning };
+        });
+        return parsedData.slice(1); // Skip the header row
+    }
+
+    // Function to search the status code or description based on input and selected category
     function searchStatusCode(query, category) {
-      const lowerQuery = query.toLowerCase();
-      const filteredData = loadedData.filter(item => {
-        // Only include items that match the query and belong to the selected category
-        return (
-          (item.Code.toLowerCase().includes(lowerQuery) || item.Description.toLowerCase().includes(lowerQuery)) &&
-          (category === '' || item.Category === category) // Check category
-        );
-      });
-      displayResults(filteredData);
+        const lowerQuery = query.toLowerCase();
+        const filteredData = csvData.filter(item => {
+            return (
+                (item.statusCode.toLowerCase().includes(lowerQuery) || item.meaning.toLowerCase().includes(lowerQuery)) &&
+                (category === '' || item.category.toLowerCase().includes(category.toLowerCase()))
+            );
+        });
+        displayResults(filteredData);
     }
 
     // Display the search results
     function displayResults(results) {
-      const resultsContainer = document.getElementById('results');
-      resultsContainer.innerHTML = ''; // Clear previous results
+        const resultsContainer = document.getElementById('results');
+        resultsContainer.innerHTML = ''; // Clear previous results
 
-      if (results.length === 0) {
-        resultsContainer.innerHTML = 'No matches found.';
-      } else {
-        const list = document.createElement('ul');
-        results.forEach(result => {
-          const listItem = document.createElement('li');
-          listItem.textContent = `Code: ${result.Code}, Description: ${result.Description}, Category: ${result.Category}`;
-          list.appendChild(listItem);
-        });
-        resultsContainer.appendChild(list);
-      }
+        if (results.length === 0) {
+            resultsContainer.innerHTML = 'No matches found.';
+        } else {
+            const list = document.createElement('ul');
+            results.forEach(result => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `Code: ${result.statusCode}, Meaning: ${result.meaning}, Category: ${result.category}`;
+                list.appendChild(listItem);
+            });
+            resultsContainer.appendChild(list);
+        }
     }
 
-    // Event listener for the search input
+    // Event listener for search input to filter data
     document.getElementById('search').addEventListener('input', function(event) {
-      const query = event.target.value;
-      const category = document.getElementById('category').value;
-      searchStatusCode(query, category); // Perform search with both query and selected category
+        const query = event.target.value;
+        const category = document.getElementById('category').value;
+        searchStatusCode(query, category); // Perform search with both query and selected category
     });
 
-    // Event listener for the category dropdown
+    // Event listener for category dropdown to filter data
     document.getElementById('category').addEventListener('change', function(event) {
-      const query = document.getElementById('search').value;
-      const category = event.target.value;
-      searchStatusCode(query, category); // Perform search with updated category filter
+        const query = document.getElementById('search').value;
+        const category = event.target.value;
+        searchStatusCode(query, category); // Perform search with updated category filter
     });
 
-    // Load the CSV when the "Load Full CSV" button is clicked
-    document.getElementById('loadButton').addEventListener('click', function() {
-      loadCSV(csvFilePath);
-    });
-  </script>
+    // Load CSV when the "Load Full CSV" button is clicked
+    document.getElementById('loadButton').addEventListener('click', loadCSV);
+</script>
+
+<hr>
+
+<pre>
+╔════ ೋღ☃ღೋ ════╗
+*       Object       * 
+╚════ ೋღ☃ღೋ ════╝
+   00: system
+   01: processor
+   02: Memory (processing): NVM, RAM, cache, etc
+   03: Memory (persistent): EEPROM
+   04: address,
+   05: agent,
+   06: function, class, method
+   07: data: byte, field, address, variable, parameter, file /folder/resource, input
+   08: options, 
+   09: state, status, flag, 
+   0a: output, result
+   0b: secrets: key, passcode, token, parameters for secrets, etc
+   0c: certificate, 
+   0d: signature, permit (signed)
+   0e: permission, condition, 
+   0f: algorithm, modes, etc 
+   10: session
+   11: command / instruction (transmit)
+   12: response (reception)
+   13: RFU
+╔════ ೋღ☃ღೋ ════╗
+*      Subject       * 
+╚════ ೋღ☃ღೋ ════╝
+   00: entity (human)
+   01: entity (non-human agent)
+   02: RFU
+╔════ ೋღ☃ღೋ ════╗
+*      Interface     * 
+╚════ ೋღ☃ღೋ ════╝
+   00: access, control, 
+   01: i/o
+   02: RFU
+╔════ ೋღ☃ღೋ ════╗
+*       Action       * 
+╚════ ೋღ☃ღೋ ════╝
+   00: command (generic)
+   01: execute,
+   02: write, 
+   03: read,  
+   04: cipher, decipher, 
+   05: authentication (data)
+   06: authentication (entity)
+   07: RFU
+╔════ ೋღ☃ღೋ ════╗
+*      Attribute     * 
+╚════ ೋღ☃ღೋ ════╝
+[INFO]
+   00: on, open
+   01: off, close
+   02: success, valid, exist, correct, verified, true, OK
+   03: failure / incompatible, invalid, false, incorrect, impermissible, NOT OK   [ERROR]
+   04: absent, unavailable, missing, [ERROR / RELIABILITY]
+   05: unrecoverable, [FATAL]
+   06: corrupted, disrupted [ERROR / FATAL]
+   07: undefined, not supported [ERROR]
+   08: active
+   09: inactive, block / lock / disabled,
+   0a: unblock, 
+   0b: =, (match)
+   0c: >, (does not match)
+   0d: <,  (does not match)
+   0e: from/to, 
+   0f: protocol
+   10: format, type
+   11: FATAL
+   12: WARNING
+   13: DEBUG/TRACE
+   14: SECURITY_FEATURE / SECURITY_COUNTERMEASURE
+   15: race_condition, already existed
+   16: space, size, boundary, limit, range, 
+   17: time / timing
+   18: energy 
+   19: unchanged
+   1a: amend 
+   1b: emend
+   1c: start
+   1d: end/ terminate/ aborted
+   1e: reset
+   1f: pause
+   20: continue
+   21: Waiting / unfinished   / incomplete/ More data or actions expected.
+   22: select, sort, etc.
+   23: loaded
+   24: referencing   (pointer, index, identifier)
+   25: out of memory, out of time
+   26: NOP
+   27: RFU
+   
+
+"""
+Sample usage: 0c 01 00 06 02
+Interpretation ➤ 
+"""
+</pre>
+
+<b>[certificate]</b> on <b>[device]</b> on <b>[interfacing for control]</b> to <b>[authorize another device]</b> (mutual authentication involved) is <b>[successful]</b>.
+
+<br>
+
+   * Mnemonic: <b>`R.E.D. S.W.I.F.T.`</b>   
+<br>
+ <b>[RFU/ERROR/DEBUG/SECURITY_FEATURE/WARNING/INFO/FATAL/TRACE]</b>
+* 0x5a for not applicable (N.A.)
+
 </body>
 </html>
+
+
