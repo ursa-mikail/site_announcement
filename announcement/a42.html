@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Probability Finder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        input[type="range"] {
+            width: 100%;
+        }
+        .heat-bar {
+            width: 100%;
+            height: 30px;
+            background: linear-gradient(to right, blue, green, yellow, red);
+            margin: 10px 0;
+        }
+        .heat-bar-value {
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Probability Finder</h1>
+    <label for="percentage">Enter Percentage (0-100%):</label>
+    <input type="number" id="percentage" min="0" max="100" step="0.01">%
+    <br><br>
+    <label for="temperature">Adjust Temperature Bar:</label>
+    <input type="range" id="temperature" min="0" max="100" step="0.01">
+    <div class="heat-bar"></div>
+    <div class="heat-bar-value" id="temperatureValue">0%</div>
+    <br><br>
+    <button onclick="findProbability()">Find Equivalent Event</button>
+    <p id="result"></p>
+
+    <script>
+        document.getElementById('temperature').addEventListener('input', function() {
+            let tempValue = this.value;
+            document.getElementById('temperatureValue').textContent = tempValue + '%';
+            document.getElementById('percentage').value = tempValue;
+        });
+
+        document.getElementById('percentage').addEventListener('input', function() {
+            let percValue = this.value;
+            document.getElementById('temperature').value = percValue;
+            document.getElementById('temperatureValue').textContent = percValue + '%';
+        });
+
+        async function fetchCSV() {
+            const response = await fetch('../data/probability_of_occurrences_00.csv');
+            const data = await response.text();
+            return data;
+        }
+
+        function csvToArray(str, delimiter = ',') {
+            const rows = str.slice(0).split('\n');
+            return rows.map(row => row.split(delimiter));
+        }
+
+        async function findProbability() {
+            const inputValue = parseFloat(document.getElementById('percentage').value) / 100;
+            const csvData = await fetchCSV();
+            const data = csvToArray(csvData);
+            let closestEvent = '';
+            let closestDiff = Infinity;
+
+            data.forEach(row => {
+                const event = row[0];
+                const probabilityRange = row[1].split(' to ').map(Number);
+                const minProbability = probabilityRange[0] / 100;
+                const maxProbability = (probabilityRange[1] || probabilityRange[0]) / 100;
+                const probability = (minProbability + maxProbability) / 2;
+                const diff = Math.abs(probability - inputValue);
+                if (diff < closestDiff) {
+                    closestDiff = diff;
+                    closestEvent = event;
+                }
+            });
+
+            document.getElementById('result').textContent = `Closest event: ${closestEvent} with a probability of ${inputValue * 100}%`;
+        }
+    </script>
+</body>
+</html>
