@@ -206,6 +206,13 @@
         </description>
     </section>
 
+<section id="[a41, a42]">
+    <title>[41, 42]. Probability Finder</title>
+    <description>
+        This page allows users to input a percentage or adjust a temperature bar to find the closest equivalent probability of various events, such as getting struck by lightning, winning the lottery, or being born. It reads data from a CSV file containing probabilities of different occurrences.
+    </description>
+</section>
+
 
     <section id="ax_summary">
         <title>Summary of All Pages</title>
