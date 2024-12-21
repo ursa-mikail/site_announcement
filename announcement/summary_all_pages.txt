@@ -89,7 +89,7 @@ Summary of Content Options:
         The CSV data contains three fields: **Category**, **Code**, and **Description**. The user can load the CSV file, 
         perform dynamic searches, and filter results by **Category**. The page displays the matching results in a table format.
 
-40. **URL Generator**
+40. **URL Traversal Generator**
     - This page allows users to generate a list of URLs based on specified inputs. Users can input the root URL, path segments, file prefix, start and end numbers, and choose whether to zero-pad the numbers and select a file extension. The generated URLs are displayed as clickable links.
 
 

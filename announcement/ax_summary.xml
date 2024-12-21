@@ -200,7 +200,7 @@
     </section>
 
     <section id="a40">
-        <title>40. URL Generator</title>
+        <title>40. URL Traversal Generator</title>
         <description>
             This page allows users to generate a list of URLs based on specified inputs. Users can input the root URL, path segments, file prefix, start and end numbers, and choose whether to zero-pad the numbers and select a file extension. The generated URLs are displayed as clickable links.
         </description>
