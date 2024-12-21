@@ -1,5 +1,6 @@
 Event,Probability
-Probability of an Earth-like planet existing around a star (10^-1 to 10^-2),10 to 1
+Probability of an Earth-like planet existing around a star (10^-1 to 10^-2),0.1
+Probability of an Earth-like planet existing around a star (10^-2 to 10^-3),0.01
 Getting struck by lightning per year,0.000002
 Getting struck by lightning in a lifetime,0.000065
 Significant asteroid impact (1 km diameter) per year,0.000002
