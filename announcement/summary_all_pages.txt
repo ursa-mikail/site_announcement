@@ -92,7 +92,7 @@ Summary of Content Options:
 40. **URL Traversal Generator**
     - This page allows users to generate a list of URLs based on specified inputs. Users can input the root URL, path segments, file prefix, start and end numbers, and choose whether to zero-pad the numbers and select a file extension. The generated URLs are displayed as clickable links.
 
-41, 42. **Probability Finder<**
+[41, 42]. **Probability Finder**
     - This page allows users to input a percentage or adjust a temperature bar to find the closest equivalent probability of various events, such as getting struck by lightning, winning the lottery, or being born. It reads data from a CSV file containing probabilities of different occurrences.
 
 
