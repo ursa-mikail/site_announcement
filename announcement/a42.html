@@ -51,7 +51,7 @@
         });
 
         async function fetchCSV() {
-            const response = await fetch('../data/probability_of_occurrences.csv');
+            const response = await fetch('../data/probability_of_occurrences_00.csv');
             const data = await response.text();
             return data;
         }
@@ -82,7 +82,7 @@
                 }
             });
 
-            document.getElementById('result').textContent = `Closest event: ${closestEvent} with a probability of ${(closestDiff + inputValue) * 100}%`;
+            document.getElementById('result').textContent = `Closest event: ${closestEvent} with a probability of ${inputValue * 100}%`;
         }
     </script>
 </body>

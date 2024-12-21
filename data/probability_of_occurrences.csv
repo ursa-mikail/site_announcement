@@ -1,16 +1,23 @@
 Event,Probability
-Earth-like planet around a star,1
-Getting struck by lightning in a year,0.0002
-Significant asteroid impact per year,0.0002
-General cancer diagnosis in a lifetime,33
-Lung cancer diagnosis in a lifetime,6.7
-Breast cancer diagnosis in a lifetime (women),12.5
-Prostate cancer diagnosis in a lifetime (men),11.1
-Plane crash per flight,0.000009
-Winning the lottery,0.00000033
-Shark attack in a year,0.000027
-Meteorite hitting a person in a year,0.0000625
-Auto accident per mile driven,0.27
-Hole-in-one in golf for an amateur,0.008
-Twins birth naturally,0.4
-
+Probability of being born,0.000000000000025
+Plane crash per mile flown,0.000000000017
+Winning the lottery (e.g., Mega Millions),0.0000000033
+Shark attack in a lifetime,0.0000000038
+Meteorite hitting a person per year,0.000000625
+Plane crash per flight,0.00000009
+Shark attack per year,0.00000027
+Getting struck by lightning per year,0.000002
+Significant asteroid impact (1 km diameter) per year,0.000002
+Getting struck by lightning in a lifetime,0.000065
+Hole-in-one in golf for an amateur,0.00008
+Hole-in-one in golf for a professional,0.0004
+Auto accident per mile driven,0.0027
+Auto accident per 1,000 miles,0.0027
+Having twins naturally,0.004
+Auto accident in a lifetime,0.013
+Probability of an Earth-like planet existing around a star (10^-2 to 10^-3),0.01
+Lung cancer diagnosis in a lifetime,0.067
+Prostate cancer diagnosis in a lifetime (men),0.111
+Breast cancer diagnosis in a lifetime (women),0.125
+Probability of an Earth-like planet existing around a star (10^-1 to 10^-2),0.1
+General cancer diagnosis in a lifetime (US),0.33
