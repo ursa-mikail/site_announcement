@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Generator</title>
+    <script>
+        function generateUrls() {
+            const rootUrl = document.getElementById("rootUrl").value;
+            const path1 = document.getElementById("path1").value;
+            const path2 = document.getElementById("path2").value;
+            const filePrefix = document.getElementById("filePrefix").value;
+            const startNum = parseInt(document.getElementById("startNum").value, 10);
+            const endNum = parseInt(document.getElementById("endNum").value, 10);
+            const zeroPad = document.getElementById("zeroPad").checked;
+            const fileExt = document.getElementById("fileExt").value;
+
+            let result = "";
+
+            for (let i = startNum; i <= endNum; i++) {
+                const fileNumber = zeroPad ? String(i).padStart(2, '0') : i;
+                const url = `${rootUrl}/${path1}/${path2}/${filePrefix}${fileNumber}${fileExt}`;
+                result += `<a href="${url}" target="_blank">${url}</a><br>`;
+            }
+
+            document.getElementById("result").innerHTML = result;
+        }
+    </script>
+</head>
+<body>
+    <h1>URL Generator</h1>
+    <form onsubmit="event.preventDefault(); generateUrls();">
+        <label for="rootUrl">Root URL:</label>
+        <input type="text" id="rootUrl" value="https://ursa-mikail.github.io/" required><br><br>
+        
+        <label for="path1">First Path Segment:</label>
+        <input type="text" id="path1" value="site_announcement" required><br><br>
+        
+        <label for="path2">Second Path Segment:</label>
+        <input type="text" id="path2" value="announcement" required><br><br>
+        
+        <label for="filePrefix">File Prefix:</label>
+        <input type="text" id="filePrefix" value="a" required><br><br>
+        
+        <label for="startNum">Start Number:</label>
+        <input type="number" id="startNum" value="1" required><br><br>
+        
+        <label for="endNum">End Number:</label>
+        <input type="number" id="endNum" value="100" required><br><br>
+        
+        <label for="zeroPad">Zero Pad Numbers:</label>
+        <input type="checkbox" id="zeroPad" checked><br><br>
+        
+        <label for="fileExt">File Extension:</label>
+        <select id="fileExt">
+            <option value=".html">.html</option>
+            <option value=".txt">.txt</option>
+            <option value=".ppt">.ppt</option>
+            <option value="">(none)</option>
+        </select><br><br>
+        
+        <input type="submit" value="Generate URLs">
+    </form>
+    
+    <h2>Generated URLs:</h2>
+    <div id="result"></div>
+</body>
+</html>

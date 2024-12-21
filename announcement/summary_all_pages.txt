@@ -81,14 +81,17 @@ Summary of Content Options:
 27. **Interactive Skill Progress Bars**
     - This page displays interactive skill progress bars with animations for various technologies. The bars animate their progress. Each skill's progress is displayed with percentage values that are dynamically updated.
 
-28. **...**
-    - ...
+[28 to 38]. **Interactive Animation**
+     - Includes interactive animations from a28 to a38. Refer to a40 for a tool that allows users to generate a list of URLs based on specified inputs. Users can input the root URL, path segments, file prefix, start and end numbers, choose whether to zero-pad the numbers, and select a file extension to create file traversal.
 
 39. **Error Status Code Search**
     - This page allows users to search for error status codes based on **Category**, **Code**, or **Description** from a CSV file. 
         The CSV data contains three fields: **Category**, **Code**, and **Description**. The user can load the CSV file, 
         perform dynamic searches, and filter results by **Category**. The page displays the matching results in a table format.
-        
+
+40. **URL Generator**
+    - This page allows users to generate a list of URLs based on specified inputs. Users can input the root URL, path segments, file prefix, start and end numbers, and choose whether to zero-pad the numbers and select a file extension. The generated URLs are displayed as clickable links.
+
 
 Summary. **ax_summary: Summary of All Pages**
    - The ax_summary provides an overarching overview of all the sections (a1 to a4). It synthesizes the key points and functionalities from each part, ensuring that users have a clear understanding of the tools and resources available across the different functionalities.

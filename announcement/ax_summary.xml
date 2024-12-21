@@ -183,10 +183,26 @@
         </description>
     </section>
 
-    <section id="a28">
-        <title>28. ...</title>
+    <section id="a28 to a38">
+        <title>[28] to [38]</title>
         <description>
-            This page ...
+            This section includes interactive animations from a28 to a38. Refer to a40 for a tool that allows users to generate a list of URLs based on specified inputs. Users can input the root URL, path segments, file prefix, start and end numbers, choose whether to zero-pad the numbers, and select a file extension to create file traversal.
+        </description>
+    </section>
+
+    <section id="a39">
+        <title>39. Error Status Code Search</title>
+        <description>
+            This page allows users to search for error status codes based on **Category**, **Code**, or **Description** from a CSV file. 
+            The CSV data contains three fields: **Category**, **Code**, and **Description**. The user can load the CSV file, 
+            perform dynamic searches, and filter results by **Category**. The page displays the matching results in a table format.
+        </description>
+    </section>
+
+    <section id="a40">
+        <title>40. URL Generator</title>
+        <description>
+            This page allows users to generate a list of URLs based on specified inputs. Users can input the root URL, path segments, file prefix, start and end numbers, and choose whether to zero-pad the numbers and select a file extension. The generated URLs are displayed as clickable links.
         </description>
     </section>
 
