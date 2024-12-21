@@ -206,12 +206,21 @@
         </description>
     </section>
 
-<section id="[a41, a42]">
-    <title>[41, 42]. Probability Finder</title>
-    <description>
-        This page allows users to input a percentage or adjust a temperature bar to find the closest equivalent probability of various events, such as getting struck by lightning, winning the lottery, or being born. It reads data from a CSV file containing probabilities of different occurrences.
-    </description>
-</section>
+    <section id="a41">
+        <title>41. Probability Finder</title>
+        <description>
+            This page allows users to input a percentage or adjust a temperature bar to find the closest equivalent probability of various events, such as getting struck by lightning, winning the lottery, or being born. It reads data from a CSV file containing probabilities of different occurrences.
+        </description>
+    </section>
+
+    <section id="a42">
+        <title>42. Interactive Text Hyperlinking</title>
+        <description>
+            This page allows users to interactively select portions of text, create hyperlinks for them, and append them to the top of the page. The process starts with the user selecting a "start" point, followed by a valid "end" point, ensuring the "end" is after the "start". Once the selection is valid, a hyperlink is generated and displayed at the top. The selected text is also highlighted in the content box. The user can make multiple selections, with each new hyperlink being appended to the list, while previous selections remain highlighted. Invalid selections are rejected with a reset message. Additionally, users can download the page as an HTML file containing all selections.
+
+            * Caveat: Only 1 hyperlink making is serviceable for now.
+        </description>
+    </section>
 
 
     <section id="ax_summary">

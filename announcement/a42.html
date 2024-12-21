@@ -3,87 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Probability Finder</title>
+    <title>Interactive Text Hyperlinking</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
         }
-        input[type="range"] {
-            width: 100%;
+        #controls {
+            margin-bottom: 20px;
         }
-        .heat-bar {
-            width: 100%;
-            height: 30px;
-            background: linear-gradient(to right, blue, green, yellow, red);
-            margin: 10px 0;
+        #links {
+            margin-bottom: 20px;
         }
-        .heat-bar-value {
-            text-align: center;
+        #content {
+            white-space: pre-wrap; /* Preserve line breaks */
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 20px;
+            cursor: text;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        #statusMessage {
+            margin-bottom: 10px;
             font-weight: bold;
+        }
+        .highlight {
+            background-color: yellow;
+        }
+        a {
+            text-decoration: none;
+            color: blue;
+        }
+        .invalid-selection {
+            color: red;
         }
     </style>
 </head>
 <body>
-    <h1>Probability Finder</h1>
-    <label for="percentage">Enter Percentage (0-100%):</label>
-    <input type="number" id="percentage" min="0" max="100" step="0.01">%
-    <br><br>
-    <label for="temperature">Adjust Temperature Bar:</label>
-    <input type="range" id="temperature" min="0" max="100" step="0.01">
-    <div class="heat-bar"></div>
-    <div class="heat-bar-value" id="temperatureValue">0%</div>
-    <br><br>
-    <button onclick="findProbability()">Find Equivalent Event</button>
-    <p id="result"></p>
+    <pre>
+        Caveat: Only 1 hyperlink making is serviceable for now.
+    </pre>
+    <div id="controls">
+        <label for="fileInput">Upload a text file:</label>
+        <input type="file" id="fileInput" accept=".txt">
+        <button id="endGame">End Game and Download HTML</button>
+    </div>
+    <div id="statusMessage"></div>
+    <div id="links">
+        <!-- Links will be added here -->
+    </div>
+    <hr>
+    <div id="content" contenteditable="true">
+        <!-- Text content will be here -->
+    </div>
+    <div id="selectedLine">
+        <!-- Selected line will be shown here -->
+    </div>
 
     <script>
-        document.getElementById('temperature').addEventListener('input', function() {
-            let tempValue = this.value;
-            document.getElementById('temperatureValue').textContent = tempValue + '%';
-            document.getElementById('percentage').value = tempValue;
-        });
+        let startIndex = null;
+        let endIndex = null;
+        let textContent = "";
+        const contentDiv = document.getElementById('content');
+        const linksDiv = document.getElementById('links');
+        const fileInput = document.getElementById('fileInput');
+        const endGameButton = document.getElementById('endGame');
+        const statusMessageDiv = document.getElementById('statusMessage');
+        const selectedLineDiv = document.getElementById('selectedLine');
 
-        document.getElementById('percentage').addEventListener('input', function() {
-            let percValue = this.value;
-            document.getElementById('temperature').value = percValue;
-            document.getElementById('temperatureValue').textContent = percValue + '%';
-        });
-
-        async function fetchCSV() {
-            const response = await fetch('../data/probability_of_occurrences_00.csv');
-            const data = await response.text();
-            return data;
+        // Clear previous selection from content
+        function clearPreviousSelection() {
+            const previousHighlight = contentDiv.querySelector('.highlight');
+            if (previousHighlight) {
+                previousHighlight.classList.remove('highlight');
+            }
         }
 
-        function csvToArray(str, delimiter = ',') {
-            const rows = str.trim().split('\n');
-            return rows.slice(1).map(row => {
-                const values = row.split(delimiter);
-                return {
-                    event: values[0],
-                    probability: parseFloat(values[1])
+        function createLink(start, end, text) {
+            // Create a unique ID for this link
+            const linkId = `link-${start}-${end}`;
+            const linkText = text.substring(start, end).trim();
+            const linkTitle = linkText.split('\n')[0] || "Link"; // Use the selected text or a default title
+
+            // Add the hyperlink to the top
+            const linkElement = document.createElement('a');
+            linkElement.href = `#${linkId}`;
+            linkElement.innerText = linkTitle;
+            linksDiv.appendChild(linkElement);
+            linksDiv.appendChild(document.createElement('br'));
+
+            // Highlight the selected text and add it to the content
+            const highlightedText = `<span id="${linkId}" class="highlight">${linkText.replace(/\n/g, '<br>')}</span>`;
+            const contentHtml = text.substring(0, start) + highlightedText + text.substring(end);
+            contentDiv.innerHTML = contentHtml.replace(/\n/g, '<br>');
+        }
+
+        function scrollToSelection(start, end) {
+            const range = document.createRange();
+            const selection = window.getSelection();
+            const startNode = contentDiv.childNodes[0];
+            const endNode = contentDiv.childNodes[0];
+
+            range.setStart(startNode, start);
+            range.setEnd(endNode, end);
+            selection.removeAllRanges();
+            selection.addRange(range);
+
+            contentDiv.scrollTop = range.getBoundingClientRect().top;
+        }
+
+        function getLineFromText(start, end) {
+            const selectedText = textContent.substring(start, end).trim();
+            const lines = selectedText.split('\n');
+            return lines.join(' ');
+        }
+
+        contentDiv.addEventListener('click', (e) => {
+            const selection = window.getSelection();
+            const currentClickIndex = selection.anchorOffset;
+            textContent = contentDiv.innerText;
+
+            if (startIndex === null) {
+                // First click, set startIndex and show status message
+                startIndex = currentClickIndex;
+                statusMessageDiv.textContent = "[start] chosen, awaiting for [end]";
+            } else if (startIndex !== null && currentClickIndex > startIndex) {
+                // Valid end click (must be after start)
+                endIndex = currentClickIndex;
+                createLink(startIndex, endIndex, textContent);
+                scrollToSelection(startIndex, endIndex);
+
+                // Display the selected line after the [end] click
+                const selectedLine = getLineFromText(startIndex, endIndex);
+                selectedLineDiv.innerHTML = `<strong>Selected Line:</strong> ${selectedLine}`;
+
+                startIndex = null; // Reset for the next selection
+                statusMessageDiv.textContent = "[start] chosen, awaiting for [end]"; // Show again to wait for the next click
+            } else {
+                // Invalid selection, end click should be after start
+                statusMessageDiv.textContent = "[end] chosen before [start], reset, reject, nothing chosen for this round";
+                startIndex = null; // Reset for the next attempt
+                endIndex = null;
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    contentDiv.innerText = event.target.result;
                 };
-            });
-        }
+                reader.readAsText(file);
+            }
+        });
 
-        async function findProbability() {
-            const inputValue = parseFloat(document.getElementById('percentage').value) / 100;
-            const csvData = await fetchCSV();
-            const data = csvToArray(csvData);
-            let closestEvent = '';
-            let closestDiff = Infinity;
-
-            data.forEach(row => {
-                const diff = Math.abs(row.probability - inputValue);
-                if (diff < closestDiff) {
-                    closestDiff = diff;
-                    closestEvent = row.event;
-                }
-            });
-
-            document.getElementById('result').textContent = `Closest event: ${closestEvent} with a probability of ${inputValue * 100}%`;
-        }
+        endGameButton.addEventListener('click', () => {
+            const htmlContent = document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'a42.html';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
     </script>
 </body>
 </html>
