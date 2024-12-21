@@ -51,14 +51,20 @@
         });
 
         async function fetchCSV() {
-            const response = await fetch('../data/probability_of_occurrences_00.csv');
+            const response = await fetch('../data/probability_of_occurrences.csv');
             const data = await response.text();
             return data;
         }
 
         function csvToArray(str, delimiter = ',') {
-            const rows = str.slice(0).split('\n');
-            return rows.map(row => row.split(delimiter));
+            const rows = str.trim().split('\n');
+            return rows.slice(1).map(row => {
+                const values = row.split(delimiter);
+                return {
+                    event: values[0],
+                    probability: parseFloat(values[1])
+                };
+            });
         }
 
         async function findProbability() {
@@ -69,19 +75,14 @@
             let closestDiff = Infinity;
 
             data.forEach(row => {
-                const event = row[0];
-                const probabilityRange = row[1].split(' to ').map(Number);
-                const minProbability = probabilityRange[0] / 100;
-                const maxProbability = (probabilityRange[1] || probabilityRange[0]) / 100;
-                const probability = (minProbability + maxProbability) / 2;
-                const diff = Math.abs(probability - inputValue);
+                const diff = Math.abs(row.probability - inputValue);
                 if (diff < closestDiff) {
                     closestDiff = diff;
-                    closestEvent = event;
+                    closestEvent = row.event;
                 }
             });
 
-            document.getElementById('result').textContent = `Closest event: ${closestEvent} with a probability of ${inputValue * 100}%`;
+            document.getElementById('result').textContent = `Closest event: ${closestEvent} with a probability of ${(closestDiff + inputValue) * 100}%`;
         }
     </script>
 </body>
