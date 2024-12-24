@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Text Hyperlinking</title>
+    <title>Text Highlighter</title>
     <style>
         #content {
             white-space: pre-wrap; /* Preserve whitespace */
@@ -13,29 +13,21 @@
         .highlight {
             cursor: pointer;
         }
-        .hyperlink {
-            display: block;
-            margin-top: 10px;
-        }
     </style>
 </head>
 <body>
-    <h1>Interactive Text Hyperlinking</h1>
+    <h1>Text Highlighter</h1>
     <input type="file" id="fileInput" accept=".txt">
     <div>
         <label for="colorPicker">Select Color: </label>
         <input type="color" id="colorPicker" value="#FFFF00">
     </div>
-    <div id="hyperlinksContainer"></div>
     <div id="content"></div>
-    <button id="downloadBtn">Download with Hyperlinks</button>
 
     <script>
         const fileInput = document.getElementById('fileInput');
         const contentDiv = document.getElementById('content');
         const colorPicker = document.getElementById('colorPicker');
-        const hyperlinksContainer = document.getElementById('hyperlinksContainer');
-        const downloadBtn = document.getElementById('downloadBtn');
         let start = null;
         let end = null;
 
@@ -67,7 +59,6 @@
                             resetSelection();
                         } else {
                             highlightRange(start, end);
-                            addHyperlink(start, end);
                             resetSelection();
                         }
                     }
@@ -82,40 +73,11 @@
             }
         }
 
-        function addHyperlink(start, end) {
-            const text = contentDiv.textContent.slice(start, end + 1);
-            const link = document.createElement('a');
-            link.href = "#";
-            link.textContent = `Link from ${start} to ${end}: ${text}`;
-            link.className = "hyperlink";
-            hyperlinksContainer.appendChild(link);
-        }
-
         function resetSelection() {
             start = null;
             end = null;
         }
-
-        downloadBtn.addEventListener('click', function() {
-            const links = document.querySelectorAll('a.hyperlink');
-            let htmlContent = contentDiv.innerHTML;
-
-            links.forEach(link => {
-                const rangeText = link.textContent.split(': ')[1];
-                const start = parseInt(link.textContent.match(/from (\d+)/)[1]);
-                const end = parseInt(link.textContent.match(/to (\d+)/)[1]);
-                const hyperlink = `<a href="#">${rangeText}</a>`;
-                htmlContent = htmlContent.replace(new RegExp(rangeText, 'g'), hyperlink);
-            });
-
-            const blob = new Blob([htmlContent], { type: 'text/html' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'out_with_hyperlinks.html';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        });
     </script>
 </body>
 </html>
+
