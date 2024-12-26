@@ -228,6 +228,13 @@
     </section>
 
 
+    <section id="a44">
+        <title>44. Get Hash Of Page</title>
+        <description>
+            This page allows users to get the hash256 of the contents of the url.
+        </description>
+    </section>
+
     <section id="ax_summary">
         <title>Summary of All Pages</title>
         <description>
