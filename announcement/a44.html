@@ -148,5 +148,48 @@
             }
         });
     </script>
+
+<pre>
+import hashlib
+import requests
+
+def fetch_and_hash_url(url):
+    """Fetch content from a URL and calculate its SHA-256 hash."""
+    try:
+        # Set a User-Agent to mimic a browser
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+        
+        # Fetch the content
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        content = response.text
+        
+        # Calculate SHA-256 hash
+        hash_obj = hashlib.sha256(content.encode('utf-8'))
+        hash_hex = hash_obj.hexdigest()
+        
+        # Print results
+        print(f"\nURL: {url}")
+        print(f"Status Code: {response.status_code}")
+        print(f"SHA-256 Hash: {hash_hex}")
+        print(f"\nContent Preview (first 200 chars):\n{content[:200]}...")
+        
+    except requests.exceptions.RequestException as e:
+        print(f"Error: {e}")
+
+# Static URL to fetch and hash
+url = 'https://raw.githubusercontent.com/ursa-mikail/git_all_repo_static/refs/heads/main/git_all_repo_segment_for_html_static.py'
+fetch_and_hash_url(url)
+
+"""
+URL: https://raw.githubusercontent.com/ursa-mikail/git_all_repo_static/refs/heads/main/git_all_repo_segment_for_html_static.py
+Status Code: 200
+SHA-256 Hash: afb7e4cdaa2f6f29a736a83690958fdda2da7b5e6b051052b20b252d3bea9293
+"""
+
+ </pre>  
+
 </body>
 </html>
