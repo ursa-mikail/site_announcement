@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YAML Highlighter</title>
+    <style>
+        .highlight {
+            padding: 0.2em;
+            border-radius: 0.2em;
+        }
+    </style>
+</head>
+<body>
+    <h1>YAML Highlighter</h1>
+    <input type="file" id="fileInput" accept=".yaml,.yml">
+    <div id="labelsContainer">
+        <label for="label1">Label 1:</label>
+        <input type="text" id="label1" placeholder="Enter label">
+        <input type="color" id="color1" value="#FFDDC1">
+    </div>
+    <button onclick="addLabelInput()">Add Another Label</button>
+    <button onclick="highlightYAML()">Highlight</button>
+    <hr>
+    <pre id="yamlDisplay"></pre>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+    <script>
+        let yamlContent = '';
+
+        function addLabelInput() {
+            const labelsContainer = document.getElementById('labelsContainer');
+            const labelCount = labelsContainer.children.length / 3 + 1;
+
+            const label = document.createElement('label');
+            label.setAttribute('for', `label${labelCount}`);
+            label.textContent = `Label ${labelCount}:`;
+
+            const labelInput = document.createElement('input');
+            labelInput.type = 'text';
+            labelInput.id = `label${labelCount}`;
+            labelInput.placeholder = 'Enter label';
+
+            const colorInput = document.createElement('input');
+            colorInput.type = 'color';
+            colorInput.id = `color${labelCount}`;
+            colorInput.value = '#FFDDC1';
+
+            labelsContainer.appendChild(label);
+            labelsContainer.appendChild(labelInput);
+            labelsContainer.appendChild(colorInput);
+        }
+
+        document.getElementById('fileInput').addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    yamlContent = event.target.result;
+                    displayYAML(yamlContent);
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        function highlightYAML() {
+            const labelsContainer = document.getElementById('labelsContainer');
+            const labelInputs = labelsContainer.querySelectorAll('input[type="text"]');
+            const colorInputs = labelsContainer.querySelectorAll('input[type="color"]');
+
+            const labels = Array.from(labelInputs).map(input => input.value.trim());
+            const colors = Array.from(colorInputs).map(input => input.value);
+
+            displayYAML(yamlContent, labels, colors);
+        }
+
+        function displayYAML(yamlContent, labels = [], colors = []) {
+            const yamlLines = yamlContent.split('\n');
+            const yamlDisplay = document.getElementById('yamlDisplay');
+            yamlDisplay.innerHTML = '';
+
+            yamlLines.forEach(line => {
+                let highlightedLine = line;
+                labels.forEach((label, index) => {
+                    const regex = new RegExp(`(${label})`, 'g');
+                    const color = colors[index] || '#FFFFC1';  // default color if none specified
+                    highlightedLine = highlightedLine.replace(regex, `<span class="highlight" style="background-color: ${color}">$1</span>`);
+                });
+                yamlDisplay.innerHTML += highlightedLine + '\n';
+            });
+        }
+    </script>
+</body>
+</html>

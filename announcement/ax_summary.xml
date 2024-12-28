@@ -227,11 +227,17 @@
         </description>
     </section>
 
-
-    <section id="a44">
-        <title>44. Get Hash Of Page</title>
+    <section id="a45">
+        <title>45. YAML Highlighter</title>
         <description>
-            This page allows users to get the hash256 of the contents of the url.
+            This page allows users to upload a YAML file and highlight specified labels within the file content. Users can add multiple labels and choose different colors for each label to be highlighted. The YAML content is displayed with the selected labels highlighted in the chosen colors.
+        </description>
+    </section>
+
+    <section id="a45">
+        <title>45. YAML Highlighter</title>
+        <description>
+            This page allows ...
         </description>
     </section>
 
