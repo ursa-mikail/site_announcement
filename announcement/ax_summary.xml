@@ -242,6 +242,14 @@
             The resulting connections are displayed in YAML format, detailing the start and end points of each connection.
         </description>
     </section>
+
+    <section id="a47">
+        <title>47. Port and Description Lookup</title>
+        <description>
+            This page provides a dynamic lookup tool for ports and their descriptions. Users can enter a port number to see its corresponding description or type in a description to find matching port numbers. The page includes an autocomplete feature that suggests descriptions as users type, allowing for quick and easy lookup. The data is fetched from a CSV file containing protocol, port, and description information.
+        </description>
+    </section>
+
     
 
     <section id="ax_summary">

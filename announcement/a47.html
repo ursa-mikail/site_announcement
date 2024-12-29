@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Port and Description Lookup</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        #description-list {
+            border: 1px solid #ccc;
+            max-height: 150px;
+            overflow-y: auto;
+            display: none;
+        }
+        #description-list div {
+            padding: 5px;
+            cursor: pointer;
+        }
+        #description-list div:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Port and Description Lookup</h1>
+    <div class="input-group">
+        <label for="port-input">Enter Port:</label>
+        <input type="text" id="port-input" oninput="showDescription()">
+        <p id="description-output"></p>
+    </div>
+    <div class="input-group">
+        <label for="description-input">Enter Description:</label>
+        <input type="text" id="description-input" oninput="showSuggestions()">
+        <div id="description-list"></div>
+        <p id="port-output"></p>
+    </div>
+
+    <script>
+        let csvData = [];
+
+        // Fetch and parse the CSV data
+        fetch('https://raw.githubusercontent.com/maraisr/ports-list/refs/heads/main/all.csv')
+            .then(response => response.text())
+            .then(data => {
+                csvData = parseCSV(data);
+            })
+            .catch(error => console.error('Error fetching CSV data:', error));
+
+        function parseCSV(data) {
+            const lines = data.split('\n');
+            const result = [];
+            const headers = lines[0].split(',');
+
+            for (let i = 1; i < lines.length; i++) {
+                const obj = {};
+                const currentline = lines[i].split(',');
+
+                for (let j = 0; j < headers.length; j++) {
+                    obj[headers[j].replace(/"/g, '')] = currentline[j].replace(/"/g, '');
+                }
+                result.push(obj);
+            }
+            return result;
+        }
+
+        function showDescription() {
+            const portInput = document.getElementById('port-input').value;
+            const descriptionOutput = document.getElementById('description-output');
+            const result = csvData.find(row => row.port === portInput);
+            descriptionOutput.textContent = result ? result.description : 'No description found';
+        }
+
+        function showSuggestions() {
+            const descriptionInput = document.getElementById('description-input').value.toLowerCase();
+            const descriptionList = document.getElementById('description-list');
+            descriptionList.innerHTML = '';
+            if (descriptionInput) {
+                const suggestions = csvData.filter(row => row.description.toLowerCase().includes(descriptionInput));
+                suggestions.forEach(suggestion => {
+                    const div = document.createElement('div');
+                    div.textContent = suggestion.description;
+                    div.onclick = () => selectSuggestion(suggestion);
+                    descriptionList.appendChild(div);
+                });
+                descriptionList.style.display = 'block';
+            } else {
+                descriptionList.style.display = 'none';
+            }
+        }
+
+        function selectSuggestion(suggestion) {
+            const descriptionInput = document.getElementById('description-input');
+            const portOutput = document.getElementById('port-output');
+            descriptionInput.value = suggestion.description;
+            portOutput.textContent = suggestion.port;
+            document.getElementById('description-list').style.display = 'none';
+        }
+
+        function showPort() {
+            const descriptionInput = document.getElementById('description-input').value.toLowerCase();
+            const portOutput = document.getElementById('port-output');
+            const result = csvData.find(row => row.description.toLowerCase().includes(descriptionInput));
+            portOutput.textContent = result ? result.port : 'No port found';
+        }
+    </script>
+</body>
+</html>
