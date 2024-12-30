@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion Clusters Tree</title>
+    <style>
+        ul {
+            list-style-type: none;
+        }
+        li {
+            margin: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Emotion Clusters Tree</h1>
+    <div id="tree"></div>
+
+    <script>
+        async function fetchCSV(url) {
+            const response = await fetch(url);
+            return await response.text();
+        }
+
+        function parseCSV(text) {
+            const lines = text.split('\n');
+            const tree = {};
+
+            for (let line of lines) {
+                const cells = line.split(',').map(cell => cell.trim().replace(/['"]+/g, ''));
+                if (cells[0]) {
+                    tree[cells[0]] = {};
+                } else if (cells[1]) {
+                    if (!tree[cells[1]]) {
+                        tree[cells[1]] = {};
+                    }
+                } else if (cells[2]) {
+                    if (!tree[cells[1]][cells[2]]) {
+                        tree[cells[1]][cells[2]] = {};
+                    }
+                } else if (cells[3]) {
+                    if (!tree[cells[1]][cells[2]][cells[3]]) {
+                        tree[cells[1]][cells[2]][cells[3]] = {};
+                    }
+                }
+            }
+            return tree;
+        }
+
+        function createTreeElement(obj) {
+            const ul = document.createElement('ul');
+            for (const key in obj) {
+                const li = document.createElement('li');
+                li.textContent = key;
+                const childUl = createTreeElement(obj[key]);
+                if (childUl) {
+                    li.appendChild(childUl);
+                }
+                ul.appendChild(li);
+            }
+            return ul;
+        }
+
+        async function buildTree() {
+            const csvUrl = 'https://raw.githubusercontent.com/ursa-mikail/emotions_clusters/refs/heads/main/emotions_clusters.csv';
+            const csvText = await fetchCSV(csvUrl);
+            const treeData = parseCSV(csvText);
+            const treeElement = createTreeElement(treeData);
+            document.getElementById('tree').appendChild(treeElement);
+        }
+
+        buildTree();
+    </script>
+</body>
+</html>
