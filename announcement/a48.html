@@ -1,169 +1,131 @@
 <!DOCTYPE html>
 <html style="height: 100%">
 <head>
-  <meta charset="UTF-8">
-  <title>Emotions Network</title>
-  <script src="https://cdn.jsdelivr.net/npm/echarts@5.0.0/dist/echarts.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jquery-ui-dist/jquery-ui.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui-dist/jquery-ui.min.css">
-  <style>
-    #main {
-      height: 100%;
-      width: 100%;
-    }
-    #autocomplete {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      z-index: 10;
-      background-color: white;
-      border: 1px solid #ccc;
-      padding: 5px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Emotions Tree</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-ui-dist/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui-dist/jquery-ui.min.css">
+    <style>
+        #main {
+            height: 100%;
+            width: 100%;
+        }
+        #autocomplete {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 5px;
+        }
+    </style>
 </head>
 <body style="height: 100%; margin: 0">
-  <input id="autocomplete" type="text" placeholder="Search Emotions..." />
-  <div id="main" style="height: 100%"></div>
-  
-  <script type="text/javascript">
-    var ROOT_PATH = '.';
-    var myChart = echarts.init(document.getElementById('main'));
-    myChart.showLoading();
+    <input id="autocomplete" type="text" placeholder="Search Emotions..." />
+    <div id="main" style="height: 100%"></div>
 
-    // Load CSV data and parse it into a graph structure
-    $.get('https://raw.githubusercontent.com/ursa-mikail/emotions_clusters/refs/heads/main/emotions_clusters.csv', function (csvData) {
-      var lines = csvData.split('\n');
-      var nodes = [];
-      var links = [];
-      var categories = [];
-      var emotionsMap = {};
+    <script type="text/javascript">
+        var myChart = echarts.init(document.getElementById('main'));
+        myChart.showLoading();
 
-      lines.forEach(function(line, index) {
-        var columns = line.split(',');
-        if (columns.length < 4) return;  // Skip incomplete rows
+        $.get('https://raw.githubusercontent.com/ursa-mikail/emotions_clusters/refs/heads/main/emotions_clusters.csv', function (csvData) {
+            var lines = csvData.split('\n');
+            var nodes = [];
+            var links = [];
+            var emotionsMap = {};
 
-        var emotion = columns[1].trim();
-        if (!emotion || emotionsMap[emotion]) return;
+            lines.forEach(function (line) {
+                var columns = line.split(',');
+                if (columns.length < 2) return;
 
-        emotionsMap[emotion] = true;
-        var node = {
-          id: emotion,
-          name: emotion,
-          category: index % 5,  // Example to assign categories (you can adjust logic here)
-        };
-        nodes.push(node);
+                var emotion = columns[1].trim();
+                var parent = columns[0].trim(); // Get the parent emotion
 
-        // Create dummy links for visualization (You can adjust this as per your data structure)
-        if (index > 0) {
-          links.push({ source: nodes[index - 1].id, target: node.id });
-        }
-      });
-
-      // Prepare categories for emotions
-      categories = Object.keys(emotionsMap).map(function(emotion, index) {
-        return { name: emotion };
-      });
-
-      var graph = {
-        nodes: nodes,
-        links: links,
-        categories: categories,
-      };
-
-      myChart.hideLoading();
-
-      var option = {
-        tooltip: {},
-        legend: [
-          {
-            data: categories.map(function (a) {
-              return a.name;
-            })
-          }
-        ],
-        series: [
-          {
-            name: 'Emotions',
-            type: 'graph',
-            layout: 'force',
-            force: {
-              repulsion: 100,
-              gravity: 0.05,
-              edgeLength: 50
-            },
-            data: nodes,
-            links: links,
-            categories: categories,
-            roam: true,
-            label: {
-              show: true,
-              position: 'right',
-              formatter: '{b}'
-            },
-            labelLayout: {
-              hideOverlap: true
-            },
-            scaleLimit: {
-              min: 0.4,
-              max: 2
-            },
-            lineStyle: {
-              color: 'source',
-              curveness: 0.3
-            },
-            emphasis: {
-              itemStyle: {
-                borderColor: '#F00',
-                borderWidth: 2,
-                shadowBlur: 10,
-                shadowColor: 'rgba(0, 0, 0, 0.3)'
-              },
-              label: {
-                show: true,
-                color: '#F00',
-              }
-            }
-          }
-        ]
-      };
-      myChart.setOption(option);
-
-      // Autocomplete for searching emotions
-      $("#autocomplete").autocomplete({
-        source: Object.keys(emotionsMap),
-        select: function(event, ui) {
-          var selectedEmotion = ui.item.value;
-          highlightNode(selectedEmotion);
-        }
-      });
-
-      function highlightNode(emotion) {
-        var selectedNode = nodes.find(function(node) {
-          return node.name === emotion;
-        });
-
-        if (selectedNode) {
-          myChart.setOption({
-            series: [{
-              emphasis: {
-                itemStyle: {
-                  borderColor: '#F00',
-                  borderWidth: 2,
-                  shadowBlur: 10,
-                  shadowColor: 'rgba(0, 0, 0, 0.3)'
-                },
-                label: {
-                  show: true,
-                  color: '#F00',
+                if (!emotionsMap[emotion]) {
+                    emotionsMap[emotion] = true;
+                    nodes.push({
+                        id: emotion,
+                        name: emotion,
+                    });
                 }
-              }
-            }]
-          });
-        }
-      }
-    });
-  </script>
+                if (parent && !emotionsMap[parent]) {
+                    emotionsMap[parent] = true;
+                    nodes.push({
+                        id: parent,
+                        name: parent,
+                    });
+                }
+                if(parent)
+                {
+                    links.push({ source: parent, target: emotion });
+                }
+            });
+
+            var graph = {
+                nodes: nodes,
+                links: links,
+            };
+
+            myChart.hideLoading();
+
+            var option = {
+                tooltip: {},
+                series: [
+                    {
+                        name: 'Emotions',
+                        type: 'tree',
+                        data: [graph.nodes[0]], // Start with the root node
+                        initialTreeDepth: 3, // Adjust initial depth as needed
+                        layout: 'radial',
+                        roam: true,
+                        label: {
+                            position: 'inside',
+                            verticalAlign: 'middle',
+                            align: 'center',
+                            fontSize: 9,
+                            rotate: 'tangential'
+                        },
+                        leaves: {
+                            label: {
+                                position: 'right',
+                                verticalAlign: 'middle',
+                                align: 'left',
+                                fontSize: 9
+                            }
+                        },
+                        expandAndCollapse: true,
+                        animationDuration: 550,
+                        animationEasing: 'linear',
+                        lineStyle: {
+                            curveness: 0.5
+                        }
+
+                    }
+                ]
+            };
+
+
+            myChart.setOption(option);
+
+            $("#autocomplete").autocomplete({
+                source: Object.keys(emotionsMap),
+                select: function (event, ui) {
+                    var selectedEmotion = ui.item.value;
+                    highlightNode(selectedEmotion);
+                }
+            });
+
+            function highlightNode(emotion) {
+                myChart.dispatchAction({
+                    type: 'focusNode',
+                    seriesIndex: 0,
+                    node: emotion
+                });
+            }
+        });
+    </script>
 </body>
 </html>
