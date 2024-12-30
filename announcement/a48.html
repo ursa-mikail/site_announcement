@@ -1,76 +1,169 @@
 <!DOCTYPE html>
-<html lang="en">
+<html style="height: 100%">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emotion Clusters Tree</title>
-    <style>
-        ul {
-            list-style-type: none;
-        }
-        li {
-            margin: 4px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Emotions Network</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.0.0/dist/echarts.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery-ui-dist/jquery-ui.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui-dist/jquery-ui.min.css">
+  <style>
+    #main {
+      height: 100%;
+      width: 100%;
+    }
+    #autocomplete {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 10;
+      background-color: white;
+      border: 1px solid #ccc;
+      padding: 5px;
+    }
+  </style>
 </head>
-<body>
-    <h1>Emotion Clusters Tree</h1>
-    <div id="tree"></div>
+<body style="height: 100%; margin: 0">
+  <input id="autocomplete" type="text" placeholder="Search Emotions..." />
+  <div id="main" style="height: 100%"></div>
+  
+  <script type="text/javascript">
+    var ROOT_PATH = '.';
+    var myChart = echarts.init(document.getElementById('main'));
+    myChart.showLoading();
 
-    <script>
-        async function fetchCSV(url) {
-            const response = await fetch(url);
-            return await response.text();
+    // Load CSV data and parse it into a graph structure
+    $.get('https://raw.githubusercontent.com/ursa-mikail/emotions_clusters/refs/heads/main/emotions_clusters.csv', function (csvData) {
+      var lines = csvData.split('\n');
+      var nodes = [];
+      var links = [];
+      var categories = [];
+      var emotionsMap = {};
+
+      lines.forEach(function(line, index) {
+        var columns = line.split(',');
+        if (columns.length < 4) return;  // Skip incomplete rows
+
+        var emotion = columns[1].trim();
+        if (!emotion || emotionsMap[emotion]) return;
+
+        emotionsMap[emotion] = true;
+        var node = {
+          id: emotion,
+          name: emotion,
+          category: index % 5,  // Example to assign categories (you can adjust logic here)
+        };
+        nodes.push(node);
+
+        // Create dummy links for visualization (You can adjust this as per your data structure)
+        if (index > 0) {
+          links.push({ source: nodes[index - 1].id, target: node.id });
         }
+      });
 
-        function parseCSV(text) {
-            const lines = text.split('\n');
-            const tree = {};
+      // Prepare categories for emotions
+      categories = Object.keys(emotionsMap).map(function(emotion, index) {
+        return { name: emotion };
+      });
 
-            for (let line of lines) {
-                const cells = line.split(',').map(cell => cell.trim().replace(/['"]+/g, ''));
-                if (cells[0]) {
-                    tree[cells[0]] = {};
-                } else if (cells[1]) {
-                    if (!tree[cells[1]]) {
-                        tree[cells[1]] = {};
-                    }
-                } else if (cells[2]) {
-                    if (!tree[cells[1]][cells[2]]) {
-                        tree[cells[1]][cells[2]] = {};
-                    }
-                } else if (cells[3]) {
-                    if (!tree[cells[1]][cells[2]][cells[3]]) {
-                        tree[cells[1]][cells[2]][cells[3]] = {};
-                    }
-                }
+      var graph = {
+        nodes: nodes,
+        links: links,
+        categories: categories,
+      };
+
+      myChart.hideLoading();
+
+      var option = {
+        tooltip: {},
+        legend: [
+          {
+            data: categories.map(function (a) {
+              return a.name;
+            })
+          }
+        ],
+        series: [
+          {
+            name: 'Emotions',
+            type: 'graph',
+            layout: 'force',
+            force: {
+              repulsion: 100,
+              gravity: 0.05,
+              edgeLength: 50
+            },
+            data: nodes,
+            links: links,
+            categories: categories,
+            roam: true,
+            label: {
+              show: true,
+              position: 'right',
+              formatter: '{b}'
+            },
+            labelLayout: {
+              hideOverlap: true
+            },
+            scaleLimit: {
+              min: 0.4,
+              max: 2
+            },
+            lineStyle: {
+              color: 'source',
+              curveness: 0.3
+            },
+            emphasis: {
+              itemStyle: {
+                borderColor: '#F00',
+                borderWidth: 2,
+                shadowBlur: 10,
+                shadowColor: 'rgba(0, 0, 0, 0.3)'
+              },
+              label: {
+                show: true,
+                color: '#F00',
+              }
             }
-            return tree;
-        }
+          }
+        ]
+      };
+      myChart.setOption(option);
 
-        function createTreeElement(obj) {
-            const ul = document.createElement('ul');
-            for (const key in obj) {
-                const li = document.createElement('li');
-                li.textContent = key;
-                const childUl = createTreeElement(obj[key]);
-                if (childUl) {
-                    li.appendChild(childUl);
+      // Autocomplete for searching emotions
+      $("#autocomplete").autocomplete({
+        source: Object.keys(emotionsMap),
+        select: function(event, ui) {
+          var selectedEmotion = ui.item.value;
+          highlightNode(selectedEmotion);
+        }
+      });
+
+      function highlightNode(emotion) {
+        var selectedNode = nodes.find(function(node) {
+          return node.name === emotion;
+        });
+
+        if (selectedNode) {
+          myChart.setOption({
+            series: [{
+              emphasis: {
+                itemStyle: {
+                  borderColor: '#F00',
+                  borderWidth: 2,
+                  shadowBlur: 10,
+                  shadowColor: 'rgba(0, 0, 0, 0.3)'
+                },
+                label: {
+                  show: true,
+                  color: '#F00',
                 }
-                ul.appendChild(li);
-            }
-            return ul;
+              }
+            }]
+          });
         }
-
-        async function buildTree() {
-            const csvUrl = 'https://raw.githubusercontent.com/ursa-mikail/emotions_clusters/refs/heads/main/emotions_clusters.csv';
-            const csvText = await fetchCSV(csvUrl);
-            const treeData = parseCSV(csvText);
-            const treeElement = createTreeElement(treeData);
-            document.getElementById('tree').appendChild(treeElement);
-        }
-
-        buildTree();
-    </script>
+      }
+    });
+  </script>
 </body>
 </html>
