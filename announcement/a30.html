@@ -38,40 +38,56 @@
     const myChart = echarts.init(document.getElementById('main'));
     myChart.showLoading();
 
-    function csvToTree(csvData) {
+    function processData(csvData) {
       const lines = csvData.split('\n');
       const root = {
         name: 'Emotions',
         children: []
       };
       
-      const allEmotions = new Set();
+      const emotionsSet = new Set();
+      const emotionsMap = new Map();
       
       lines.forEach(line => {
         const emotions = line.split(',')
           .map(e => e.trim())
           .filter(e => e.length > 0);
-        
+          
         if (emotions.length === 0) return;
         
-        let currentNode = root;
         emotions.forEach(emotion => {
-          allEmotions.add(emotion);
-          let child = currentNode.children?.find(c => c.name === emotion);
-          if (!child) {
-            child = {
+          emotionsSet.add(emotion);
+          if (!emotionsMap.has(emotion)) {
+            emotionsMap.set(emotion, {
               name: emotion,
               children: []
-            };
-            currentNode.children.push(child);
+            });
           }
-          currentNode = child;
         });
+
+        // Create parent-child relationships
+        for (let i = 0; i < emotions.length - 1; i++) {
+          const parentEmotion = emotionsMap.get(emotions[i]);
+          const childEmotion = emotionsMap.get(emotions[i + 1]);
+          
+          // Check if this child is already present
+          if (!parentEmotion.children.some(child => child.name === childEmotion.name)) {
+            parentEmotion.children.push(childEmotion);
+          }
+        }
+
+        // Add first level emotions to root
+        if (emotions[0]) {
+          const firstEmotion = emotionsMap.get(emotions[0]);
+          if (!root.children.some(child => child.name === firstEmotion.name)) {
+            root.children.push(firstEmotion);
+          }
+        }
       });
 
-      // Setup autocomplete data
-      $(#autocomplete).autocomplete({
-        source: Array.from(allEmotions),
+      // Setup autocomplete
+      $("#autocomplete").autocomplete({
+        source: Array.from(emotionsSet),
         select: function(event, ui) {
           const selectedEmotion = ui.item.value;
           highlightNode(selectedEmotion);
@@ -98,7 +114,7 @@
     fetch('https://raw.githubusercontent.com/ursa-mikail/emotions_clusters/refs/heads/main/emotions_clusters.csv')
       .then(response => response.text())
       .then(csvData => {
-        const treeData = csvToTree(csvData);
+        const treeData = processData(csvData);
         myChart.hideLoading();
         
         const option = {
@@ -110,9 +126,9 @@
             type: 'tree',
             name: 'Emotions',
             data: [treeData],
-            top: '1%',
+            top: '5%',
             left: '7%',
-            bottom: '1%',
+            bottom: '5%',
             right: '20%',
             symbolSize: 7,
             label: {
@@ -134,14 +150,15 @@
             expandAndCollapse: true,
             animationDuration: 550,
             animationDurationUpdate: 750,
-            initialTreeDepth: 2
+            initialTreeDepth: 2,
+            orient: 'LR',
+            layout: 'orthogonal'
           }]
         };
 
         myChart.setOption(option);
       });
 
-    // Handle window resizing
     window.addEventListener('resize', () => {
       myChart.resize();
     });
