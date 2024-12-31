@@ -1,142 +1,150 @@
 <!DOCTYPE html>
-<html lang="en">
+<html style="height: 100%">
 <head>
-    <meta charset="UTF-8">
-    <title>ECharts Graph Modularity Example</title>
-    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/echarts-gl/dist/echarts-gl.min.js"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/echarts/extension/bmap/bmap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/echarts-graph-modularity"></script>
-    <style>
-        #main {
-            width: 100%;
-            height: 600px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Emotions Tree</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/base/jquery-ui.min.css">
+  <style>
+    #main {
+      height: 100%;
+      width: 100%;
+    }
+    #search-container {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 10;
+      background-color: white;
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 4px;
+    }
+    #autocomplete {
+      padding: 5px;
+      width: 200px;
+    }
+  </style>
 </head>
-<body>
-    <div id="main"></div>
-    <script>
-        //import * as echarts from 'echarts';
-        //import 'echarts-gl';
-        //import 'echarts-graph-modularity';
+<body style="height: 100%; margin: 0">
+  <div id="search-container">
+    <input id="autocomplete" type="text" placeholder="Search Emotions...">
+  </div>
+  <div id="main"></div>
+  
+  <script>
+    const myChart = echarts.init(document.getElementById('main'));
+    myChart.showLoading();
 
-        var ROOT_PATH = '.';
-
-        var chartDom = document.getElementById('main');
-        var myChart = echarts.init(chartDom, 'dark');
-        var option;
-
-        $.getJSON(ROOT_PATH + '/data/npmdep.json', function (data) {
-            var nodes = data.nodes.map(function (nodeName, idx) {
-                return {
-                    name: nodeName,
-                    value: data.dependentsCount[idx]
-                };
-            });
-            var edges = [];
-            for (var i = 0; i < data.edges.length; ) {
-                var s = data.edges[i++];
-                var t = data.edges[i++];
-                edges.push({
-                    source: s,
-                    target: t
-                });
-            }
-            nodes.forEach(function (node) {
-                node.emphasis = {
-                    label: {
-                        show: true
-                    }
-                };
-                if (node.value > 5000) {
-                    node.label = {
-                        show: true
-                    };
-                }
-            });
-            myChart.setOption({
-                backgroundColor: '#000',
-                series: [
-                    {
-                        color: [
-                            'rgb(203,239,15)',
-                            'rgb(73,15,239)',
-                            'rgb(15,217,239)',
-                            'rgb(30,15,239)',
-                            'rgb(15,174,239)',
-                            'rgb(116,239,15)',
-                            'rgb(239,15,58)',
-                            'rgb(15,239,174)',
-                            'rgb(239,102,15)',
-                            'rgb(239,15,15)',
-                            'rgb(15,44,239)',
-                            'rgb(239,145,15)',
-                            'rgb(30,239,15)',
-                            'rgb(239,188,15)',
-                            'rgb(159,239,15)',
-                            'rgb(159,15,239)',
-                            'rgb(15,239,44)',
-                            'rgb(15,239,87)',
-                            'rgb(15,239,217)',
-                            'rgb(203,15,239)',
-                            'rgb(239,15,188)',
-                            'rgb(239,15,102)',
-                            'rgb(239,58,15)',
-                            'rgb(239,15,145)',
-                            'rgb(116,15,239)',
-                            'rgb(15,131,239)',
-                            'rgb(73,239,15)',
-                            'rgb(15,239,131)',
-                            'rgb(15,87,239)',
-                            'rgb(239,15,231)'
-                        ],
-                        type: 'graphGL',
-                        nodes: nodes,
-                        edges: edges,
-                        modularity: {
-                            resolution: 2,
-                            sort: true
-                        },
-                        lineStyle: {
-                            color: 'rgba(255,255,255,1)',
-                            opacity: 0.05
-                        },
-                        itemStyle: {
-                            opacity: 1
-                        },
-                        focusNodeAdjacency: false,
-                        focusNodeAdjacencyOn: 'click',
-                        symbolSize: function (value) {
-                            return Math.sqrt(value / 10);
-                        },
-                        label: {
-                            color: '#fff'
-                        },
-                        emphasis: {
-                            label: {
-                                show: false
-                            },
-                            lineStyle: {
-                                opacity: 0.5,
-                                width: 4
-                            }
-                        },
-                        forceAtlas2: {
-                            steps: 5,
-                            stopThreshold: 20,
-                            jitterTolerence: 10,
-                            edgeWeight: [0.2, 1],
-                            gravity: 5,
-                            edgeWeightInfluence: 0
-                        }
-                    }
-                ]
-            });
+    function csvToTree(csvData) {
+      const lines = csvData.split('\n');
+      const root = {
+        name: 'Emotions',
+        children: []
+      };
+      
+      const allEmotions = new Set();
+      
+      lines.forEach(line => {
+        const emotions = line.split(',')
+          .map(e => e.trim())
+          .filter(e => e.length > 0);
+        
+        if (emotions.length === 0) return;
+        
+        let currentNode = root;
+        emotions.forEach(emotion => {
+          allEmotions.add(emotion);
+          let child = currentNode.children?.find(c => c.name === emotion);
+          if (!child) {
+            child = {
+              name: emotion,
+              children: []
+            };
+            currentNode.children.push(child);
+          }
+          currentNode = child;
         });
+      });
 
-        option && myChart.setOption(option);
-    </script>
+      // Setup autocomplete data
+      $(#autocomplete).autocomplete({
+        source: Array.from(allEmotions),
+        select: function(event, ui) {
+          const selectedEmotion = ui.item.value;
+          highlightNode(selectedEmotion);
+        }
+      });
+
+      return root;
+    }
+
+    function highlightNode(emotionName) {
+      myChart.dispatchAction({
+        type: 'highlight',
+        seriesName: 'Emotions',
+        name: emotionName
+      });
+      
+      myChart.dispatchAction({
+        type: 'showTip',
+        seriesName: 'Emotions',
+        name: emotionName
+      });
+    }
+
+    fetch('https://raw.githubusercontent.com/ursa-mikail/emotions_clusters/refs/heads/main/emotions_clusters.csv')
+      .then(response => response.text())
+      .then(csvData => {
+        const treeData = csvToTree(csvData);
+        myChart.hideLoading();
+        
+        const option = {
+          tooltip: {
+            trigger: 'item',
+            triggerOn: 'mousemove'
+          },
+          series: [{
+            type: 'tree',
+            name: 'Emotions',
+            data: [treeData],
+            top: '1%',
+            left: '7%',
+            bottom: '1%',
+            right: '20%',
+            symbolSize: 7,
+            label: {
+              position: 'left',
+              verticalAlign: 'middle',
+              align: 'right',
+              fontSize: 12
+            },
+            leaves: {
+              label: {
+                position: 'right',
+                verticalAlign: 'middle',
+                align: 'left'
+              }
+            },
+            emphasis: {
+              focus: 'descendant'
+            },
+            expandAndCollapse: true,
+            animationDuration: 550,
+            animationDurationUpdate: 750,
+            initialTreeDepth: 2
+          }]
+        };
+
+        myChart.setOption(option);
+      });
+
+    // Handle window resizing
+    window.addEventListener('resize', () => {
+      myChart.resize();
+    });
+  </script>
 </body>
 </html>
