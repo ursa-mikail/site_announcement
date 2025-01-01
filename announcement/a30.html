@@ -6,101 +6,122 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/base/jquery-ui.min.css">
   <style>
+    body {
+      margin: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+    }
     #main {
       height: 100%;
       width: 100%;
     }
-    #search-container {
+    #controls {
       position: absolute;
       top: 20px;
       left: 20px;
       z-index: 10;
       background-color: white;
-      border: 1px solid #ccc;
-      padding: 10px;
-      border-radius: 4px;
+      border: 1px solid #ddd;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    #autocomplete {
-      padding: 5px;
+    #search-box {
+      padding: 8px;
       width: 200px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+    .depth-control {
+      margin-top: 10px;
+    }
+    button {
+      padding: 5px 10px;
+      margin: 0 5px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background: #f8f8f8;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #eee;
     }
   </style>
 </head>
-<body style="height: 100%; margin: 0">
-  <div id="search-container">
-    <input id="autocomplete" type="text" placeholder="Search Emotions...">
+<body>
+  <div id="controls">
+    <input id="search-box" type="text" placeholder="Search emotions...">
+    <div class="depth-control">
+      <button id="expand">Expand All</button>
+      <button id="collapse">Collapse All</button>
+    </div>
   </div>
   <div id="main"></div>
   
   <script>
-    const myChart = echarts.init(document.getElementById('main'));
-    myChart.showLoading();
-
-    function csvToTree(csvData) {
-      const lines = csvData.split('\n');
+    function convertToTreeData(data, parentName = "Emotions") {
       const root = {
-        name: 'Emotions',
+        name: parentName,
         children: []
       };
-      
-      const allEmotions = new Set();
-      
-      lines.forEach(line => {
-        const emotions = line.split(',')
-          .map(e => e.trim())
-          .filter(e => e.length > 0);
-        
-        if (emotions.length === 0) return;
-        
-        let currentNode = root;
-        emotions.forEach(emotion => {
-          allEmotions.add(emotion);
-          let child = currentNode.children?.find(c => c.name === emotion);
-          if (!child) {
-            child = {
-              name: emotion,
-              children: []
-            };
-            currentNode.children.push(child);
-          }
-          currentNode = child;
-        });
-      });
 
-      // Setup autocomplete data
-      $("#autocomplete").autocomplete({
-        source: Array.from(allEmotions),
-        select: function(event, ui) {
-          const selectedEmotion = ui.item.value;
-          highlightNode(selectedEmotion);
+      function processNode(node, parent) {
+        if (Array.isArray(node)) {
+          node.forEach(item => {
+            if (typeof item === 'string') {
+              parent.children.push({ name: item });
+            } else if (typeof item === 'object') {
+              Object.entries(item).forEach(([key, value]) => {
+                const newNode = { name: key, children: [] };
+                parent.children.push(newNode);
+                processNode(value, newNode);
+              });
+            }
+          });
+        } else if (typeof node === 'object' && node !== null) {
+          Object.entries(node).forEach(([key, value]) => {
+            const newNode = { name: key, children: [] };
+            parent.children.push(newNode);
+            processNode(value, newNode);
+          });
         }
-      });
+      }
 
+      processNode(data, root);
       return root;
     }
 
-    function highlightNode(emotionName) {
-      myChart.dispatchAction({
-        type: 'highlight',
-        seriesName: 'Emotions',
-        name: emotionName
-      });
-      
-      myChart.dispatchAction({
-        type: 'showTip',
-        seriesName: 'Emotions',
-        name: emotionName
-      });
-    }
+    const myChart = echarts.init(document.getElementById('main'));
+    myChart.showLoading();
 
-    fetch('https://raw.githubusercontent.com/ursa-mikail/emotions_clusters/main/emotions_clusters.csv')
+    fetch('https://raw.githubusercontent.com/ursa-mikail/emotions_clusters/refs/heads/main/emotions_clusters.yaml')
       .then(response => response.text())
-      .then(csvData => {
-        const treeData = csvToTree(csvData);
-        myChart.hideLoading();
+      .then(yamlText => {
+        const emotionsData = jsyaml.load(yamlText);
+        const treeData = convertToTreeData(emotionsData);
         
+        // Collect all emotion names for search
+        const allEmotions = new Set();
+        function collectEmotions(node) {
+          allEmotions.add(node.name);
+          if (node.children) {
+            node.children.forEach(collectEmotions);
+          }
+        }
+        collectEmotions(treeData);
+
+        // Setup autocomplete
+        $("#search-box").autocomplete({
+          source: Array.from(allEmotions),
+          select: function(event, ui) {
+            highlightEmotion(ui.item.value);
+          }
+        });
+
         const option = {
           tooltip: {
             trigger: 'item',
@@ -108,18 +129,23 @@
           },
           series: [{
             type: 'tree',
-            name: 'Emotions',
+            name: 'Emotions Tree',
             data: [treeData],
-            top: '1%',
+            top: '5%',
             left: '7%',
-            bottom: '1%',
+            bottom: '5%',
             right: '20%',
-            symbolSize: 7,
+            symbolSize: 10,
+            itemStyle: {
+              color: '#4a90e2',
+              borderColor: '#2c3e50'
+            },
             label: {
               position: 'left',
               verticalAlign: 'middle',
               align: 'right',
-              fontSize: 12
+              fontSize: 14,
+              color: '#2c3e50'
             },
             leaves: {
               label: {
@@ -129,7 +155,10 @@
               }
             },
             emphasis: {
-              focus: 'descendant'
+              focus: 'descendant',
+              itemStyle: {
+                color: '#e74c3c'
+              }
             },
             expandAndCollapse: true,
             animationDuration: 550,
@@ -138,8 +167,40 @@
           }]
         };
 
+        myChart.hideLoading();
         myChart.setOption(option);
       });
+
+    function highlightEmotion(emotionName) {
+      myChart.dispatchAction({
+        type: 'highlight',
+        seriesName: 'Emotions Tree',
+        name: emotionName
+      });
+      
+      myChart.dispatchAction({
+        type: 'showTip',
+        seriesName: 'Emotions Tree',
+        name: emotionName
+      });
+    }
+
+    // Handle expand/collapse buttons
+    document.getElementById('expand').addEventListener('click', () => {
+      myChart.setOption({
+        series: [{
+          initialTreeDepth: -1
+        }]
+      });
+    });
+
+    document.getElementById('collapse').addEventListener('click', () => {
+      myChart.setOption({
+        series: [{
+          initialTreeDepth: 1
+        }]
+      });
+    });
 
     // Handle window resizing
     window.addEventListener('resize', () => {
