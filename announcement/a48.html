@@ -3,179 +3,145 @@
 <head>
   <meta charset="UTF-8">
   <title>Emotions Network</title>
-  <script src="https://cdn.jsdelivr.net/npm/echarts@5.0.0/dist/echarts.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jquery-ui-dist/jquery-ui.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui-dist/jquery-ui.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/jquery-ui.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/base/jquery-ui.min.css">
   <style>
-    #main {
-      height: 100%;
-      width: 100%;
-    }
-    #autocomplete {
+    body { margin: 0; height: 100%; }
+    #main { height: 100%; width: 100%; }
+    #search-box {
       position: absolute;
       top: 20px;
       left: 20px;
       z-index: 10;
-      background-color: white;
+      padding: 8px;
+      width: 200px;
       border: 1px solid #ccc;
-      padding: 5px;
+      border-radius: 4px;
+      background: white;
     }
   </style>
 </head>
-<body style="height: 100%; margin: 0">
-    
-    <pre style="text-align: right;">
-    Note: Also check a30.
-    </pre>
-
-  <input id="autocomplete" type="text" placeholder="Search Emotions..." />
-  <div id="main" style="height: 100%"></div>
+<body>
+  <input id="search-box" type="text" placeholder="Search emotions...">
+  <div id="main"></div>
   
-  <script type="text/javascript">
-    var ROOT_PATH = '.';
-    var myChart = echarts.init(document.getElementById('main'));
+  <script>
+    const myChart = echarts.init(document.getElementById('main'));
     myChart.showLoading();
 
-    $.get('https://raw.githubusercontent.com/ursa-mikail/emotions_clusters/refs/heads/main/emotions_clusters.csv', function (csvData) {
-      var lines = csvData.split('\n');
-      var nodes = [];
-      var links = [];
-      var categories = [];
-      var emotionsMap = {};
+    function processYamlData(data, parentName = null) {
+      const nodes = [];
+      const links = [];
+      const seen = new Set();
 
-      var categoryCounter = 0;
-
-      lines.forEach(function(line, index) {
-        var columns = line.split(',');
-        if (columns.length < 4) return;  // Skip incomplete rows
-
-        var emotion = columns[1].trim();
-        if (!emotion) return;
-
-        if (!emotionsMap[emotion]) {
-          emotionsMap[emotion] = {
-            id: emotion,
-            name: emotion,
-            category: categoryCounter++
-          };
-          nodes.push(emotionsMap[emotion]);
+      function addNode(name) {
+        if (!seen.has(name)) {
+          nodes.push({
+            id: name,
+            name: name,
+            symbolSize: 20,
+            category: parentName || name
+          });
+          seen.add(name);
         }
+      }
 
-        // Link to previous node if not the first node
-        if (nodes.length > 1) {
-          links.push({
-            source: nodes[nodes.length - 2].id,
-            target: nodes[nodes.length - 1].id
+      function processItem(item, parent) {
+        if (typeof item === 'string') {
+          addNode(item);
+          if (parent) {
+            links.push({
+              source: parent,
+              target: item
+            });
+          }
+        } else if (Array.isArray(item)) {
+          item.forEach(subItem => processItem(subItem, parent));
+        } else if (typeof item === 'object' && item !== null) {
+          Object.entries(item).forEach(([key, value]) => {
+            addNode(key);
+            if (parent) {
+              links.push({
+                source: parent,
+                target: key
+              });
+            }
+            processItem(value, key);
           });
         }
-      });
+      }
 
-      // Prepare categories for emotions
-      categories = nodes.map(function(node) {
-        return { name: node.name };
-      });
+      processItem(data, null);
+      return { nodes, links };
+    }
 
-      var graph = {
-        nodes: nodes,
-        links: links,
-        categories: categories
-      };
+    fetch('https://raw.githubusercontent.com/ursa-mikail/emotions_clusters/refs/heads/main/emotions_clusters.yaml')
+      .then(response => response.text())
+      .then(yamlText => {
+        const emotionsData = jsyaml.load(yamlText);
+        const { nodes, links } = processYamlData(emotionsData);
 
-      myChart.hideLoading();
+        const categories = Array.from(new Set(nodes.map(n => n.category)))
+          .map(name => ({ name }));
 
-      var option = {
-        tooltip: {},
-        legend: [
-          {
-            data: categories.map(function (a) {
-              return a.name;
-            })
-          }
-        ],
-        series: [
-          {
-            name: 'Emotions',
+        const option = {
+          tooltip: {},
+          legend: [{
+            data: categories.map(a => a.name),
+            orient: 'vertical',
+            right: 10,
+            top: 20
+          }],
+          series: [{
             type: 'graph',
             layout: 'force',
-            force: {
-              repulsion: 100,
-              gravity: 0.05,
-              edgeLength: 50
-            },
+            animation: false,
+            draggable: true,
             data: nodes,
             links: links,
             categories: categories,
             roam: true,
             label: {
               show: true,
-              position: 'right',
-              formatter: '{b}'
+              position: 'right'
             },
-            labelLayout: {
-              hideOverlap: true
-            },
-            scaleLimit: {
-              min: 0.4,
-              max: 2
-            },
-            lineStyle: {
-              color: 'source',
-              curveness: 0.3
+            force: {
+              repulsion: 100,
+              gravity: 0.1,
+              edgeLength: 50,
+              friction: 0.6
             },
             emphasis: {
-              itemStyle: {
-                borderColor: '#F00',
-                borderWidth: 2,
-                shadowBlur: 10,
-                shadowColor: 'rgba(0, 0, 0, 0.3)'
-              },
-              label: {
-                show: true,
-                color: '#F00',
+              focus: 'adjacency',
+              lineStyle: {
+                width: 10
               }
             }
-          }
-        ]
-      };
-      myChart.setOption(option);
+          }]
+        };
 
-      // Autocomplete for searching emotions
-      $("#autocomplete").autocomplete({
-        source: Object.keys(emotionsMap),
-        select: function(event, ui) {
-          var selectedEmotion = ui.item.value;
-          highlightNode(selectedEmotion);
-        }
+        myChart.hideLoading();
+        myChart.setOption(option);
+
+        $("#search-box").autocomplete({
+          source: nodes.map(n => n.name),
+          select: (event, ui) => {
+            const node = nodes.find(n => n.name === ui.item.value);
+            if (node) {
+              myChart.dispatchAction({
+                type: 'focusNodeAdjacency',
+                seriesIndex: 0,
+                dataIndex: nodes.indexOf(node)
+              });
+            }
+          }
+        });
       });
 
-      function highlightNode(emotion) {
-        var selectedNode = nodes.find(function(node) {
-          return node.name === emotion;
-        });
-
-        if (selectedNode) {
-          myChart.setOption({
-            series: [{
-              emphasis: {
-                focus: 'adjacency',
-                blurScope: 'global',
-                itemStyle: {
-                  borderColor: '#F00',
-                  borderWidth: 2,
-                  shadowBlur: 10,
-                  shadowColor: 'rgba(0, 0, 0, 0.3)'
-                },
-                label: {
-                  show: true,
-                  color: '#F00',
-                }
-              }
-            }]
-          });
-        }
-      }
-    });
+    window.addEventListener('resize', () => myChart.resize());
   </script>
 </body>
 </html>
