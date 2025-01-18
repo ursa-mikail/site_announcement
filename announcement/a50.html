@@ -1,0 +1,530 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml" lang="en"><head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>One-Time Pad Generator</title>
+<meta name="description" content="JavaScript One-Time Pad Generator">
+<meta name="keywords" content="one, time, pad, generator, onetime, cryptography, JavaScript">
+<style type="text/css">
+    a:link,  a:visited {
+	background-color: inherit;
+    	color: rgb(0%, 0%, 80%);
+	text-decoration: none;
+    }
+
+    a:hover  {
+    	background-color:  rgb(30%, 30%, 100%);
+    	color: rgb(100%, 100%, 100%);
+    }
+    
+    a:active {
+    	color: rgb(100%, 0%, 0%);
+    	background-color:  rgb(30%, 30%, 100%);
+    }
+    
+    a.i:link, a.i:visited, a.i:hover {
+    	background-color:  inherit;
+    	color: inherit;
+	text-decoration: none;
+    }
+    
+    body {
+        margin-left: 15%;
+        margin-right: 10%;
+	background-color: #FFFFFF;
+	color: #000000;
+    }
+    
+    body.jsgen {
+        margin-left: 5%;
+        margin-right: 5%;
+    }
+    
+    dt {
+    	margin-top: 0.5em;
+    }
+    
+    img.button {
+    	border: 0px;
+	vertical-align: middle;
+    }
+    
+    img.keyicon {
+	vertical-align: bottom;
+    }
+    
+    p, dd, li {
+    	text-align: justify;
+    }
+    
+    p.centre {
+    	text-align: center;
+    }
+    
+    table.r {
+   	float: right;
+    }
+    
+    table.c {
+    	background-color: #E0E0E0;
+	color: #000000;
+    	margin-left: auto;
+	margin-right: auto;
+    }
+
+    td.c {
+    	text-align: center;
+    }
+    
+    textarea {
+    	background-color: #FFFFD0;
+	color: #000000;
+    }
+</style>
+<script type="text/javascript">
+//<![CDATA[
+
+// Initialize load time
+let loadTime = new Date().getTime();
+
+// Schrage's modular multiplication algorithm
+function uGen(old, a, q, r, m) {
+    let t = Math.floor(old / q);
+    t = a * (old - t * q) - t * r;
+    return t < 0 ? t + m : t;
+}
+
+// L'Ecuyer's random number generator
+function LEnext() {
+    const i = Math.floor(this.state / 67108862);
+    this.gen1 = uGen(this.gen1, 40014, 53668, 12211, 2147483563);
+    this.gen2 = uGen(this.gen2, 40692, 52774, 3791, 2147483399);
+    this.state = (this.shuffle[i] + this.gen2) % 2147483563;
+    this.shuffle[i] = this.gen1;
+    return this.state;
+}
+
+// Generate random integer between 0 and n
+function LEnint(n) {
+    return Math.floor(this.next() / (1 + 2147483562 / (n + 1)));
+}
+
+// Constructor for L'Ecuyer's generator
+function LEcuyer(seed) {
+    this.shuffle = Array(32);
+    this.gen1 = this.gen2 = seed & 0x7FFFFFFF;
+    for (let i = 0; i < 19; i++) {
+        this.gen1 = uGen(this.gen1, 40014, 53668, 12211, 2147483563);
+    }
+    for (let i = 0; i < 32; i++) {
+        this.gen1 = uGen(this.gen1, 40014, 53668, 12211, 2147483563);
+        this.shuffle[31 - i] = this.gen1;
+    }
+    this.state = this.shuffle[0];
+    this.next = LEnext;
+    this.nextInt = LEnint;
+}
+
+// Separator character generator
+function sepchar(randomSeparator) {
+    const seps = "!#$%&()*+,-./:;<=>?@[]^_{|}~";
+    return randomSeparator
+        ? seps.charAt(sepran.nextInt(seps.length - 1))
+        : "-";
+}
+
+// Generate the one-time pad
+function gen() {
+    const form = document.getElementById("onetime");
+    const nkeys = parseInt(form.nkeys.value);
+    const linelen = parseInt(form.linelen.value);
+    const klength = parseInt(form.klength.value);
+    const seplength = parseInt(form.sep.value);
+    const randomSeparator = form.rsep.checked;
+    const caseType = parseInt(form.textcase.value);
+    const seed = form.seedy[0].checked ? new Date().getTime() : parseInt(form.seeder.value);
+
+    const ran = new LEcuyer(seed);
+    const sepran = new LEcuyer(seed + 1);
+
+    let output = "";
+    for (let i = 0; i < nkeys; i++) {
+        let line = "";
+        for (let j = 0; j < linelen; j++) {
+            if (j > 0 && j % seplength === 0) {
+                line += sepchar(randomSeparator);
+            }
+            let charCode = ran.nextInt(25) + 65;
+            if (caseType === 1) charCode += 32; // Lowercase
+            if (caseType === 3 && ran.nextInt(1)) charCode += 32; // Mixed case
+            line += String.fromCharCode(charCode);
+        }
+        output += line + "\n";
+    }
+    form.pad.value = output;
+}
+
+// Clear the generated pad
+function clearPad() {
+    document.getElementById("onetime").pad.value = "";
+}
+
+// Select all text in the pad
+function selectPad() {
+    document.getElementById("onetime").pad.select();
+}
+
+//]]>
+</script>
+
+
+</head><body class="jsgen">
+
+<h1>&nbsp; One-Time Pad Generator</h1>
+
+<p>
+Generates one-time pads or password lists in a variety of forms, based a pseudorandom sequence generator, which can be seeded either from the current date and time, or from a seed provided.  Fill in the form below to select the format of the pad and press &#8220;Generate&#8221; to create the pad in the text box.  
+
+Then copy and paste the generated pad. Each of the labels on the request form is linked to a description of that parameter.
+</p>
+
+<form id="onetime" action="#" onsubmit="return false;">
+<p class="centre">
+<b>Output:</b>
+<a href="#NumberOfKeys">Number of keys</a>: <input name="nkeys" value="20" size="4" maxlength="12" type="text">
+<a href="#LineLength">Line length</a>: <input name="linelen" value="48" size="3" maxlength="12" type="text">
+<br>
+<b>Format:</b>
+<a href="#KeyLength">Key length</a>: <input name="klength" value="8" size="3" maxlength="12" type="text">
+<a href="#GroupLength">Group length</a>: <input name="sep" value="4" size="2" maxlength="12" type="text">
+<br>
+<b>Composition:</b>
+<a href="#KeyText">Key text</a>: <input name="keytype" type="radio"> Numeric
+<input name="keytype" type="radio"> Word-like
+<input name="keytype" checked="checked" type="radio"> Alphabetic
+<input name="keytype" type="radio"> Gibberish
+<br>
+<a href="#LetterCase">Letters:</a>
+<select size="i" name="textcase">
+    <option value="1" selected="selected">Lower case</option>
+    <option value="2">Upper case</option>
+    <option value="3">Mixed case</option>
+</select>
+
+<input name="rsep" type="checkbox"> <a href="#RandomSep">Random separators</a>
+<input name="dosig" type="checkbox"> <a href="#Signatures">Include signatures</a>
+<br>
+<b><a href="#Seed">Seed:</a></b>
+<input name="seedy" checked="checked" type="radio"> From clock
+<input name="seedy" type="radio"> User-defined:
+<input name="seeder" value="" size="12" maxlength="128" onchange="document.getElementById('onetime').seedy[1].checked=true;" type="text">
+<br>
+<input value=" Generate " onclick="gen();" type="button">
+&nbsp;
+<input value=" Clear " onclick="document.getElementById('onetime').pad.value = '';" type="button">
+&nbsp;
+<input value=" Select " onclick="document.getElementById('onetime').pad.select();" type="button"><br>
+<textarea name="pad" rows="12" cols="72">
+Uh, oh.  It appears your browser either does not support JavaScript or that JavaScript has been disabled.  
+</textarea>
+</p>
+</form>
+
+<script type="text/javascript">
+//<![CDATA[
+    //  Clear out "sorry, no JavaScript" message from text box.
+    document.getElementById('onetime').pad.value = "";
+//]]>
+</script>
+
+<h2><a name="details">Details</a></h2>
+
+<p>
+Each of the fields in the one-time pad request form is described below.
+</p>
+
+<h3><a name="output">Output</a></h3>
+
+<h4><a name="NumberOfKeys">Number of keys</a></h4>
+
+<p>
+Enter the number of keys to generate.  If you generate more than fit in the results text box, you can use the scroll bar to view the additional lines.
+</p>
+
+<h4><a name="LineLength">Line length</a></h4>
+
+<p>
+Lines in the output will be limited to the given length (or contain
+only one key if the line length is less than required for a single
+key).  If the line length > width of the results box, you can use the horizontal scroll bar to view the rest of the line.  Enter <tt>0</tt> to force one key per line; this is handy when you're preparing a list of keys to be read by a computer program.
+</p>
+
+<h3><a name="format">Format</a></h3>
+
+<h4><a name="KeyLength">Key length</a></h4>
+
+<p>
+Each key will contain this number of characters, not counting separators between groups.
+</p>
+
+<h4><a name="GroupLength">Group length</a></h4>
+
+<p>
+If a nonzero value is entered in this field, the key will be broken into groups of the given number of characters by separators.  Humans find it easier to read and remember sequences of characters when divided into groups of five or fewer characters.
+</p>
+
+<h3><a name="composition">Composition</a></h3>
+
+<h4><a name="KeyText">Key text</a></h4>
+
+<p>
+This set of radio buttons lets you select the character set used in
+the keys.  The alternatives are listed in order of increasing security.
+</p>
+
+<blockquote>
+<dl>
+<dt><b>Numeric</b></dt>
+<dd>Keys contain only the decimal digits &#8220;0&#8221; through &#8220;9&#8221;.
+    <em>Least secure.</em></dd>
+
+<dt><b>Word-like</b></dt>
+<dd>Keys are composed of alphabetic characters which obey the
+    digraph statistics of English text.  Such keys contain
+    sequences of vowels and consonants familiar to speakers
+    of Western languages, and are therefore usually easier to
+    memorise but, for a given key length, are less secure than purely random letters.</dd>
+
+<dt><b>Alphabetic</b></dt>
+<dd>Keys consist of letters of the alphabet chosen at random. 
+    Each character has an equal probability of being 1 of the 26 letters.</dd>
+
+<dt><b>Gibberish</b></dt>
+<dd>Keys use most of the printable ASCII character set, excluding
+    only characters frequently used for quoting purposes.  This
+    option provides the greatest security for a given key length,
+    but most people find keys like this difficult to memorise or
+    even transcribe from a printed pad.  If a human is in the loop,
+    it's often better to use a longer alphabetic or word-like key.
+    <em>Most secure.</em></dd>
+</dl>
+</blockquote>
+
+<h4><a name="LetterCase">Letters</a></h4>
+
+<p>
+The case of letters in keys generated with Word-like, Alphabetic, and
+Gibberish key text will be as chosen.  Most people find it easier to
+read lower case letters than all capitals, but for some applications
+(for example, where keys must be scanned optically by hardware that
+only recognises capital letters), capitals are required.  Selecting
+&#8220;Mixed&nbsp;case&#8221; creates keys with a mix of upper- and
+lower-case letters; such keys are more secure than those with uniform
+letter case, but do not pass the &#8220;telephone test&#8221;: you
+can't read them across a (hopefully secure) voice link without having
+to indicate whether each letter is or is not a capital.
+</p>
+
+<h4><a name="RandomSep">Random separators</a></h4>
+
+<p>
+When the <a href="#KeyLength">Key length</a> is longer than
+a nonzero <a href="#GroupLength">Group length</a> specification,
+the key is divided into sequences of the given group length
+by separator characters.  By default, a hyphen, &#8220;<tt>-</tt>&#8221;, is used
+to separate groups.  If you check this box, separators will be
+chosen at random among punctuation marks generally acceptable
+for applications such as passwords.  If you're generating passwords
+for a computer system, random separators dramatically increase the difficulty of guessing passwords by exhaustive search.
+</p>
+
+<h4><a name="Signatures">Include signatures</a></h4>
+
+<p>
+When this box is checked, at the end of the list of keys, preceded by
+a line beginning with ten dashes &#8220;<tt>-</tt>&#8221;, the sha256 signature of
+each key is given, one per line, with signatures expressed as 32
+hexadecimal digits.  Key signatures can be used to increase security
+when keys are used to control access to computer systems or databases.
+Instead of storing a copy of the keys, the computer stores their
+signatures.  When the user enters a key, its signature is computed
+with the same sha256 used to generate it initially, and the key
+is accepted only if the signature matches.  Since discovering
+a key which will generate a given signature is believed to be
+computationally prohibitive, even if the list of signatures stored on
+the computer is compromised, that information will not permit an intruder to deduce a valid key.
+</p>
+
+<p>
+Signature calculation is a computationally intense process for which
+JavaScript is not ideally suited; be patient while signatures are generated.
+</p>
+
+<p>
+For signature-based validation to be secure, it is essential
+the original keys be long enough to prohibit discovery of matching
+signatures by exhaustive search.  Suppose, for example, one used
+four digit numeric keys, as used for Personal Identification
+Numbers (PINs) by many credit card systems.  Since only 10,000
+different keys exist, one could simply compute the signatures of
+every possible key from 0000 through 9999, permitting an attacker who
+came into possession of the table of signatures to recover the
+keys by a simple lookup process.  For maximum security, keys must
+contain at least as much information as the 128 bit signatures
+computed from them.  This implies a minimum key length (not counting
+non-random separator characters) for the various key formats as
+follows:
+</p>
+
+<table class="c" border="1" cellpadding="4">
+<tbody><tr><th>Key Composition</th> <th>Minimum Characters</th></tr>
+<tr><td>Numeric</td> <td class="c">39</td></tr>
+<tr><td>Word-like</td> <td class="c">30</td></tr>
+<tr><td>Alphabetic</td> <td class="c">28</td></tr>
+<tr><td>Gibberish</td> <td class="c">20</td></tr>
+</tbody></table>
+
+<p>
+Note: For many practical applications there is no
+need for anything approaching 128-bit security.  The guidelines above
+apply only in the case where maximum protection in the event of
+undetected compromise of key signatures occurs.  In many
+cases, much shorter keys are acceptable, especially when it is assumed
+that a compromise of the system's password or signature database would
+be only part of a much more serious subversion of all resources on the system.
+</p>
+
+<h3><a name="Seed">Seed</a></h3>
+
+<p>
+The <em>seed</em> is the starting value which determines all
+subsequent values in the pseudorandom sequence used to generate
+the one-time pad.  Given the seed, the pad can be reproduced.  The
+seed is a 31-bit number which can be derived from the date and
+time at which the one-time pad was requested, or from a
+user-defined seed value.  If the user-defined seed consists
+entirely of decimal digits, it is used directly as the seed,
+modulo 2<sup>31</sup>; if a string containing non-digit characters
+is entered, it is used to compute a <em>hash code</em> which is
+used to seed the generator.
+</p>
+
+<p>
+When the clock is used to create the seed, the seed value is entered
+in the User-defined box to allow you, by checking &#8220;User-defined&#8221;,
+to produce additional pads with the same seed.
+</p>
+
+<h2><a name="security">Security</a></h2>
+<p>
+Even if some mechanism such as encryption could absolutely prevent the
+pad's being intercepted, you'd still have no way to be sure the site generating the pad didn't keep a copy
+in a file, conveniently tagged with your Internet address.
+</p>
+
+<p>
+It is essential that the pad be generated on <em>trusted</em> computer (with trusted entropy), without
+involving any transmission or interaction with other sites on the Internet.  It does not transmit anything over the Internet. 
+</p>
+
+<p>
+1-time pad generated with this page might be compromised in a variety of ways, including the following:
+</p>
+
+<ul>
+<li>    Web browser and/or JavaScript interpreter may
+        contain bugs or deliberate security violations
+        which report activity on your computer back to some
+        other Internet site.</li>
+
+<li>    Some other applet running on another page of your
+        browser, perhaps without your being aware of its
+        existence, is spying on other windows.</li>
+
+<li>    Some other application running on your computer
+        may have compromised your system's security and
+        be snooping on your activity.</li>
+
+<li>    Web browser may be keeping a &#8220;history log&#8221;
+        or &#8220;cache&#8221; of data you generate.  Somebody may
+        come along later and recover a copy of the pad
+        from that log.</li>
+
+<li>    The implementation of this page may contain a bug
+        or deliberate error which makes its output
+        predictable.  This is why <a href="#trans"><cite>transparency</cite></a>,
+        discussed below, is essential.</li>
+
+<li>    Your computer's security may have been compromised
+        physically; when's the last time you checked that a
+        bug that transmits your keystrokes and/or screen
+        contents to that van parked down the street
+        wasn't lurking inside your computer cabinet?</li>
+</ul>
+
+<p>
+1 way to rule out the most probable risks is to download a copy of the generator page and run it
+from a &#8220;<tt>file:</tt>&#8221; URL on a computer which has no network
+connection whatsoever and is located in a secure location
+under your control.  And look  carefully at any files
+created by your Web browser.  You may find things squirreled away there&#8230;.
+</p>
+
+<p>
+<b><a name="trans">Transparency</a>.</b>
+Any security-related tool is only as good as its design
+and implementation.  <em>Transparency</em> means that, in
+essence, all the moving parts are visible so you can judge
+for yourself whether the tool merits your confidence.  In
+the case of a program, this means that source code must
+be available, and that you can verify that the program
+you're running corresponds to the source code provided.
+</p>
+
+<p>
+Transparency is important even if you don't know enough about
+programming or security to determine whether the program
+contains any flaws.  The very fact that it can be examined
+by anybody allows those with the required expertise to pass
+judgement, and you can form your own conclusions based on
+their analysis.
+</p>
+
+<h2>Credits</h2>
+
+<p>
+The pseudorandom sequence generator is based on L'Ecuyer's
+2-sequence generator as described in
+<cite>Communications of the ACM</cite>, Vol. 31 (1968), page 742.
+A Bays-Durham shuffle is used to guard against regularities
+lurking in L'Ecuyer's algorithm; see
+<cite>ACM Transactions on Mathematical Software</cite>, Vol. 2 (1976)
+pages 59&#8211;64 for details.
+</p>
+
+<p>
+The JavaScript implementation of sha256.
+</p>
+
+<p>
+
+</p><hr>
+
+<p>
+
+</p><table class="r">
+<tbody><tr><td align="center">
+    <a class="i" href="http://validator.w3.org/check?uri=referer"><img class="button" src="otp_js_files/valid-xhtml10.png" alt="Valid XHTML 1.0" width="88" height="31"></a>
+</td></tr>
+</tbody></table>
+
+<address>
+by <a href="https://github.com/ursa-mikail">Mikail Eliyah</a>
+<br>2025-01-17_2133hr_50sec<br>
+Updated: 2025-01-17_2133hr_50sec
+</address>
+
+<p class="centre">
+<em>_</em>
+</p>
+</body></html>
