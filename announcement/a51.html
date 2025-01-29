@@ -1,116 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Visualizations - Opinion Manipulation & More</title>
-    <!-- ECharts library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.0.2/echarts.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-        }
-        #graph-container {
-            width: 100%;
-            height: 600px;
-            border: 1px solid #ccc;
-            margin-bottom: 20px;
-        }
-        #summary {
-            margin: 20px 0;
-            font-size: 1.2em;
-            line-height: 1.6;
-        }
-        h2 {
-            margin-bottom: 10px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Opinion Manipulation and Disinformation Network</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.3.8/dist/echarts.min.js"></script>
+  <style>
+    /* Set the chart's container dimensions */
+    #main {
+      width: 100%;
+      height: 600px;
+    }
+  </style>
 </head>
 <body>
+  <div id="main"></div>
+  <script>
+    var myChart = echarts.init(document.getElementById('main'));
+    myChart.showLoading();
 
-    <h1>Interactive Visualization of Opinion Manipulation, Cyber Threats, and Exploitation</h1>
+    // Data from your provided structure and the required labels (opinion manipulation, cyber attacks, etc.)
+    var graph = {
+      "nodes": [
+        { "id": "0", "name": "Opinion Manipulation", "symbolSize": 50, "category": 0 },
+        { "id": "1", "name": "Disinformation", "symbolSize": 40, "category": 1 },
+        { "id": "2", "name": "Defamation", "symbolSize": 30, "category": 1 },
+        { "id": "3", "name": "Image Manipulation", "symbolSize": 30, "category": 2 },
+        { "id": "4", "name": "Civil Unrest", "symbolSize": 35, "category": 3 },
+        { "id": "5", "name": "Harassment - Disinformation", "symbolSize": 25, "category": 4 },
+        { "id": "6", "name": "Harassment - Bullying", "symbolSize": 30, "category": 4 },
+        { "id": "7", "name": "Neferious Content Generation", "symbolSize": 25, "category": 5 },
+        { "id": "8", "name": "Monetization and Profit - Deepfake", "symbolSize": 35, "category": 6 },
+        { "id": "9", "name": "Content Farming", "symbolSize": 30, "category": 6 },
+        { "id": "10", "name": "Scam and Fraud - Phishing", "symbolSize": 20, "category": 7 },
+        { "id": "11", "name": "Celebrity Ads Scam", "symbolSize": 25, "category": 7 },
+        { "id": "12", "name": "Forgery", "symbolSize": 20, "category": 8 },
+        { "id": "13", "name": "Child Exploitation and Abuse", "symbolSize": 45, "category": 9 },
+        { "id": "14", "name": "Content Farming - Plagiarism", "symbolSize": 20, "category": 10 },
+        { "id": "15", "name": "Digital Resurrection", "symbolSize": 25, "category": 10 },
+        { "id": "16", "name": "Parody - Satire", "symbolSize": 20, "category": 11 },
+        { "id": "17", "name": "Terrorism - Propaganda", "symbolSize": 40, "category": 12 },
+        { "id": "18", "name": "Cyber Attacks - Info Theft", "symbolSize": 50, "category": 13 },
+        { "id": "19", "name": "Cyber Attacks - Target Identification", "symbolSize": 40, "category": 13 },
+        { "id": "20", "name": "Subversion - Anti-Scraping", "symbolSize": 35, "category": 14 }
+      ],
+      "links": [
+        { "source": "0", "target": "1" },
+        { "source": "1", "target": "2" },
+        { "source": "3", "target": "1" },
+        { "source": "4", "target": "1" },
+        { "source": "5", "target": "2" },
+        { "source": "6", "target": "5" },
+        { "source": "7", "target": "5" },
+        { "source": "8", "target": "6" },
+        { "source": "9", "target": "6" },
+        { "source": "10", "target": "9" },
+        { "source": "11", "target": "10" },
+        { "source": "12", "target": "10" },
+        { "source": "13", "target": "12" },
+        { "source": "14", "target": "13" },
+        { "source": "15", "target": "13" },
+        { "source": "16", "target": "1" },
+        { "source": "17", "target": "16" },
+        { "source": "18", "target": "17" },
+        { "source": "19", "target": "18" },
+        { "source": "20", "target": "1" }
+      ],
+      "categories": [
+        { "name": "Opinion Manipulation" },
+        { "name": "Disinformation" },
+        { "name": "Image Manipulation" },
+        { "name": "Civil Unrest" },
+        { "name": "Harassment - Disinformation" },
+        { "name": "Harassment - Bullying" },
+        { "name": "Nefarious Content Generation" },
+        { "name": "Monetization and Profit" },
+        { "name": "Scam and Fraud" },
+        { "name": "Child Exploitation and Abuse" },
+        { "name": "Content Farming" },
+        { "name": "Parody - Satire" },
+        { "name": "Terrorism - Propaganda" },
+        { "name": "Cyber Attacks" },
+        { "name": "Subversion" }
+      ]
+    };
 
-    <div id="summary">
-        <section id="a51">
-            <h2>42. Interactive Text Hyperlinking & Disinformation</h2>
-            <p>This page visualizes various aspects of opinion manipulation, cyber threats, and exploitation through an interactive graph. Below, you'll see different categories that include:</p>
-            <ul>
-                <li><strong>Opinion Manipulation:</strong> Disinformation, Image Manipulation</li>
-                <li><strong>Civil Unrest:</strong> Political Disinformation, AI-Generated Fake News</li>
-                <li><strong>Monetization and Profit:</strong> Deepfake Commodification, Content Farming</li>
-                <li><strong>Scams and Fraud:</strong> Phishing, Forgery</li>
-                <li><strong>Child Exploitation:</strong> AI-generated Child Abuse Material</li>
-                <li><strong>Terrorism and Extremism:</strong> Propaganda and Recruitment Content</li>
-                <li><strong>Cyber Attacks:</strong> Data Theft, Resource Development</li>
-            </ul>
-            <p>Explore the interconnectedness between these factors through the graph visualization below, inspired by the network in Les Miserables.</p>
-        </section>
-    </div>
+    myChart.hideLoading();
 
-    <div id="graph-container"></div>
+    graph.nodes.forEach(function (node) {
+      node.label = {
+        show: node.symbolSize > 30
+      };
+    });
 
-    <script>
-        // Initialize chart
-        var myChart = echarts.init(document.getElementById('graph-container'));
+    var option = {
+      title: {
+        text: 'Network of Manipulation, Fraud, and Cyber Activities',
+        subtext: 'Circular Layout',
+        top: 'bottom',
+        left: 'right'
+      },
+      tooltip: {},
+      legend: [
+        {
+          data: graph.categories.map(function (a) {
+            return a.name;
+          })
+        }
+      ],
+      animationDurationUpdate: 1500,
+      animationEasingUpdate: 'quinticInOut',
+      series: [
+        {
+          name: 'Manipulation and Fraud Network',
+          type: 'graph',
+          layout: 'circular',
+          circular: {
+            rotateLabel: true
+          },
+          data: graph.nodes,
+          links: graph.links,
+          categories: graph.categories,
+          roam: true,
+          label: {
+            position: 'right',
+            formatter: '{b}'
+          },
+          lineStyle: {
+            color: 'source',
+            curveness: 0.3
+          }
+        }
+      ]
+    };
 
-        // Show loading indicator
-        myChart.showLoading();
-
-        // Load JSON data for the graph (Les Miserables dataset as an example)
-        $.getJSON('https://example.com/data/les-miserables.json', function (graph) {
-            // Hide loading indicator
-            myChart.hideLoading();
-
-            // Process nodes for label visibility
-            graph.nodes.forEach(function (node) {
-                node.label = {
-                    show: node.symbolSize > 30
-                };
-            });
-
-            // ECharts option configuration
-            var option = {
-                title: {
-                    text: 'Les Miserables',
-                    subtext: 'Circular layout',
-                    top: 'bottom',
-                    left: 'right'
-                },
-                tooltip: {},
-                legend: [{
-                    data: graph.categories.map(function (a) { return a.name; })
-                }],
-                animationDurationUpdate: 1500,
-                animationEasingUpdate: 'quinticInOut',
-                series: [{
-                    name: 'Les Miserables',
-                    type: 'graph',
-                    layout: 'circular',
-                    circular: {
-                        rotateLabel: true
-                    },
-                    data: graph.nodes,
-                    links: graph.links,
-                    categories: graph.categories,
-                    roam: true,
-                    label: {
-                        position: 'right',
-                        formatter: '{b}'
-                    },
-                    lineStyle: {
-                        color: 'source',
-                        curveness: 0.3
-                    }
-                }]
-            };
-
-            // Set option to the chart
-            myChart.setOption(option);
-        });
-    </script>
-
+    myChart.setOption(option);
+  </script>
 </body>
 </html>
-
