@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Opinion Manipulation and Disinformation Network</title>
-  <script src="https://cdn.jsdelivr.net/npm/echarts@5.3.8/dist/echarts.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.3.8/echarts.min.js"></script>
   <style>
     /* Set the chart's container dimensions */
     #main {
@@ -16,10 +16,11 @@
 <body>
   <div id="main"></div>
   <script>
+    // Initialize the chart instance
     var myChart = echarts.init(document.getElementById('main'));
     myChart.showLoading();
 
-    // Data from your provided structure and the required labels (opinion manipulation, cyber attacks, etc.)
+    // Graph data (adapted from your provided data)
     var graph = {
       "nodes": [
         { "id": "0", "name": "Opinion Manipulation", "symbolSize": 50, "category": 0 },
@@ -29,7 +30,7 @@
         { "id": "4", "name": "Civil Unrest", "symbolSize": 35, "category": 3 },
         { "id": "5", "name": "Harassment - Disinformation", "symbolSize": 25, "category": 4 },
         { "id": "6", "name": "Harassment - Bullying", "symbolSize": 30, "category": 4 },
-        { "id": "7", "name": "Neferious Content Generation", "symbolSize": 25, "category": 5 },
+        { "id": "7", "name": "Nefarious Content Generation", "symbolSize": 25, "category": 5 },
         { "id": "8", "name": "Monetization and Profit - Deepfake", "symbolSize": 35, "category": 6 },
         { "id": "9", "name": "Content Farming", "symbolSize": 30, "category": 6 },
         { "id": "10", "name": "Scam and Fraud - Phishing", "symbolSize": 20, "category": 7 },
