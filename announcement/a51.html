@@ -15,135 +15,70 @@
 </head>
 <body>
   <div id="main"></div>
-  <script>
-    // Ensure echarts is loaded and working
-    if (typeof echarts === 'undefined') {
-      console.error("ECharts is not loaded. Please check the CDN link.");
-    } else {
-      console.log("ECharts is loaded.");
-    }
+  <script type="module">
+    import * as echarts from 'echarts';
 
-    // Initialize the chart instance
-    var myChart = echarts.init(document.getElementById('main'));
+    var chartDom = document.getElementById('main');
+    var myChart = echarts.init(chartDom);
+    var option;
 
-    myChart.showLoading();
-
-    // Graph data (adapted from your provided data)
-    var graph = {
-      "nodes": [
-        { "id": "0", "name": "Opinion Manipulation", "symbolSize": 50, "category": 0 },
-        { "id": "1", "name": "Disinformation", "symbolSize": 40, "category": 1 },
-        { "id": "2", "name": "Defamation", "symbolSize": 30, "category": 1 },
-        { "id": "3", "name": "Image Manipulation", "symbolSize": 30, "category": 2 },
-        { "id": "4", "name": "Civil Unrest", "symbolSize": 35, "category": 3 },
-        { "id": "5", "name": "Harassment - Disinformation", "symbolSize": 25, "category": 4 },
-        { "id": "6", "name": "Harassment - Bullying", "symbolSize": 30, "category": 4 },
-        { "id": "7", "name": "Nefarious Content Generation", "symbolSize": 25, "category": 5 },
-        { "id": "8", "name": "Monetization and Profit - Deepfake", "symbolSize": 35, "category": 6 },
-        { "id": "9", "name": "Content Farming", "symbolSize": 30, "category": 6 },
-        { "id": "10", "name": "Scam and Fraud - Phishing", "symbolSize": 20, "category": 7 },
-        { "id": "11", "name": "Celebrity Ads Scam", "symbolSize": 25, "category": 7 },
-        { "id": "12", "name": "Forgery", "symbolSize": 20, "category": 8 },
-        { "id": "13", "name": "Child Exploitation and Abuse", "symbolSize": 45, "category": 9 },
-        { "id": "14", "name": "Content Farming - Plagiarism", "symbolSize": 20, "category": 10 },
-        { "id": "15", "name": "Digital Resurrection", "symbolSize": 25, "category": 10 },
-        { "id": "16", "name": "Parody - Satire", "symbolSize": 20, "category": 11 },
-        { "id": "17", "name": "Terrorism - Propaganda", "symbolSize": 40, "category": 12 },
-        { "id": "18", "name": "Cyber Attacks - Info Theft", "symbolSize": 50, "category": 13 },
-        { "id": "19", "name": "Cyber Attacks - Target Identification", "symbolSize": 40, "category": 13 },
-        { "id": "20", "name": "Subversion - Anti-Scraping", "symbolSize": 35, "category": 14 }
-      ],
-      "links": [
-        { "source": "0", "target": "1" },
-        { "source": "1", "target": "2" },
-        { "source": "3", "target": "1" },
-        { "source": "4", "target": "1" },
-        { "source": "5", "target": "2" },
-        { "source": "6", "target": "5" },
-        { "source": "7", "target": "5" },
-        { "source": "8", "target": "6" },
-        { "source": "9", "target": "6" },
-        { "source": "10", "target": "9" },
-        { "source": "11", "target": "10" },
-        { "source": "12", "target": "10" },
-        { "source": "13", "target": "12" },
-        { "source": "14", "target": "13" },
-        { "source": "15", "target": "13" },
-        { "source": "16", "target": "1" },
-        { "source": "17", "target": "16" },
-        { "source": "18", "target": "17" },
-        { "source": "19", "target": "18" },
-        { "source": "20", "target": "1" }
-      ],
-      "categories": [
-        { "name": "Opinion Manipulation" },
-        { "name": "Disinformation" },
-        { "name": "Image Manipulation" },
-        { "name": "Civil Unrest" },
-        { "name": "Harassment - Disinformation" },
-        { "name": "Harassment - Bullying" },
-        { "name": "Nefarious Content Generation" },
-        { "name": "Monetization and Profit" },
-        { "name": "Scam and Fraud" },
-        { "name": "Child Exploitation and Abuse" },
-        { "name": "Content Farming" },
-        { "name": "Parody - Satire" },
-        { "name": "Terrorism - Propaganda" },
-        { "name": "Cyber Attacks" },
-        { "name": "Subversion" }
-      ]
+    // Define the data (nodes and links) in Sankey format
+    option = {
+      series: {
+        type: 'sankey',
+        layout: 'none',
+        emphasis: {
+          focus: 'adjacency'
+        },
+        data: [
+          { name: 'Opinion Manipulation' },
+          { name: 'Disinformation' },
+          { name: 'Defamation' },
+          { name: 'Image Manipulation' },
+          { name: 'Civil Unrest' },
+          { name: 'Harassment - Disinformation' },
+          { name: 'Harassment - Bullying' },
+          { name: 'Nefarious Content Generation' },
+          { name: 'Monetization and Profit - Deepfake' },
+          { name: 'Content Farming' },
+          { name: 'Scam and Fraud - Phishing' },
+          { name: 'Celebrity Ads Scam' },
+          { name: 'Forgery' },
+          { name: 'Child Exploitation and Abuse' },
+          { name: 'Content Farming - Plagiarism' },
+          { name: 'Digital Resurrection' },
+          { name: 'Parody - Satire' },
+          { name: 'Terrorism - Propaganda' },
+          { name: 'Cyber Attacks - Info Theft' },
+          { name: 'Cyber Attacks - Target Identification' },
+          { name: 'Subversion - Anti-Scraping' }
+        ],
+        links: [
+          { source: 'Opinion Manipulation', target: 'Disinformation', value: 5 },
+          { source: 'Disinformation', target: 'Defamation', value: 3 },
+          { source: 'Defamation', target: 'Image Manipulation', value: 4 },
+          { source: 'Civil Unrest', target: 'Disinformation', value: 4 },
+          { source: 'Harassment - Disinformation', target: 'Defamation', value: 2 },
+          { source: 'Harassment - Bullying', target: 'Harassment - Disinformation', value: 2 },
+          { source: 'Nefarious Content Generation', target: 'Harassment - Disinformation', value: 3 },
+          { source: 'Monetization and Profit - Deepfake', target: 'Nefarious Content Generation', value: 3 },
+          { source: 'Content Farming', target: 'Monetization and Profit - Deepfake', value: 3 },
+          { source: 'Scam and Fraud - Phishing', target: 'Content Farming', value: 2 },
+          { source: 'Celebrity Ads Scam', target: 'Scam and Fraud - Phishing', value: 2 },
+          { source: 'Forgery', target: 'Scam and Fraud - Phishing', value: 3 },
+          { source: 'Child Exploitation and Abuse', target: 'Forgery', value: 4 },
+          { source: 'Content Farming - Plagiarism', target: 'Monetization and Profit - Deepfake', value: 3 },
+          { source: 'Digital Resurrection', target: 'Content Farming - Plagiarism', value: 2 },
+          { source: 'Parody - Satire', target: 'Image Manipulation', value: 1 },
+          { source: 'Terrorism - Propaganda', target: 'Parody - Satire', value: 4 },
+          { source: 'Cyber Attacks - Info Theft', target: 'Terrorism - Propaganda', value: 5 },
+          { source: 'Cyber Attacks - Target Identification', target: 'Cyber Attacks - Info Theft', value: 3 },
+          { source: 'Subversion - Anti-Scraping', target: 'Cyber Attacks - Info Theft', value: 4 }
+        ]
+      }
     };
 
-    myChart.hideLoading();
-
-    graph.nodes.forEach(function (node) {
-      node.label = {
-        show: node.symbolSize > 30
-      };
-    });
-
-    var option = {
-      title: {
-        text: 'Network of Manipulation, Fraud, and Cyber Activities',
-        subtext: 'Circular Layout',
-        top: 'bottom',
-        left: 'right'
-      },
-      tooltip: {},
-      legend: [
-        {
-          data: graph.categories.map(function (a) {
-            return a.name;
-          })
-        }
-      ],
-      animationDurationUpdate: 1500,
-      animationEasingUpdate: 'quinticInOut',
-      series: [
-        {
-          name: 'Manipulation and Fraud Network',
-          type: 'graph',
-          layout: 'circular',
-          circular: {
-            rotateLabel: true
-          },
-          data: graph.nodes,
-          links: graph.links,
-          categories: graph.categories,
-          roam: true,
-          label: {
-            position: 'right',
-            formatter: '{b}'
-          },
-          lineStyle: {
-            color: 'source',
-            curveness: 0.3
-          }
-        }
-      ]
-    };
-
-    myChart.setOption(option);
+    option && myChart.setOption(option);
   </script>
 </body>
 </html>
