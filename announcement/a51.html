@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Opinion Manipulation and Disinformation Network</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.3.8/echarts.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.3.8/dist/echarts.min.js"></script>
   <style>
     /* Set the chart's container dimensions */
     #main {
@@ -15,14 +15,13 @@
 </head>
 <body>
   <div id="main"></div>
-  <script type="module">
-    import * as echarts from 'echarts';
-
+  <script type="text/javascript">
+    // Initialize the chart container
     var chartDom = document.getElementById('main');
     var myChart = echarts.init(chartDom);
     var option;
 
-    // Define the data (nodes and links) in Sankey format
+    // Define the data for the Sankey diagram
     option = {
       series: {
         type: 'sankey',
@@ -78,7 +77,8 @@
       }
     };
 
-    option && myChart.setOption(option);
+    // Set the chart options and render it
+    myChart.setOption(option);
   </script>
 </body>
 </html>
