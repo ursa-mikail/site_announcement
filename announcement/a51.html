@@ -16,8 +16,16 @@
 <body>
   <div id="main"></div>
   <script>
+    // Ensure echarts is loaded and working
+    if (typeof echarts === 'undefined') {
+      console.error("ECharts is not loaded. Please check the CDN link.");
+    } else {
+      console.log("ECharts is loaded.");
+    }
+
     // Initialize the chart instance
     var myChart = echarts.init(document.getElementById('main'));
+
     myChart.showLoading();
 
     // Graph data (adapted from your provided data)
