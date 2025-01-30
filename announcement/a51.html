@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Counter Crime Against humanity: C2AH</title>
+  <title>Counter Crime Against Humanity: C2AH</title>
   <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
   <style>
     /* Set the chart's container dimensions */
@@ -14,7 +14,12 @@
   </style>
 </head>
 <body>
+  <h1>Counter Crime Against Humanity: C2AH</h1>
+  <p>This diagram shows the relationships between various harmful activities such as opinion manipulation, civil unrest, harassment, fraud, and others. It aims to visualize how these crimes interact and evolve over time.</p>
+  
+  <!-- The Sankey diagram container -->
   <div id="main"></div>
+
   <script type="text/javascript">
     // Initialize the chart container
     var chartDom = document.getElementById('main');
@@ -50,7 +55,16 @@
           { name: 'Terrorism - Propaganda' },
           { name: 'Cyber Attacks - Info Theft' },
           { name: 'Cyber Attacks - Target Identification' },
-          { name: 'Subversion - Anti-Scraping' }
+          { name: 'Subversion - Anti-Scraping' },
+          { name: 'Impersonation' },
+          { name: 'Appropriated Likeness' },
+          { name: 'Sockpuppeting' },
+          { name: 'Non-Consensual Intimate Imagery' },
+          { name: 'Sexual Abuse Material' },
+          { name: 'Realistic Depiction Falsification' },
+          { name: 'Infringement / Counterfeit' },
+          { name: 'Modification for Targeting and Personalization' },
+          { name: 'De-personalization' }
         ],
         links: [
           { source: 'Opinion Manipulation', target: 'Disinformation', value: 5 },
@@ -72,7 +86,15 @@
           { source: 'Terrorism - Propaganda', target: 'Parody - Satire', value: 4 },
           { source: 'Cyber Attacks - Info Theft', target: 'Terrorism - Propaganda', value: 5 },
           { source: 'Cyber Attacks - Target Identification', target: 'Cyber Attacks - Info Theft', value: 3 },
-          { source: 'Subversion - Anti-Scraping', target: 'Cyber Attacks - Info Theft', value: 4 }
+          { source: 'Subversion - Anti-Scraping', target: 'Cyber Attacks - Info Theft', value: 4 },
+          { source: 'Impersonation', target: 'Disinformation', value: 2 },
+          { source: 'Impersonation', target: 'Defamation', value: 3 },
+          { source: 'Appropriated Likeness', target: 'Impersonation', value: 3 },
+          { source: 'Sockpuppeting', target: 'Impersonation', value: 2 },
+          { source: 'Non-Consensual Intimate Imagery', target: 'Sexual Abuse Material', value: 5 },
+          { source: 'Realistic Depiction Falsification', target: 'Impersonation', value: 4 },
+          { source: 'Infringement / Counterfeit', target: 'Content Farming', value: 3 },
+          { source: 'Modification for Targeting and Personalization', target: 'De-personalization', value: 3 }
         ]
       }
     };
