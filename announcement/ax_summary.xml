@@ -271,6 +271,14 @@
         This page presents an interactive Sankey diagram that illustrates the relationships between various forms of harmful activities, including opinion manipulation, civil unrest, harassment, fraud, and others. It aims to visualize how these crimes interconnect and the impact they have on society. The goal is to raise awareness of these issues and foster a deeper understanding of how they spread and evolve over time. The Sankey diagram provides a visual representation of the flow between different harmful acts, allowing users to explore and understand their interdependencies.
       </description>
     </section>
+
+    <section id="a52">
+      <title>52. Cipher Utility</title>
+      <description>
+        Provide a tool to decipher a ciphered announcement file and cipher plain text.
+      </description>
+    </section>
+
       
     <section id="ax_summary">
         <title>Summary of All Pages</title>
