@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ciphering Utility</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    pre {
+        font-size: 16px;
+        border: 2px solid grey;
+        width: 100%;
+        border-left: 12px solid green;
+        border-radius: 5px;
+        padding: 14px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+    
+    textarea, input[type="text"] {
+        font-size: 20px;
+        border: 2px solid grey;
+        width: 100%;
+        border-radius: 5px;
+        padding: 14px;
+        margin: 10px 0;
+    }
+
+    button {
+        padding: 10px 20px;
+        font-size: 16px;
+        margin: 5px 0;
+        cursor: pointer;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+    }
+
+    button:hover {
+        background-color: #45a049;
+    }
+
+    .clear-btn {
+        background-color: #f44336;
+    }
+
+    .clear-btn:hover {
+        background-color: #da190b;
+    }
+
+    .display-section {
+        position: relative;
+        margin: 10px 0;
+    }
+
+    .button-group {
+        margin: 10px 0;
+        display: flex;
+        gap: 10px;
+    }
+
+    .key-selection {
+        margin: 20px 0;
+        padding: 15px;
+        background-color: #f5f5f5;
+        border-radius: 5px;
+    }
+
+    .radio-group {
+        margin: 10px 0;
+    }
+
+    .radio-group label {
+        margin-right: 20px;
+        cursor: pointer;
+    }
+
+    .radio-group input[type="radio"] {
+        margin-right: 5px;
+    }
+
+    .info-text {
+        color: #666;
+        font-size: 14px;
+        margin: 5px 0;
+    }
+
+    header {
+        background-color: #4CAF50;
+        color: white;
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+        border-radius: 5px;
+    }
+
+    header h1 {
+        margin: 0;
+        padding: 0;
+    }
+
+    header p {
+        margin: 10px 0 0 0;
+        opacity: 0.9;
+    }
+
+    section {
+        margin: 30px 0;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+</style>
+</head>
+<body>
+    <header>
+        <h1>Hex Text Encoder/Decoder Utility</h1>
+        <p>Convert text to hex and back with key-based encoding</p>
+    </header>
+
+    <section>
+        <h2>Key Generation or Input (Minimum 16 bytes / 32 hex characters)</h2>
+        <div class="info-text">Note: For security, it's recommended to use at least 16 bytes (32 hex characters) for the key</div>
+        <label for="hexLength">Hex Byte Length:</label>
+        <input type="text" id="hexLength" placeholder="Enter number of bytes (minimum 16)">
+        <button id="generateHex">Generate</button>
+        <br><br>
+        <label for="inputKey">Or Input Key:</label>
+        <input type="text" id="inputKey" placeholder="Enter hex key (minimum 32 characters)">
+        <div class="display-section">
+            <pre id="generatedHex"></pre>
+            <div class="button-group">
+                <button class="clear-btn" onclick="clearDisplay('generatedHex')">Clear Generated Key</button>
+            </div>
+        </div>
+
+        <div class="key-selection">
+            <h3>Select Key to Use:</h3>
+            <div class="radio-group">
+                <label>
+                    <input type="radio" name="keyChoice" value="generated" checked>
+                    Use Generated Key
+                </label>
+                <label>
+                    <input type="radio" name="keyChoice" value="manual">
+                    Use Manual Input Key
+                </label>
+            </div>
+        </div>
+    </section>
+    
+    <section>
+        <h2>Fetch & Decipher from GitHub</h2>
+        <label for="fileUrl">File URL:</label>
+        <input type="text" id="fileUrl" placeholder="Enter file URL (e.g., GitHub URL)">
+        <div class="button-group">
+            <button id="fetchFile">Fetch & Decipher</button>
+            <button id="downloadDeciphered" style="display: none;">Download Deciphered Text</button>
+            <button class="clear-btn" onclick="clearDisplay('decipher')">Clear Display</button>
+        </div>
+        <pre id="decipher"></pre>
+    </section>
+    
+    <section>
+        <h2>Plaintext to Cipher</h2>
+        <textarea id="cipherInput" placeholder="Enter text to cipher"></textarea>
+        <div class="button-group">
+            <button id="cipherText">Cipher & Download</button>
+            <button class="clear-btn" onclick="document.getElementById('cipherInput').value = ''">Clear Input</button>
+        </div>
+    </section>
+    
+    <section>
+        <h2>Upload Ciphered File to Decipher</h2>
+        <input type="file" id="fileUploadDecipher">
+        <div class="button-group">
+            <button id="uploadDecipher">Upload & Decipher</button>
+            <button id="downloadUploadedDeciphered" style="display: none;">Download Deciphered Text</button>
+            <button class="clear-btn" onclick="clearDisplay('uploadedDecipher')">Clear Display</button>
+        </div>
+        <div class="info-text">Deciphered text will appear below:</div>
+        <pre id="uploadedDecipher"></pre>
+    </section>
+    
+    <section>
+        <h2>Upload Plaintext File to Cipher</h2>
+        <input type="file" id="fileUploadCipher">
+        <div class="button-group">
+            <button id="uploadCipher">Upload & Cipher</button>
+        </div>
+    </section>
+    
+    <script>
+        const MIN_KEY_BYTES = 16; // 16 bytes = 32 hex characters
+        let lastDecipheredText = '';
+        let lastCipheredText = '';
+        let lastUploadedDecipheredText = '';
+
+        function validateKeyLength(key) {
+            if (!key) return false;
+            // Remove any spaces or non-hex characters
+            key = key.replace(/[^0-9a-fA-F]/g, '');
+            return key.length >= (MIN_KEY_BYTES * 2);
+        }
+
+        function clearDisplay(elementId) {
+            document.getElementById(elementId).innerText = '';
+            if (elementId === 'decipher') {
+                document.getElementById('downloadDeciphered').style.display = 'none';
+                lastDecipheredText = '';
+            }
+            if (elementId === 'uploadedDecipher') {
+                document.getElementById('downloadUploadedDeciphered').style.display = 'none';
+                lastUploadedDecipheredText = '';
+            }
+        }
+
+        function getSelectedKey() {
+            const keyChoice = document.querySelector('input[name="keyChoice"]:checked').value;
+            let selectedKey;
+            
+            if (keyChoice === 'generated') {
+                selectedKey = document.getElementById("generatedHex").innerText;
+                if (!selectedKey) {
+                    alert("Please generate a key first!");
+                    return null;
+                }
+            } else {
+                selectedKey = document.getElementById("inputKey").value;
+                if (!selectedKey) {
+                    alert("Please enter a manual key!");
+                    return null;
+                }
+            }
+
+            // Validate key length
+            if (!validateKeyLength(selectedKey)) {
+                alert(`Key must be at least ${MIN_KEY_BYTES * 2} hex characters (${MIN_KEY_BYTES} bytes) long!`);
+                return null;
+            }
+
+            return selectedKey;
+        }
+
+        function generateHex() {
+            let hexLength = parseInt(document.getElementById("hexLength").value, 10);
+            if (isNaN(hexLength)) {
+                alert("Please enter a valid number of bytes.");
+                return;
+            }
+            if (hexLength < MIN_KEY_BYTES) {
+                alert(`Key length must be at least ${MIN_KEY_BYTES} bytes for security!`);
+                return;
+            }
+            let hexString = Array.from(crypto.getRandomValues(new Uint8Array(hexLength)))
+                .map(byte => byte.toString(16).padStart(2, '0'))
+                .join('');
+            document.getElementById("generatedHex").innerText = hexString;
+        }
+        
+        async function fetchAndDecipher() {
+            const key = getSelectedKey();
+            if (!key) return;
+
+            let fileUrl = document.getElementById("fileUrl").value;
+            if (!fileUrl) {
+                alert("Please enter a valid file URL.");
+                return;
+            }
+            try {
+                let response = await fetch(fileUrl);
+                let hexString = await response.text();
+                let bytes = new Uint8Array(hexString.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+                let text = new TextDecoder().decode(bytes);
+                lastDecipheredText = text;
+                document.getElementById("decipher").innerText = text;
+                document.getElementById("downloadDeciphered").style.display = "block";
+            } catch (error) {
+                document.getElementById("decipher").innerText = "Error: " + error.message;
+            }
+        }
+
+        function downloadDecipheredText() {
+            if (!lastDecipheredText) {
+                alert("No deciphered text available to download.");
+                return;
+            }
+            downloadText(lastDecipheredText, "deciphered.txt");
+        }
+
+        function downloadUploadedDecipheredText() {
+            if (!lastUploadedDecipheredText) {
+                alert("No deciphered text available to download.");
+                return;
+            }
+            downloadText(lastUploadedDecipheredText, "deciphered.txt");
+        }
+        
+        function cipherTextAndDownload() {
+            const key = getSelectedKey();
+            if (!key) return;
+
+            let text = document.getElementById("cipherInput").value;
+            if (!text) {
+                alert("Please enter text to cipher.");
+                return;
+            }
+            
+            let encoded = new TextEncoder().encode(text);
+            let hexString = Array.from(encoded).map(byte => byte.toString(16).padStart(2, '0')).join('');
+            lastCipheredText = hexString;
+            downloadText(hexString, "ciphered.txt");
+        }
+
+        function downloadText(content, filename) {
+            const blob = new Blob([content], { type: "text/plain" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        async function handleFileUploadDecipher(event) {
+            const key = getSelectedKey();
+            if (!key) return;
+
+            const file = event.target.files[0];
+            if (!file) {
+                alert("Please select a file to decipher.");
+                return;
+            }
+            
+            try {
+                const text = await file.text();
+                // Validate hex format
+                if (!/^[0-9a-fA-F]+$/.test(text)) {
+                    throw new Error("File content is not in valid hex format");
+                }
+                
+                // Convert hex to bytes and then to text
+                let bytes = new Uint8Array(text.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+                let deciphered = new TextDecoder().decode(bytes);
+                
+                // Store and display the deciphered text
+                lastUploadedDecipheredText = deciphered;
+                document.getElementById("uploadedDecipher").innerText = deciphered;
+                
+                // Show the download button
+                document.getElementById("downloadUploadedDeciphered").style.display = "block";
+            } catch (error) {
+                alert("Error deciphering file: " + error.message);
+                document.getElementById("uploadedDecipher").innerText = "Error deciphering file: " + error.message;
+            }
+
+            // Reset the file input so the same file can be selected again
+            event.target.value = '';
+        }
+
+        async function handleFileUploadCipher(event) {
+            const key = getSelectedKey();
+            if (!key) return;
+
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const text = await file.text();
+            let encoded = new TextEncoder().encode(text);
+            let hexString = Array.from(encoded).map(byte => byte.toString(16).padStart(2, '0')).join('');
+            lastCipheredText = hexString;
+            downloadText(hexString, "ciphered.txt");
+        }
+
+        // Input validation for manual key
+        document.getElementById("inputKey").addEventListener('input', function(e) {
+            let key = e.target.value;
+            // Remove any non-hex characters
+            key = key.replace(/[^0-9a-fA-F]/g, '');
+            e.target.value = key;
+        });
+
+        // Event Listeners
+        document.getElementById("generateHex").addEventListener("click", generateHex);
+        document.getElementById("fetchFile").addEventListener("click", fetchAndDecipher);
+        document.getElementById("downloadDeciphered").addEventListener("click", downloadDecipheredText);
+        document.getElementById("downloadUploadedDeciphered").addEventListener("click", downloadUploadedDecipheredText);
+        document.getElementById("cipherText").addEventListener("click", cipherTextAndDownload);
+        document.getElementById("fileUploadDecipher").addEventListener("change", handleFileUploadDecipher);
+        document.getElementById("uploadCipher").addEventListener("click", () => document.getElementById("fileUploadCipher").click());
+        document.getElementById("fileUploadCipher").addEventListener("change", handleFileUploadCipher);
+        document.getElementById("uploadDecipher").addEventListener("click", () => document.getElementById("fileUploadDecipher").click());
+    </script>
+</body>
+</html>
