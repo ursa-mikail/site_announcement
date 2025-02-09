@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+    pre {
+        font-size: 16px;
+        border: 2px solid grey;
+        width: 100%;
+        border-left: 12px solid green;
+        border-radius: 5px;
+        padding: 14px;
+    }
+
+    textarea {
+        font-size: 20px;
+        border: 2px solid grey;
+        width: 100%;
+        border-radius: 5px;
+        padding: 14px;
+    }
+</style>
+</head>
+
+<body>
+    <table width="100%">
+
+        <tr>
+            <th width="15%">Method</th>
+            <td style="text-align:left">
+                <p>
+                    <input id="genkey" class="btn btn-large btn-primary"  type="button" value="Gen AES GCM Key" />
+                </p>
+            </td>
+        </tr>
+    </table>
+
+    <h2>AES GCM Encryption</h2>
+    <table width="100%">
+        <tr>
+            <th width="15%">Message)</th>
+            <td>
+
+                <textarea cols="20" id="message" name="message" rows="2" style="width:100%"></textarea>
+            </td>
+        </tr>
+        <tr>
+            <th width="15%">Key</th>
+            <td>
+
+                <pre id="key"></pre>
+
+            </td>
+        </tr>
+        <tr>
+            <th width="15%">Cipher</th>
+            <td>
+                <pre id="cipher"></pre>
+
+
+            </td>
+        </tr>
+
+        <tr>
+            <th>Decipher</th>
+            <td>
+                <pre id="decipher"></pre>
+
+            </td>
+        </tr>
+    </table>
+
+<script>
+    (async function () {
+        let ciphertext,key;
+
+        function buf2hex(buffer) { // buffer is an ArrayBuffer
+            return [...new Uint8Array(buffer)]
+                .map(x => x.toString(16).padStart(2, '0'))
+                .join('');
+        }
+
+        function getMessage() {
+            let message = document.getElementById('message').value;
+            let enc = new TextEncoder();
+            return enc.encode(message);
+        }
+
+        const myKey = document.getElementById("key");
+        const message = document.getElementById("message");
+        async function genKey() {
+             key = await window.crypto.subtle.generateKey(
+                {
+                    name: "AES-GCM",
+                    length: 256,
+                },
+                true,
+                ["encrypt", "decrypt"]);
+
+            myKey.innerText = JSON.stringify(
+                await window.crypto.subtle.exportKey("jwk", key));
+        }
+
+        async function encryptMessage(key) {
+            let encoded = getMessage();
+            iv = window.crypto.getRandomValues(new Uint8Array(16));
+            ciphertext = await window.crypto.subtle.encrypt(
+                {
+                    name: "AES-GCM",
+                    iv: iv
+                },
+                key,
+                encoded
+            );
+
+            let buffer = new Uint8Array(ciphertext);
+
+            var k = JSON.stringify(
+                await window.crypto.subtle.exportKey("jwk", key));
+
+
+            document.getElementById('cipher').innerText = "Cipher: " + buf2hex(buffer);
+            document.getElementById('key').innerText = "Key: " + k;
+            document.getElementById('key').innerText += "\nIV: " + buf2hex(iv);
+
+        }
+
+        async function decryptMessage(key) {
+            let decrypted = await window.crypto.subtle.decrypt(
+                {
+                    name: "AES-GCM",
+                    iv: iv
+                },
+                key,
+                ciphertext
+            );
+            let dec = await new TextDecoder();
+
+
+            document.getElementById('decipher').innerText = await dec.decode(decrypted);
+
+        }
+        async function update() {
+            await encryptMessage(key);
+            await decryptMessage(key);
+
+        }
+
+        await genKey();
+        document.getElementById('message').value = "Hello 123";
+        await update();
+        document.getElementById("genkey").addEventListener("click", genKey);
+        document.getElementById("message").addEventListener("input", update);
+        message.focus();
+
+    })();
+</script>
+</body>
+</html>
