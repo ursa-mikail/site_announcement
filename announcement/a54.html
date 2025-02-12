@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+        .section {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px;
+        }
+        #configDisplay {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px;
+            height: 200px;
+            overflow-y: auto;
+        }
+        .section div {
+            margin: 5px 0;
+        }
+        label {
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="protocolSection"></div>
+        <div id="cipherSection"></div>
+        <div id="hashSection"></div>
+        <div id="keyExchangeSection"></div>
+    </div>
+    <div id="configDisplay"></div>
+    <script src="a54.js"></script>
+</body>
+</html>
