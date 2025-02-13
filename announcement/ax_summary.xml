@@ -285,6 +285,13 @@
         Provide a tool for AES GCM message ciphering.
       </description>
     </section>
+
+    <section id="a54">
+      <title>54. Configurable Security Options UI</title>
+      <description>
+        A web-based tool that dynamically loads security configurations from a `config.txt` file and presents them as categorized checkboxes. The interface organizes protocols, ciphers, hashes, and key exchanges into distinct sections with bordered boxes. Users can toggle options and submit their selections for display.
+      </description>
+    </section>    
       
     <section id="ax_summary">
         <title>Summary of All Pages</title>
