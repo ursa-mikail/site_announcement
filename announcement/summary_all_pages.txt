@@ -128,7 +128,7 @@ Summary of Content Options:
      - Provide a tool to decipher a ciphered announcement file and cipher plain text.
 
 53. **AES GCM Cipher Utility**
-    - Provide a tool for AES GCM message ciphering.
+    - Provide a tool for AES GCM message ciphering. This tool includes a feature to pull down a file (given url) and decipher. 
 
 54. **Configurable Security Options UI**
     - A web-based tool that dynamically loads security configurations from a `config.txt` file and presents them as categorized checkboxes. The interface organizes protocols, ciphers, hashes, and key exchanges into distinct sections with bordered boxes. Users can toggle options and submit their selections for display.

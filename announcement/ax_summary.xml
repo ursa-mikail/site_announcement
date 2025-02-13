@@ -282,7 +282,7 @@
     <section id="a53">
       <title>53. AES GCM Cipher Utility</title>
       <description>
-        Provide a tool for AES GCM message ciphering.
+        Provide a tool for AES GCM message ciphering. This tool includes a feature to pull down a file (given url) and decipher. 
       </description>
     </section>
 
