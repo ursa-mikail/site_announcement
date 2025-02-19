@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<style>
+    .dropdown {
+        font-size: 16px;
+        border: 2px solid grey;
+        width: 100%;
+        border-left: 12px solid green;
+        border-radius: 5px;
+        padding: 14px;
+    }
+
+    pre {
+        font-size: 16px;
+        border: 2px solid grey;
+        width: 100%;
+        border-left: 12px solid green;
+        border-radius: 5px;
+        padding: 14px;
+    }
+
+    textarea {
+        font-size: 20px;
+        border: 2px solid grey;
+        width: 100%;
+        border-radius: 5px;
+        padding: 14px;
+    }
+</style>
+
+</head>
+<body>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/hmac-md5.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/hmac-ripemd160.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/hmac-sha1.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/hmac-sha224.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/hmac-sha256.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/hmac-sha3.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/hmac-sha384.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/hmac-sha512.min.js"></script>
+
+
+<div class="indented">
+    <table width="100%">
+
+        <tr>
+            <th width="15%">Method</th>
+            <td style="text-align:left">
+                <p>
+                    <input id="genkey" class="btn btn-large btn-primary" type="button" value="Gen New HMAC Key" />
+
+
+                </p>
+
+
+
+            </td>
+        </tr>
+        <tr>
+            <th width="15%">Message</th>
+            <td>
+
+                <textarea cols="20" id="message" name="message" rows="2" style="width:100%"></textarea>
+            </td>
+        </tr>
+
+
+        <tr>
+            <th width="15%">Method</th>
+            <td style="text-align:left">
+                <div class="dropdown">
+                    <select name="hashtype" id="hashtype">
+                        <option value="MD-5">HMAC MD-5</option>
+                        <option value="RIPEMD-160">HMAC RIPEMD-160</option>
+                        <option value="SHA-1">HMAC SHA-1</option>
+                        <option value="SHA-224">HMAC SHA-224</option>
+
+                        <option value="SHA-256">HMAC SHA-256</option>
+                        <option value="SHA-3">HMAC SHA-3</option>
+                        <option value="SHA-384">HMAC SHA-384</option>
+                        <option value="SHA-512">HMAC SHA-512</option>
+
+
+                    </select>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th width="15%">Key size</th>
+            <td style="text-align:left">
+                <div class="dropdown">
+                    <select name="keysize" id="keysize">
+                        <option value="128">128</option>
+                        <option value="192">192</option>
+                        <option value="256">256</option>
+
+
+                    </select>
+                </div>
+            </td>
+        </tr>
+
+    </table>
+
+
+    <h2>HMAC</h2>
+    <table width="100%">
+
+
+        <tr>
+            <th valign="top" width="15%">MAC</th>
+            <td>
+                <pre id="cipher"></pre>
+
+
+            </td>
+        </tr>
+
+    </table>
+
+    <h2>Keys</h2>
+    <table width="100%">
+        <tr>
+            <th valign="top" width="15%">Secret key</th>
+            <td>
+
+                <pre id="key"></pre>
+
+            </td>
+        </tr>
+
+    </table>
+</div>
+
+<script>
+    (async function () {
+        var keyseed, cipher, keystream;
+
+        const message = document.getElementById("message");
+
+        async function genKey() {
+
+            keysize =document.getElementById("keysize").value;
+
+            keyseed = CryptoJS.lib.WordArray.random(keysize / 8);
+
+            document.getElementById("key").innerHTML = "Key size: " + keysize+"\n";
+            document.getElementById("key").innerHTML += "Key: " + keyseed;
+
+
+        }
+
+        async function encryptMessage() {
+
+            var word = message.value;
+
+            var hashtype = document.getElementById("hashtype").value;
+
+
+            var word = message.value;
+
+            var hash;
+
+
+
+            hash = CryptoJS.HmacMD5(word, keyseed);
+            if (hashtype == "SHA-1") hash = CryptoJS.HmacSHA1(word, keyseed);
+            else if (hashtype == "RIPEMD160") hash = CryptoJS.HmacRIPEMD160(word, keyseed);
+            else if (hashtype == "SHA-224") hash = CryptoJS.HmacSHA224(word, keyseed);
+            else if (hashtype == "SHA-256") hash = CryptoJS.HmacSHA256(word, keyseed);
+            else if (hashtype == "SHA3") hash = CryptoJS.HmacSHA3(word, keyseed);
+            else if (hashtype == "SHA-384") hash = CryptoJS.HmacSHA384(word, keyseed);
+            else if (hashtype == "SHA-512") hash = CryptoJS.HmacSHA512(word, keyseed);
+
+            var output = hash.toString(CryptoJS.enc.Hex);
+
+            document.getElementById("cipher").innerHTML = "Type:\t\tHMAC-" + hashtype;
+            document.getElementById("cipher").innerHTML += "\nMessage:\t" + word;
+
+            document.getElementById("cipher").innerHTML += "\nHex:\t\t" + output;
+            document.getElementById("cipher").innerHTML += "\nBase64:\t\t" + CryptoJS.enc.Base64.parse(String(output));
+
+
+
+        }
+
+
+        async function update() {
+            await encryptMessage();
+
+
+        }
+
+        await genKey();
+        document.getElementById('message').value = "Hello 123";
+        await update();
+        document.getElementById("genkey").addEventListener("click", genKey);
+        document.getElementById("genkey").addEventListener("click", update);
+        document.getElementById("message").addEventListener("input", update);
+        document.getElementById("hashtype").addEventListener("click", update);
+        document.getElementById("keysize").addEventListener("click", genKey);
+        document.getElementById("keysize").addEventListener("click", update);
+
+
+        message.focus();
+
+
+    })();
+</script>
+
+</body>
+</html>

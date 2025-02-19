@@ -293,6 +293,13 @@
       </description>
     </section>    
       
+    <section id="a55">
+      <title>55. HMAC</title>
+      <description>
+        HMAC key generator.
+      </description>
+    </section>   
+         
     <section id="ax_summary">
         <title>Summary of All Pages</title>
         <description>
