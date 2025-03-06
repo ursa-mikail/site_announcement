@@ -21,7 +21,7 @@
     <div id="result"></div>
 
     <script>
-        function fetchAndComputeSHA256(url) {
+        async function fetchAndComputeSHA256(url) {
             try {
                 const response = await fetch(url);
                 const text = await response.text();
@@ -33,7 +33,7 @@
             }
         }
 
-        function computeSHA256() {
+        async function computeSHA256() {
             const urls = [
                 "https://ursa-mikail.github.io/site_announcement/announcement/simple_with_checking/bad.html",
                 "https://ursa-mikail.github.io/site_announcement/announcement/simple_with_checking/good.html",
