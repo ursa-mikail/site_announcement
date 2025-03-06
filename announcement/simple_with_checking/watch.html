@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHA256 Hash Computation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1-crypto-js.min.js"></script>
+</head>
+<body>
+    <h1>SHA256 Hash Computation</h1>
+    <p>Computing SHA256 hashes for the following URLs:</p>
+    <ul>
+        <li><a href="https://ursa-mikail.github.io/site_announcement/announcement/simple_with_checking/bad.html" target="_blank">Bad HTML</a></li>
+        <li><a href="https://ursa-mikail.github.io/site_announcement/announcement/simple_with_checking/good.html" target="_blank">Good HTML</a></li>
+        <li><a href="https://ursa-mikail.github.io/site_announcement/announcement/simple_with_checking/index.html" target="_blank">Index HTML</a></li>
+    </ul>
+
+    <button onclick="computeSHA256()">Compute Hashes</button>
+
+    <h3>Results</h3>
+    <div id="result"></div>
+
+    <script>
+        async function fetchAndComputeSHA256(url) {
+            try {
+                const response = await fetch(url);
+                const text = await response.text();
+                const hash = CryptoJS.SHA256(text).toString(CryptoJS.enc.Hex);
+                return hash;
+            } catch (error) {
+                console.error('Error fetching the URL:', error);
+                return null;
+            }
+        }
+
+        async function computeSHA256() {
+            const urls = [
+                "https://ursa-mikail.github.io/site_announcement/announcement/simple_with_checking/bad.html",
+                "https://ursa-mikail.github.io/site_announcement/announcement/simple_with_checking/good.html",
+                "https://ursa-mikail.github.io/site_announcement/announcement/simple_with_checking/index.html"
+            ];
+
+            let resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = ''; // Clear previous results
+
+            for (let url of urls) {
+                const hash = await fetchAndComputeSHA256(url);
+                if (hash) {
+                    const p = document.createElement('p');
+                    p.textContent = `SHA256 for ${url}: ${hash}`;
+                    resultDiv.appendChild(p);
+                } else {
+                    const p = document.createElement('p');
+                    p.textContent = `Failed to fetch or compute hash for ${url}`;
+                    resultDiv.appendChild(p);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
