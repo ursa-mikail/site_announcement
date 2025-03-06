@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iframe Hash Integrity Check</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        iframe {
+            width: 45%;
+            height: 90vh;
+            border: 2px solid black;
+        }
+    </style>
+</head>
+<body>
+    <iframe src="good.html" title="Good Page"></iframe>
+    <iframe src="good.html?redirect=bad.html" title="Redirected Page"></iframe>
+
+
+    <br><br>
+
+    <!-- Link to the integrity checker page -->
+    <a href="check_iframes_integrity.html" target="_blank">Check Iframe Integrity</a>
+
+</body>
+</html>
+

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Original Page</title>
+    <meta name="expected-hash" content="EXPECTED_SHA256_HASH_HERE">
+    <script>
+        async function computeSHA256(text) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(text);
+            const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function verifyPageIntegrity() {
+            const expectedHash = document.querySelector("meta[name='expected-hash']").content;
+
+            // Fetch the page content
+            const response = await fetch(window.location.href);
+            const pageText = await response.text();
+
+            // Compute the hash of the loaded page
+            const computedHash = await computeSHA256(pageText);
+
+            // Display hashes on the page
+            document.getElementById("computed-hash").textContent = computedHash;
+            document.getElementById("expected-hash").textContent = expectedHash;
+
+            if (computedHash !== expectedHash) {
+                document.body.innerHTML = `<h1>Security Warning</h1>
+                                           <p>Page integrity check failed. Possible tampering detected.</p>
+                                           <p><strong>Expected Hash:</strong> ${expectedHash}</p>
+                                           <p><strong>Computed Hash:</strong> ${computedHash}</p>`;
+                console.error("Hash mismatch! Computed:", computedHash, "Expected:", expectedHash);
+            }
+        }
+
+        window.onload = verifyPageIntegrity;
+    </script>
+</head>
+<body>
+    <h1>Secure Original Page</h1>
+    <p>This page verifies its own content integrity.</p>
+    <p><strong>Expected Hash:</strong> <span id="expected-hash">Loading...</span></p>
+    <p><strong>Computed Hash:</strong> <span id="computed-hash">Computing...</span></p>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good Page</title>
+    <script>
+        window.onload = function() {
+            const params = new URLSearchParams(window.location.search);
+            const redirectUrl = params.get("redirect");
+
+            if (redirectUrl) {
+                // Simulating a malicious redirect
+                window.location.href = redirectUrl;
+            }
+        };
+    </script>
+</head>
+<body>
+    <h1>Welcome to the Good Page</h1>
+    <p>If you see this, no redirection has occurred.</p>
+</body>
+</html>
+

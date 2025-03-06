@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iframe Redirect Attack Demo</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        iframe {
+            width: 45%;
+            height: 90vh;
+            border: 2px solid black;
+        }
+    </style>
+</head>
+<body>
+    <!-- Good Page -->
+    <iframe src="good.html" title="Good Page"></iframe>
+
+    <!-- Malicious Redirect Simulation -->
+    <iframe src="good.html?redirect=bad.html" title="Redirected Page"></iframe>
+</body>
+</html>
+
