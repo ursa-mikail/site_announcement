@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHA256 Streaming Hash Computation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .url-input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .hash {
+            font-family: monospace;
+            word-break: break-all;
+        }
+        .content-preview {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            padding: 10px;
+            margin-top: 10px;
+            background-color: #f9f9f9;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .log {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>SHA256 Streaming Hash Computation</h1>
+    
+    <div>
+        <h3>Enter URL to compute SHA256 hash:</h3>
+        <input type="text" id="urlInput" class="url-input" 
+            placeholder="Enter URL (e.g., https://ursa-mikail.github.io/site_announcement/announcement/simple_with_checking/bad.html)" 
+            value="https://ursa-mikail.github.io/site_announcement/announcement/simple_with_checking/bad.html">
+        <button id="computeBtn">Compute SHA256</button>
+    </div>
+    
+    <div class="log" id="log"></div>
+    
+    <div class="result" id="result" style="display: none;">
+        <h3>Results:</h3>
+        <p><strong>URL:</strong> <span id="resultUrl"></span></p>
+        <p><strong>SHA256 Hash:</strong> <br><span id="resultHash" class="hash"></span></p>
+        <h4>Content Preview (first 1000 characters):</h4>
+        <div class="content-preview" id="contentPreview"></div>
+    </div>
+    
+    <script>
+        function log(message) {
+            const logElement = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.textContent = message;
+            logElement.appendChild(entry);
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+        
+        async function computeHash() {
+            const url = document.getElementById('urlInput').value.trim();
+            if (!url) {
+                alert('Please enter a URL');
+                return;
+            }
+            
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('log').innerHTML = '';
+            
+            log(`Starting to fetch: ${url}`);
+            
+            try {
+                // Try direct fetch with no-cors mode
+                log('Attempting direct fetch with no-cors...');
+                const response = await fetch(url, { mode: 'no-cors' })
+                    .catch(e => {
+                        log(`Direct fetch failed: ${e.message}`);
+                        throw e;
+                    });
+                
+                // This won't work in most cases due to CORS
+                log('Fetch successful! Reading content...');
+                const text = await response.text();
+                
+                // Compute hash
+                log('Computing SHA256 hash...');
+                const hash = CryptoJS.SHA256(text).toString(CryptoJS.enc.Hex);
+                
+                // Display results
+                document.getElementById('resultUrl').textContent = url;
+                document.getElementById('resultHash').textContent = hash;
+                document.getElementById('contentPreview').textContent = text.substring(0, 1000) + (text.length > 1000 ? '...' : '');
+                document.getElementById('result').style.display = 'block';
+                
+                log('Hash computation completed successfully!');
+            } catch (error) {
+                log(`Error: ${error.message}`);
+                log('Using alternative approach with character streaming simulation...');
+                
+                // Fallback to a simulated approach
+                simulateCharacterStreamingAndHash(url);
+            }
+        }
+        
+        function simulateCharacterStreamingAndHash(url) {
+            log('Creating a simulated character stream from the URL...');
+            
+            // This is a simulation since actual character streaming is not possible due to CORS
+            // In a real implementation, you would need a proxy server or browser extension
+            
+            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+            
+            log(`Using proxy: ${proxyUrl}`);
+            
+            fetch(proxyUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    log('Proxy fetch successful, reading content...');
+                    return response.text();
+                })
+                .then(text => {
+                    log(`Received ${text.length} characters. Computing SHA256 hash...`);
+                    const hash = CryptoJS.SHA256(text).toString(CryptoJS.enc.Hex);
+                    
+                    document.getElementById('resultUrl').textContent = url;
+                    document.getElementById('resultHash').textContent = hash;
+                    document.getElementById('contentPreview').textContent = text.substring(0, 1000) + (text.length > 1000 ? '...' : '');
+                    document.getElementById('result').style.display = 'block';
+                    
+                    log('Hash computation completed successfully!');
+                })
+                .catch(error => {
+                    log(`Error during proxy fetch: ${error.message}`);
+                    log('All attempts failed. To resolve this issue:');
+                    log('1. Try running this from a local server with CORS headers');
+                    log('2. Use a browser extension that disables CORS (for testing only)');
+                    log('3. Create a server-side proxy that fetches the URLs for you');
+                });
+        }
+        
+        document.getElementById('computeBtn').addEventListener('click', computeHash);
+        
+        // Automatically populate URLs
+        const urlsToTest = [
+            "https://ursa-mikail.github.io/site_announcement/announcement/simple_with_checking/bad.html",
+            "https://ursa-mikail.github.io/site_announcement/announcement/simple_with_checking/good.html",
+            "https://ursa-mikail.github.io/site_announcement/announcement/simple_with_checking/index.html"
+        ];
+        
+        const urlInput = document.getElementById('urlInput');
+        let currentUrlIndex = 0;
+        
+        // Add buttons to switch between predefined URLs
+        const urlButtonsContainer = document.createElement('div');
+        urlButtonsContainer.style.marginTop = '10px';
+        
+        urlsToTest.forEach((url, index) => {
+            const button = document.createElement('button');
+            button.textContent = `URL ${index + 1}`;
+            button.style.marginRight = '5px';
+            button.addEventListener('click', () => {
+                urlInput.value = url;
+                currentUrlIndex = index;
+            });
+            urlButtonsContainer.appendChild(button);
+        });
+        
+        urlInput.parentNode.insertBefore(urlButtonsContainer, urlInput.nextSibling);
+    </script>
+</body>
+</html>
