@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASCII to Audio Player</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+        
+        .repo-link {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 50px;
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .repo-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .player-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        .player {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .player:hover {
+            transform: translateY(-5px);
+        }
+        
+        .player-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .player-title i {
+            color: #fdbb2d;
+        }
+        
+        audio {
+            width: 100%;
+            height: 50px;
+            border-radius: 10px;
+            outline: none;
+        }
+        
+        audio::-webkit-media-controls-panel {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+        }
+        
+        .description {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .player {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ASCII to Audio Player</h1>
+            <p class="subtitle">Listen to the audio representation of ASCII data</p>
+            <a href="https://github.com/ursa-mikail/data_format/tree/main/ascii_to_audio" class="repo-link" target="_blank">
+                View Repository: data_format/ascii_to_audio
+            </a>
+        </header>
+        
+        <div class="player-container">
+            <div class="player">
+                <h2 class="player-title">
+                    <i>🎵</i> ASCII to Audio (MIDI)
+                </h2>
+                <audio controls>
+                    <source src="https://github.com/ursa-mikail/data_format/blob/main/ascii_to_audio/ascii_to_audio.mid.wav?raw=true" type="audio/wav">
+                    Your browser does not support the audio element.
+                </audio>
+                <p class="description">
+                    This audio file represents ASCII data converted to MIDI format and then to audio.
+                </p>
+            </div>
+            
+            <div class="player">
+                <h2 class="player-title">
+                    <i>🎵</i> ASCII to Audio (Direct)
+                </h2>
+                <audio controls>
+                    <source src="https://github.com/ursa-mikail/data_format/blob/main/ascii_to_audio/ascii_to_audio.wav?raw=true" type="audio/wav">
+                    Your browser does not support the audio element.
+                </audio>
+                <p class="description">
+                    This audio file represents ASCII data directly converted to audio format.
+                </p>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Created for data_format/ascii_to_audio repository | a56.html</p>
+        </footer>
+    </div>
+</body>
+</html>
