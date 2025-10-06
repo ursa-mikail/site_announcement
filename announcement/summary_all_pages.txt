@@ -139,6 +139,9 @@ Summary of Content Options:
 56. **ASCII to Audio**
     - ASCII to Audio.
 
+57. **Interactive Graphs**
+    - Interactive Graphs
+
 Summary. **ax_summary: Summary of All Pages**
    - The ax_summary provides an overarching overview of all the sections (a1 to a4). It synthesizes the key points and functionalities from each part, ensuring that users have a clear understanding of the tools and resources available across the different functionalities.
 
