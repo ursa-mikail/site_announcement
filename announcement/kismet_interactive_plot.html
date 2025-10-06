@@ -1,0 +1,166 @@
+
+
+<style>
+.mpld3-tooltip {background: yellow;}
+</style>
+
+<div id="fig_el5205fa26dcc5-1a8c-4a6e-a7a2-561f26cc682d3143213529"></div>
+<script>
+function mpld3_load_lib(url, callback){
+  var s = document.createElement('script');
+  s.src = url;
+  s.async = true;
+  s.onreadystatechange = s.onload = callback;
+  s.onerror = function(){console.warn("failed to load library " + url);};
+  document.getElementsByTagName("head")[0].appendChild(s);
+}
+
+if(typeof(mpld3) !== "undefined" && mpld3._mpld3IsLoaded){
+   // already loaded: just create the figure
+   !function(mpld3){
+       
+    mpld3.register_plugin("htmltooltip", HtmlTooltipPlugin);
+    HtmlTooltipPlugin.prototype = Object.create(mpld3.Plugin.prototype);
+    HtmlTooltipPlugin.prototype.constructor = HtmlTooltipPlugin;
+    HtmlTooltipPlugin.prototype.requiredProps = ["id"];
+    HtmlTooltipPlugin.prototype.defaultProps = {labels:null,
+                                                target:null,
+                                                hoffset:0,
+                                                voffset:10,
+                                                targets:null};
+    function HtmlTooltipPlugin(fig, props){
+        mpld3.Plugin.call(this, fig, props);
+    };
+
+    HtmlTooltipPlugin.prototype.draw = function(){
+        var obj = mpld3.get_element(this.props.id);
+        var labels = this.props.labels;
+        var targets = this.props.targets;
+        var tooltip = d3.select("body").append("div")
+            .attr("class", "mpld3-tooltip")
+            .style("position", "absolute")
+            .style("z-index", "10")
+            .style("visibility", "hidden");
+
+        obj.elements()
+            .on("mouseover", function(d, i){
+                tooltip.html(labels[i])
+                    .style("visibility", "visible");
+            })
+            .on("mousemove", function(d, i){
+                tooltip
+                .style("top", d3.event.pageY + this.props.voffset + "px")
+                .style("left",d3.event.pageX + this.props.hoffset + "px");
+            }.bind(this))
+            .on("mousedown.callout", function(d, i){
+                window.open(targets[i],"_blank");
+            })
+            .on("mouseout", function(d, i){
+                tooltip.style("visibility", "hidden");
+            });
+    };
+    
+       mpld3.draw_figure("fig_el5205fa26dcc5-1a8c-4a6e-a7a2-561f26cc682d3143213529", {"width": 1200.0, "height": 600.0, "axes": [{"bbox": [0.05491898148148149, 0.19139033926160265, 0.9325810185185186, 0.7447207718495085], "xlim": [20347.05, 20367.95], "ylim": [-2.3, 92.3], "xdomain": [[2025, 8, 16, 1, 12, 0, 0.0], [2025, 9, 6, 22, 48, 0, 0.0]], "ydomain": [-2.3, 92.3], "xscale": "date", "yscale": "linear", "axes": [{"position": "bottom", "nticks": 10, "tickvalues": null, "tickformat_formatter": "", "tickformat": null, "scale": "linear", "fontsize": 10.0, "grid": {"gridOn": true, "color": "#B0B0B0", "dasharray": "none", "alpha": 0.3}, "visible": true}, {"position": "left", "nticks": 7, "tickvalues": null, "tickformat_formatter": "", "tickformat": null, "scale": "linear", "fontsize": 10.0, "grid": {"gridOn": true, "color": "#B0B0B0", "dasharray": "none", "alpha": 0.3}, "visible": true}], "axesbg": "#FFFFFF", "axesbgalpha": null, "zoomable": true, "id": "el5205af41c2bd-4e82-40f8-b404-019eb209a1c8", "lines": [{"data": "data01", "xindex": 0, "yindex": 1, "coordinates": "data", "id": "el52050a7621be-a93d-46a1-ad87-2c73494c456a", "color": "#9467BD", "linewidth": 2.0, "dasharray": "none", "alpha": 0.5, "zorder": 2, "drawstyle": "default"}], "paths": [{"data": "data03", "xindex": 0, "yindex": 1, "coordinates": "axes", "pathcodes": ["M", "L", "S", "L", "S", "L", "S", "L", "S", "Z"], "id": "el52055eafe07a-761e-4f99-8a9f-45aa8e08ee65", "dasharray": "none", "alpha": 0.8, "facecolor": "rgba(255, 255, 255, 0.8)", "edgecolor": "rgba(204, 204, 204, 0.8)", "edgewidth": 1.0, "zorder": 1000000.0}], "markers": [], "texts": [{"text": "Date", "position": [0.5, -0.1831429233843958], "coordinates": "axes", "h_anchor": "middle", "v_baseline": "hanging", "rotation": -0.0, "fontsize": 12.0, "color": "#000000", "alpha": 1, "zorder": 3, "id": "el52058aa9fd89-14b5-4f59-9742-89ef5f2041da"}, {"text": "Score", "position": [-0.02940117902575241, 0.5], "coordinates": "axes", "h_anchor": "middle", "v_baseline": "auto", "rotation": -90.0, "fontsize": 12.0, "color": "#000000", "alpha": 1, "zorder": 3, "id": "el5205f0429202-f946-41f0-8019-195e316c7a99"}, {"text": "Kismet Score Timeline", "position": [0.5, 1.0186497938742811], "coordinates": "axes", "h_anchor": "middle", "v_baseline": "auto", "rotation": -0.0, "fontsize": 14.0, "color": "#000000", "alpha": 1, "zorder": 3, "id": "el5205a0569d2a-d090-4585-948f-8968d65094c3"}, {"text": "Kismet Score", "position": [0.9077381321749926, 0.9474075812745273], "coordinates": "axes", "h_anchor": "start", "v_baseline": "auto", "rotation": -0.0, "fontsize": 10.0, "color": "#000000", "alpha": 1, "zorder": 1000003.0, "id": "el5205b29f7dce-ea99-43b2-ba46-43d5016481d2"}], "collections": [{"offsets": "data01", "xindex": 0, "yindex": 1, "paths": [[[[0.0, -0.5], [0.13260155, -0.5], [0.25978993539242673, -0.44731684579412084], [0.3535533905932738, -0.3535533905932738], [0.44731684579412084, -0.25978993539242673], [0.5, -0.13260155], [0.5, 0.0], [0.5, 0.13260155], [0.44731684579412084, 0.25978993539242673], [0.3535533905932738, 0.3535533905932738], [0.25978993539242673, 0.44731684579412084], [0.13260155, 0.5], [0.0, 0.5], [-0.13260155, 0.5], [-0.25978993539242673, 0.44731684579412084], [-0.3535533905932738, 0.3535533905932738], [-0.44731684579412084, 0.25978993539242673], [-0.5, 0.13260155], [-0.5, 0.0], [-0.5, -0.13260155], [-0.44731684579412084, -0.25978993539242673], [-0.3535533905932738, -0.3535533905932738], [-0.25978993539242673, -0.44731684579412084], [-0.13260155, -0.5], [0.0, -0.5]], ["M", "C", "C", "C", "C", "C", "C", "C", "C", "Z"]]], "pathtransforms": [[13.88888888888889, 0.0, 0.0, 13.88888888888889, 0.0, 0.0]], "alphas": [0.7], "edgecolors": ["rgba(148, 103, 189, 0.7)"], "facecolors": ["rgba(148, 103, 189, 0.7)"], "edgewidths": [1.0], "offsetcoordinates": "data", "pathcoordinates": "display", "zorder": 1, "id": "el52053d84d17e-cf3b-4bae-9f0e-9640df9f3ec4"}, {"offsets": "data02", "xindex": 0, "yindex": 1, "paths": [[[[0.0, -0.5], [0.13260155, -0.5], [0.25978993539242673, -0.44731684579412084], [0.3535533905932738, -0.3535533905932738], [0.44731684579412084, -0.25978993539242673], [0.5, -0.13260155], [0.5, 0.0], [0.5, 0.13260155], [0.44731684579412084, 0.25978993539242673], [0.3535533905932738, 0.3535533905932738], [0.25978993539242673, 0.44731684579412084], [0.13260155, 0.5], [0.0, 0.5], [-0.13260155, 0.5], [-0.25978993539242673, 0.44731684579412084], [-0.3535533905932738, 0.3535533905932738], [-0.44731684579412084, 0.25978993539242673], [-0.5, 0.13260155], [-0.5, 0.0], [-0.5, -0.13260155], [-0.44731684579412084, -0.25978993539242673], [-0.3535533905932738, -0.3535533905932738], [-0.25978993539242673, -0.44731684579412084], [-0.13260155, -0.5], [0.0, -0.5]], ["M", "C", "C", "C", "C", "C", "C", "C", "C", "Z"]]], "pathtransforms": [[13.88888888888889, 0.0, 0.0, 13.88888888888889, 0.0, 0.0]], "alphas": [0.7], "edgecolors": ["rgba(148, 103, 189, 0.7)"], "facecolors": ["rgba(148, 103, 189, 0.7)"], "edgewidths": [1.0], "offsetcoordinates": "axes", "pathcoordinates": "display", "zorder": 1000001.0, "id": "el520524e37c81-56e9-4ed6-8064-e4f7db4a3cc8"}], "images": [], "sharex": [], "sharey": []}], "data": {"data01": [[20348.0, 53.0], [20349.0, 61.0], [20350.0, 71.0], [20351.0, 42.0], [20352.0, 62.0], [20353.0, 53.0], [20354.0, 37.0], [20355.0, 88.0], [20356.0, 87.0], [20357.0, 61.0], [20358.0, 12.0], [20359.0, 50.0], [20360.0, 63.0], [20361.0, 36.0], [20362.0, 24.0], [20363.0, 83.0], [20364.0, 2.0], [20365.0, 4.0], [20366.0, 81.0], [20367.0, 71.0]], "data02": [[0.8853986968662739, 0.9555668660945252]], "data03": [[0.8705057399937948, 0.9282604595635986], [0.9913124418243873, 0.9282604595635986], [0.9937946013031338, 0.9282604595635986], [0.9937946013031338, 0.9344770575216925], [0.9937946013031338, 0.9782419071466719], [0.9937946013031338, 0.9844585051047658], [0.9913124418243873, 0.9844585051047658], [0.8705057399937948, 0.9844585051047658], [0.8680235805150482, 0.9844585051047658], [0.8680235805150482, 0.9782419071466719], [0.8680235805150482, 0.9344770575216925], [0.8680235805150482, 0.9282604595635986], [0.8705057399937948, 0.9282604595635986]]}, "id": "el5205fa26dcc5-1a8c-4a6e-a7a2-561f26cc682d", "plugins": [{"type": "reset"}, {"type": "zoom", "button": true, "enabled": false}, {"type": "boxzoom", "button": true, "enabled": false}, {"type": "htmltooltip", "id": "el52053d84d17e-cf3b-4bae-9f0e-9640df9f3ec4", "labels": ["Date: 2025-09-17<br>Score: 53<br>Log: Difficult soon keep perhaps.", "Date: 2025-09-18<br>Score: 61<br>Log: Understand first wear use.", "Date: 2025-09-19<br>Score: 71<br>Log: Environmental it civil small window.", "Date: 2025-09-20<br>Score: 42<br>Log: Garden role already message interesting.", "Date: 2025-09-21<br>Score: 62<br>Log: Air manage body rise board.", "Date: 2025-09-22<br>Score: 53<br>Log: Add national case Mr half.", "Date: 2025-09-23<br>Score: 37<br>Log: Serve scene several card what right.", "Date: 2025-09-24<br>Score: 88<br>Log: Wish money two occur if more.", "Date: 2025-09-25<br>Score: 87<br>Log: Wrong trade he type subject phone hope.", "Date: 2025-09-26<br>Score: 61<br>Log: Magazine finally kind body leg.", "Date: 2025-09-27<br>Score: 12<br>Log: Thousand grow television support.", "Date: 2025-09-28<br>Score: 50<br>Log: Look rock blood important national.", "Date: 2025-09-29<br>Score: 63<br>Log: Happen able this.", "Date: 2025-09-30<br>Score: 36<br>Log: Natural thank medical could.", "Date: 2025-10-01<br>Score: 24<br>Log: Director investment wear start political hundred.", "Date: 2025-10-02<br>Score: 83<br>Log: Fill each man free world read once.", "Date: 2025-10-03<br>Score: 2<br>Log: Thank seat person end off.", "Date: 2025-10-04<br>Score: 4<br>Log: Room base church lawyer so.", "Date: 2025-10-05<br>Score: 81<br>Log: Activity decide me film site soldier system.", "Date: 2025-10-06<br>Score: 71<br>Log: Property religious agreement new between be list."], "targets": null, "hoffset": 0, "voffset": 10}]});
+   }(mpld3);
+}else if(typeof define === "function" && define.amd){
+   // require.js is available: use it to load d3/mpld3
+   require.config({paths: {d3: "https://d3js.org/d3.v5"}});
+   require(["d3"], function(d3){
+      window.d3 = d3;
+      mpld3_load_lib("https://mpld3.github.io/js/mpld3.v0.5.11.js", function(){
+         
+    mpld3.register_plugin("htmltooltip", HtmlTooltipPlugin);
+    HtmlTooltipPlugin.prototype = Object.create(mpld3.Plugin.prototype);
+    HtmlTooltipPlugin.prototype.constructor = HtmlTooltipPlugin;
+    HtmlTooltipPlugin.prototype.requiredProps = ["id"];
+    HtmlTooltipPlugin.prototype.defaultProps = {labels:null,
+                                                target:null,
+                                                hoffset:0,
+                                                voffset:10,
+                                                targets:null};
+    function HtmlTooltipPlugin(fig, props){
+        mpld3.Plugin.call(this, fig, props);
+    };
+
+    HtmlTooltipPlugin.prototype.draw = function(){
+        var obj = mpld3.get_element(this.props.id);
+        var labels = this.props.labels;
+        var targets = this.props.targets;
+        var tooltip = d3.select("body").append("div")
+            .attr("class", "mpld3-tooltip")
+            .style("position", "absolute")
+            .style("z-index", "10")
+            .style("visibility", "hidden");
+
+        obj.elements()
+            .on("mouseover", function(d, i){
+                tooltip.html(labels[i])
+                    .style("visibility", "visible");
+            })
+            .on("mousemove", function(d, i){
+                tooltip
+                .style("top", d3.event.pageY + this.props.voffset + "px")
+                .style("left",d3.event.pageX + this.props.hoffset + "px");
+            }.bind(this))
+            .on("mousedown.callout", function(d, i){
+                window.open(targets[i],"_blank");
+            })
+            .on("mouseout", function(d, i){
+                tooltip.style("visibility", "hidden");
+            });
+    };
+    
+         mpld3.draw_figure("fig_el5205fa26dcc5-1a8c-4a6e-a7a2-561f26cc682d3143213529", {"width": 1200.0, "height": 600.0, "axes": [{"bbox": [0.05491898148148149, 0.19139033926160265, 0.9325810185185186, 0.7447207718495085], "xlim": [20347.05, 20367.95], "ylim": [-2.3, 92.3], "xdomain": [[2025, 8, 16, 1, 12, 0, 0.0], [2025, 9, 6, 22, 48, 0, 0.0]], "ydomain": [-2.3, 92.3], "xscale": "date", "yscale": "linear", "axes": [{"position": "bottom", "nticks": 10, "tickvalues": null, "tickformat_formatter": "", "tickformat": null, "scale": "linear", "fontsize": 10.0, "grid": {"gridOn": true, "color": "#B0B0B0", "dasharray": "none", "alpha": 0.3}, "visible": true}, {"position": "left", "nticks": 7, "tickvalues": null, "tickformat_formatter": "", "tickformat": null, "scale": "linear", "fontsize": 10.0, "grid": {"gridOn": true, "color": "#B0B0B0", "dasharray": "none", "alpha": 0.3}, "visible": true}], "axesbg": "#FFFFFF", "axesbgalpha": null, "zoomable": true, "id": "el5205af41c2bd-4e82-40f8-b404-019eb209a1c8", "lines": [{"data": "data01", "xindex": 0, "yindex": 1, "coordinates": "data", "id": "el52050a7621be-a93d-46a1-ad87-2c73494c456a", "color": "#9467BD", "linewidth": 2.0, "dasharray": "none", "alpha": 0.5, "zorder": 2, "drawstyle": "default"}], "paths": [{"data": "data03", "xindex": 0, "yindex": 1, "coordinates": "axes", "pathcodes": ["M", "L", "S", "L", "S", "L", "S", "L", "S", "Z"], "id": "el52055eafe07a-761e-4f99-8a9f-45aa8e08ee65", "dasharray": "none", "alpha": 0.8, "facecolor": "rgba(255, 255, 255, 0.8)", "edgecolor": "rgba(204, 204, 204, 0.8)", "edgewidth": 1.0, "zorder": 1000000.0}], "markers": [], "texts": [{"text": "Date", "position": [0.5, -0.1831429233843958], "coordinates": "axes", "h_anchor": "middle", "v_baseline": "hanging", "rotation": -0.0, "fontsize": 12.0, "color": "#000000", "alpha": 1, "zorder": 3, "id": "el52058aa9fd89-14b5-4f59-9742-89ef5f2041da"}, {"text": "Score", "position": [-0.02940117902575241, 0.5], "coordinates": "axes", "h_anchor": "middle", "v_baseline": "auto", "rotation": -90.0, "fontsize": 12.0, "color": "#000000", "alpha": 1, "zorder": 3, "id": "el5205f0429202-f946-41f0-8019-195e316c7a99"}, {"text": "Kismet Score Timeline", "position": [0.5, 1.0186497938742811], "coordinates": "axes", "h_anchor": "middle", "v_baseline": "auto", "rotation": -0.0, "fontsize": 14.0, "color": "#000000", "alpha": 1, "zorder": 3, "id": "el5205a0569d2a-d090-4585-948f-8968d65094c3"}, {"text": "Kismet Score", "position": [0.9077381321749926, 0.9474075812745273], "coordinates": "axes", "h_anchor": "start", "v_baseline": "auto", "rotation": -0.0, "fontsize": 10.0, "color": "#000000", "alpha": 1, "zorder": 1000003.0, "id": "el5205b29f7dce-ea99-43b2-ba46-43d5016481d2"}], "collections": [{"offsets": "data01", "xindex": 0, "yindex": 1, "paths": [[[[0.0, -0.5], [0.13260155, -0.5], [0.25978993539242673, -0.44731684579412084], [0.3535533905932738, -0.3535533905932738], [0.44731684579412084, -0.25978993539242673], [0.5, -0.13260155], [0.5, 0.0], [0.5, 0.13260155], [0.44731684579412084, 0.25978993539242673], [0.3535533905932738, 0.3535533905932738], [0.25978993539242673, 0.44731684579412084], [0.13260155, 0.5], [0.0, 0.5], [-0.13260155, 0.5], [-0.25978993539242673, 0.44731684579412084], [-0.3535533905932738, 0.3535533905932738], [-0.44731684579412084, 0.25978993539242673], [-0.5, 0.13260155], [-0.5, 0.0], [-0.5, -0.13260155], [-0.44731684579412084, -0.25978993539242673], [-0.3535533905932738, -0.3535533905932738], [-0.25978993539242673, -0.44731684579412084], [-0.13260155, -0.5], [0.0, -0.5]], ["M", "C", "C", "C", "C", "C", "C", "C", "C", "Z"]]], "pathtransforms": [[13.88888888888889, 0.0, 0.0, 13.88888888888889, 0.0, 0.0]], "alphas": [0.7], "edgecolors": ["rgba(148, 103, 189, 0.7)"], "facecolors": ["rgba(148, 103, 189, 0.7)"], "edgewidths": [1.0], "offsetcoordinates": "data", "pathcoordinates": "display", "zorder": 1, "id": "el52053d84d17e-cf3b-4bae-9f0e-9640df9f3ec4"}, {"offsets": "data02", "xindex": 0, "yindex": 1, "paths": [[[[0.0, -0.5], [0.13260155, -0.5], [0.25978993539242673, -0.44731684579412084], [0.3535533905932738, -0.3535533905932738], [0.44731684579412084, -0.25978993539242673], [0.5, -0.13260155], [0.5, 0.0], [0.5, 0.13260155], [0.44731684579412084, 0.25978993539242673], [0.3535533905932738, 0.3535533905932738], [0.25978993539242673, 0.44731684579412084], [0.13260155, 0.5], [0.0, 0.5], [-0.13260155, 0.5], [-0.25978993539242673, 0.44731684579412084], [-0.3535533905932738, 0.3535533905932738], [-0.44731684579412084, 0.25978993539242673], [-0.5, 0.13260155], [-0.5, 0.0], [-0.5, -0.13260155], [-0.44731684579412084, -0.25978993539242673], [-0.3535533905932738, -0.3535533905932738], [-0.25978993539242673, -0.44731684579412084], [-0.13260155, -0.5], [0.0, -0.5]], ["M", "C", "C", "C", "C", "C", "C", "C", "C", "Z"]]], "pathtransforms": [[13.88888888888889, 0.0, 0.0, 13.88888888888889, 0.0, 0.0]], "alphas": [0.7], "edgecolors": ["rgba(148, 103, 189, 0.7)"], "facecolors": ["rgba(148, 103, 189, 0.7)"], "edgewidths": [1.0], "offsetcoordinates": "axes", "pathcoordinates": "display", "zorder": 1000001.0, "id": "el520524e37c81-56e9-4ed6-8064-e4f7db4a3cc8"}], "images": [], "sharex": [], "sharey": []}], "data": {"data01": [[20348.0, 53.0], [20349.0, 61.0], [20350.0, 71.0], [20351.0, 42.0], [20352.0, 62.0], [20353.0, 53.0], [20354.0, 37.0], [20355.0, 88.0], [20356.0, 87.0], [20357.0, 61.0], [20358.0, 12.0], [20359.0, 50.0], [20360.0, 63.0], [20361.0, 36.0], [20362.0, 24.0], [20363.0, 83.0], [20364.0, 2.0], [20365.0, 4.0], [20366.0, 81.0], [20367.0, 71.0]], "data02": [[0.8853986968662739, 0.9555668660945252]], "data03": [[0.8705057399937948, 0.9282604595635986], [0.9913124418243873, 0.9282604595635986], [0.9937946013031338, 0.9282604595635986], [0.9937946013031338, 0.9344770575216925], [0.9937946013031338, 0.9782419071466719], [0.9937946013031338, 0.9844585051047658], [0.9913124418243873, 0.9844585051047658], [0.8705057399937948, 0.9844585051047658], [0.8680235805150482, 0.9844585051047658], [0.8680235805150482, 0.9782419071466719], [0.8680235805150482, 0.9344770575216925], [0.8680235805150482, 0.9282604595635986], [0.8705057399937948, 0.9282604595635986]]}, "id": "el5205fa26dcc5-1a8c-4a6e-a7a2-561f26cc682d", "plugins": [{"type": "reset"}, {"type": "zoom", "button": true, "enabled": false}, {"type": "boxzoom", "button": true, "enabled": false}, {"type": "htmltooltip", "id": "el52053d84d17e-cf3b-4bae-9f0e-9640df9f3ec4", "labels": ["Date: 2025-09-17<br>Score: 53<br>Log: Difficult soon keep perhaps.", "Date: 2025-09-18<br>Score: 61<br>Log: Understand first wear use.", "Date: 2025-09-19<br>Score: 71<br>Log: Environmental it civil small window.", "Date: 2025-09-20<br>Score: 42<br>Log: Garden role already message interesting.", "Date: 2025-09-21<br>Score: 62<br>Log: Air manage body rise board.", "Date: 2025-09-22<br>Score: 53<br>Log: Add national case Mr half.", "Date: 2025-09-23<br>Score: 37<br>Log: Serve scene several card what right.", "Date: 2025-09-24<br>Score: 88<br>Log: Wish money two occur if more.", "Date: 2025-09-25<br>Score: 87<br>Log: Wrong trade he type subject phone hope.", "Date: 2025-09-26<br>Score: 61<br>Log: Magazine finally kind body leg.", "Date: 2025-09-27<br>Score: 12<br>Log: Thousand grow television support.", "Date: 2025-09-28<br>Score: 50<br>Log: Look rock blood important national.", "Date: 2025-09-29<br>Score: 63<br>Log: Happen able this.", "Date: 2025-09-30<br>Score: 36<br>Log: Natural thank medical could.", "Date: 2025-10-01<br>Score: 24<br>Log: Director investment wear start political hundred.", "Date: 2025-10-02<br>Score: 83<br>Log: Fill each man free world read once.", "Date: 2025-10-03<br>Score: 2<br>Log: Thank seat person end off.", "Date: 2025-10-04<br>Score: 4<br>Log: Room base church lawyer so.", "Date: 2025-10-05<br>Score: 81<br>Log: Activity decide me film site soldier system.", "Date: 2025-10-06<br>Score: 71<br>Log: Property religious agreement new between be list."], "targets": null, "hoffset": 0, "voffset": 10}]});
+      });
+    });
+}else{
+    // require.js not available: dynamically load d3 & mpld3
+    mpld3_load_lib("https://d3js.org/d3.v5.js", function(){
+         mpld3_load_lib("https://mpld3.github.io/js/mpld3.v0.5.11.js", function(){
+                 
+    mpld3.register_plugin("htmltooltip", HtmlTooltipPlugin);
+    HtmlTooltipPlugin.prototype = Object.create(mpld3.Plugin.prototype);
+    HtmlTooltipPlugin.prototype.constructor = HtmlTooltipPlugin;
+    HtmlTooltipPlugin.prototype.requiredProps = ["id"];
+    HtmlTooltipPlugin.prototype.defaultProps = {labels:null,
+                                                target:null,
+                                                hoffset:0,
+                                                voffset:10,
+                                                targets:null};
+    function HtmlTooltipPlugin(fig, props){
+        mpld3.Plugin.call(this, fig, props);
+    };
+
+    HtmlTooltipPlugin.prototype.draw = function(){
+        var obj = mpld3.get_element(this.props.id);
+        var labels = this.props.labels;
+        var targets = this.props.targets;
+        var tooltip = d3.select("body").append("div")
+            .attr("class", "mpld3-tooltip")
+            .style("position", "absolute")
+            .style("z-index", "10")
+            .style("visibility", "hidden");
+
+        obj.elements()
+            .on("mouseover", function(d, i){
+                tooltip.html(labels[i])
+                    .style("visibility", "visible");
+            })
+            .on("mousemove", function(d, i){
+                tooltip
+                .style("top", d3.event.pageY + this.props.voffset + "px")
+                .style("left",d3.event.pageX + this.props.hoffset + "px");
+            }.bind(this))
+            .on("mousedown.callout", function(d, i){
+                window.open(targets[i],"_blank");
+            })
+            .on("mouseout", function(d, i){
+                tooltip.style("visibility", "hidden");
+            });
+    };
+    
+                 mpld3.draw_figure("fig_el5205fa26dcc5-1a8c-4a6e-a7a2-561f26cc682d3143213529", {"width": 1200.0, "height": 600.0, "axes": [{"bbox": [0.05491898148148149, 0.19139033926160265, 0.9325810185185186, 0.7447207718495085], "xlim": [20347.05, 20367.95], "ylim": [-2.3, 92.3], "xdomain": [[2025, 8, 16, 1, 12, 0, 0.0], [2025, 9, 6, 22, 48, 0, 0.0]], "ydomain": [-2.3, 92.3], "xscale": "date", "yscale": "linear", "axes": [{"position": "bottom", "nticks": 10, "tickvalues": null, "tickformat_formatter": "", "tickformat": null, "scale": "linear", "fontsize": 10.0, "grid": {"gridOn": true, "color": "#B0B0B0", "dasharray": "none", "alpha": 0.3}, "visible": true}, {"position": "left", "nticks": 7, "tickvalues": null, "tickformat_formatter": "", "tickformat": null, "scale": "linear", "fontsize": 10.0, "grid": {"gridOn": true, "color": "#B0B0B0", "dasharray": "none", "alpha": 0.3}, "visible": true}], "axesbg": "#FFFFFF", "axesbgalpha": null, "zoomable": true, "id": "el5205af41c2bd-4e82-40f8-b404-019eb209a1c8", "lines": [{"data": "data01", "xindex": 0, "yindex": 1, "coordinates": "data", "id": "el52050a7621be-a93d-46a1-ad87-2c73494c456a", "color": "#9467BD", "linewidth": 2.0, "dasharray": "none", "alpha": 0.5, "zorder": 2, "drawstyle": "default"}], "paths": [{"data": "data03", "xindex": 0, "yindex": 1, "coordinates": "axes", "pathcodes": ["M", "L", "S", "L", "S", "L", "S", "L", "S", "Z"], "id": "el52055eafe07a-761e-4f99-8a9f-45aa8e08ee65", "dasharray": "none", "alpha": 0.8, "facecolor": "rgba(255, 255, 255, 0.8)", "edgecolor": "rgba(204, 204, 204, 0.8)", "edgewidth": 1.0, "zorder": 1000000.0}], "markers": [], "texts": [{"text": "Date", "position": [0.5, -0.1831429233843958], "coordinates": "axes", "h_anchor": "middle", "v_baseline": "hanging", "rotation": -0.0, "fontsize": 12.0, "color": "#000000", "alpha": 1, "zorder": 3, "id": "el52058aa9fd89-14b5-4f59-9742-89ef5f2041da"}, {"text": "Score", "position": [-0.02940117902575241, 0.5], "coordinates": "axes", "h_anchor": "middle", "v_baseline": "auto", "rotation": -90.0, "fontsize": 12.0, "color": "#000000", "alpha": 1, "zorder": 3, "id": "el5205f0429202-f946-41f0-8019-195e316c7a99"}, {"text": "Kismet Score Timeline", "position": [0.5, 1.0186497938742811], "coordinates": "axes", "h_anchor": "middle", "v_baseline": "auto", "rotation": -0.0, "fontsize": 14.0, "color": "#000000", "alpha": 1, "zorder": 3, "id": "el5205a0569d2a-d090-4585-948f-8968d65094c3"}, {"text": "Kismet Score", "position": [0.9077381321749926, 0.9474075812745273], "coordinates": "axes", "h_anchor": "start", "v_baseline": "auto", "rotation": -0.0, "fontsize": 10.0, "color": "#000000", "alpha": 1, "zorder": 1000003.0, "id": "el5205b29f7dce-ea99-43b2-ba46-43d5016481d2"}], "collections": [{"offsets": "data01", "xindex": 0, "yindex": 1, "paths": [[[[0.0, -0.5], [0.13260155, -0.5], [0.25978993539242673, -0.44731684579412084], [0.3535533905932738, -0.3535533905932738], [0.44731684579412084, -0.25978993539242673], [0.5, -0.13260155], [0.5, 0.0], [0.5, 0.13260155], [0.44731684579412084, 0.25978993539242673], [0.3535533905932738, 0.3535533905932738], [0.25978993539242673, 0.44731684579412084], [0.13260155, 0.5], [0.0, 0.5], [-0.13260155, 0.5], [-0.25978993539242673, 0.44731684579412084], [-0.3535533905932738, 0.3535533905932738], [-0.44731684579412084, 0.25978993539242673], [-0.5, 0.13260155], [-0.5, 0.0], [-0.5, -0.13260155], [-0.44731684579412084, -0.25978993539242673], [-0.3535533905932738, -0.3535533905932738], [-0.25978993539242673, -0.44731684579412084], [-0.13260155, -0.5], [0.0, -0.5]], ["M", "C", "C", "C", "C", "C", "C", "C", "C", "Z"]]], "pathtransforms": [[13.88888888888889, 0.0, 0.0, 13.88888888888889, 0.0, 0.0]], "alphas": [0.7], "edgecolors": ["rgba(148, 103, 189, 0.7)"], "facecolors": ["rgba(148, 103, 189, 0.7)"], "edgewidths": [1.0], "offsetcoordinates": "data", "pathcoordinates": "display", "zorder": 1, "id": "el52053d84d17e-cf3b-4bae-9f0e-9640df9f3ec4"}, {"offsets": "data02", "xindex": 0, "yindex": 1, "paths": [[[[0.0, -0.5], [0.13260155, -0.5], [0.25978993539242673, -0.44731684579412084], [0.3535533905932738, -0.3535533905932738], [0.44731684579412084, -0.25978993539242673], [0.5, -0.13260155], [0.5, 0.0], [0.5, 0.13260155], [0.44731684579412084, 0.25978993539242673], [0.3535533905932738, 0.3535533905932738], [0.25978993539242673, 0.44731684579412084], [0.13260155, 0.5], [0.0, 0.5], [-0.13260155, 0.5], [-0.25978993539242673, 0.44731684579412084], [-0.3535533905932738, 0.3535533905932738], [-0.44731684579412084, 0.25978993539242673], [-0.5, 0.13260155], [-0.5, 0.0], [-0.5, -0.13260155], [-0.44731684579412084, -0.25978993539242673], [-0.3535533905932738, -0.3535533905932738], [-0.25978993539242673, -0.44731684579412084], [-0.13260155, -0.5], [0.0, -0.5]], ["M", "C", "C", "C", "C", "C", "C", "C", "C", "Z"]]], "pathtransforms": [[13.88888888888889, 0.0, 0.0, 13.88888888888889, 0.0, 0.0]], "alphas": [0.7], "edgecolors": ["rgba(148, 103, 189, 0.7)"], "facecolors": ["rgba(148, 103, 189, 0.7)"], "edgewidths": [1.0], "offsetcoordinates": "axes", "pathcoordinates": "display", "zorder": 1000001.0, "id": "el520524e37c81-56e9-4ed6-8064-e4f7db4a3cc8"}], "images": [], "sharex": [], "sharey": []}], "data": {"data01": [[20348.0, 53.0], [20349.0, 61.0], [20350.0, 71.0], [20351.0, 42.0], [20352.0, 62.0], [20353.0, 53.0], [20354.0, 37.0], [20355.0, 88.0], [20356.0, 87.0], [20357.0, 61.0], [20358.0, 12.0], [20359.0, 50.0], [20360.0, 63.0], [20361.0, 36.0], [20362.0, 24.0], [20363.0, 83.0], [20364.0, 2.0], [20365.0, 4.0], [20366.0, 81.0], [20367.0, 71.0]], "data02": [[0.8853986968662739, 0.9555668660945252]], "data03": [[0.8705057399937948, 0.9282604595635986], [0.9913124418243873, 0.9282604595635986], [0.9937946013031338, 0.9282604595635986], [0.9937946013031338, 0.9344770575216925], [0.9937946013031338, 0.9782419071466719], [0.9937946013031338, 0.9844585051047658], [0.9913124418243873, 0.9844585051047658], [0.8705057399937948, 0.9844585051047658], [0.8680235805150482, 0.9844585051047658], [0.8680235805150482, 0.9782419071466719], [0.8680235805150482, 0.9344770575216925], [0.8680235805150482, 0.9282604595635986], [0.8705057399937948, 0.9282604595635986]]}, "id": "el5205fa26dcc5-1a8c-4a6e-a7a2-561f26cc682d", "plugins": [{"type": "reset"}, {"type": "zoom", "button": true, "enabled": false}, {"type": "boxzoom", "button": true, "enabled": false}, {"type": "htmltooltip", "id": "el52053d84d17e-cf3b-4bae-9f0e-9640df9f3ec4", "labels": ["Date: 2025-09-17<br>Score: 53<br>Log: Difficult soon keep perhaps.", "Date: 2025-09-18<br>Score: 61<br>Log: Understand first wear use.", "Date: 2025-09-19<br>Score: 71<br>Log: Environmental it civil small window.", "Date: 2025-09-20<br>Score: 42<br>Log: Garden role already message interesting.", "Date: 2025-09-21<br>Score: 62<br>Log: Air manage body rise board.", "Date: 2025-09-22<br>Score: 53<br>Log: Add national case Mr half.", "Date: 2025-09-23<br>Score: 37<br>Log: Serve scene several card what right.", "Date: 2025-09-24<br>Score: 88<br>Log: Wish money two occur if more.", "Date: 2025-09-25<br>Score: 87<br>Log: Wrong trade he type subject phone hope.", "Date: 2025-09-26<br>Score: 61<br>Log: Magazine finally kind body leg.", "Date: 2025-09-27<br>Score: 12<br>Log: Thousand grow television support.", "Date: 2025-09-28<br>Score: 50<br>Log: Look rock blood important national.", "Date: 2025-09-29<br>Score: 63<br>Log: Happen able this.", "Date: 2025-09-30<br>Score: 36<br>Log: Natural thank medical could.", "Date: 2025-10-01<br>Score: 24<br>Log: Director investment wear start political hundred.", "Date: 2025-10-02<br>Score: 83<br>Log: Fill each man free world read once.", "Date: 2025-10-03<br>Score: 2<br>Log: Thank seat person end off.", "Date: 2025-10-04<br>Score: 4<br>Log: Room base church lawyer so.", "Date: 2025-10-05<br>Score: 81<br>Log: Activity decide me film site soldier system.", "Date: 2025-10-06<br>Score: 71<br>Log: Property religious agreement new between be list."], "targets": null, "hoffset": 0, "voffset": 10}]});
+            })
+         });
+}
+</script>

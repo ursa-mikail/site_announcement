@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Interactive Plots Dashboard</title>
+    <style>
+        .nav { margin: 20px; }
+        .nav button { margin: 5px; padding: 10px; }
+        .content { padding: 20px; border: 1px solid #ccc; margin: 20px; }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <button onclick="loadContent('pnuema_interactive_plot.html')">Pnuema</button>
+        <button onclick="loadContent('psyche_interactive_plot.html')">Psyche</button>
+        <button onclick="loadContent('soma_interactive_plot.html')">Soma</button>
+        <button onclick="loadContent('opus_interactive_plot.html')">Opus</button>
+        <button onclick="loadContent('kismet_interactive_plot.html')">Kismet</button>
+    </div>
+    
+    <div id="content" class="content">
+        Select a plot to display...
+    </div>
+
+    <script>
+        async function loadContent(url) {
+            try {
+                const response = await fetch(url);
+                const html = await response.text();
+                document.getElementById('content').innerHTML = html;
+            } catch (error) {
+                document.getElementById('content').innerHTML = 'Error loading content';
+            }
+        }
+    </script>
+</body>
+</html>
