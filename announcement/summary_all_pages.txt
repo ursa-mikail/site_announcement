@@ -139,10 +139,10 @@ Summary of Content Options:
 56. **ASCII to Audio**
     - ASCII to Audio.
 
-57. **Mnemonics Table**
+57. **Interactive Graphs**
     - Interactive Graphs
 
-58. **Interactive Graphs**
+58. **Mnemonics Table**
     - Search and autocomplete interface for your mnemonics table
 
 Summary. **ax_summary: Summary of All Pages**
