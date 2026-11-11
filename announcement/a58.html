@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mnemonics Explorer · People 2019-03.30</title>
+<style>
+    :root{
+        --bg:#070a11;
+        --text:#e8ecf5;
+        --muted:#8b97ad;
+        --stroke:rgba(255,255,255,.09);
+        --accent:#7c5cff;
+        --accent2:#22d3ee;
+        --radius:18px;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+
+    body{
+        margin:0;
+        height:100dvh;
+        display:flex;
+        flex-direction:column;
+        overflow:hidden;
+        color:var(--text);
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter, Roboto, sans-serif;
+        -webkit-font-smoothing:antialiased;
+        background:
+            radial-gradient(1200px 620px at 8% -12%, #1a1440 0%, transparent 62%),
+            radial-gradient(900px 520px at 112% 112%, #072a33 0%, transparent 60%),
+            var(--bg);
+    }
+
+    /* ---------- scrollbars ---------- */
+    ::-webkit-scrollbar{ width:10px; height:10px; }
+    ::-webkit-scrollbar-track{ background:transparent; }
+    ::-webkit-scrollbar-thumb{
+        background:rgba(255,255,255,.12);
+        border-radius:99px;
+        border:3px solid transparent;
+        background-clip:content-box;
+    }
+    ::-webkit-scrollbar-thumb:hover{ background:rgba(255,255,255,.24); background-clip:content-box; }
+
+    /* ---------- top bar ---------- */
+    .topbar{
+        position:relative;
+        z-index:20;
+        flex:0 0 auto;
+        display:flex;
+        align-items:center;
+        gap:16px;
+        padding:12px 16px;
+        background:rgba(8,11,18,.72);
+        backdrop-filter:blur(20px) saturate(160%);
+        -webkit-backdrop-filter:blur(20px) saturate(160%);
+        border-bottom:1px solid var(--stroke);
+    }
+
+    .brand{ display:flex; align-items:center; gap:11px; min-width:0; }
+    .logo{
+        width:38px; height:38px; border-radius:12px;
+        display:grid; place-items:center;
+        background:linear-gradient(135deg,#7c5cff,#22d3ee);
+        color:#060912; font-weight:800; font-size:17px;
+        box-shadow:0 8px 24px -8px rgba(124,92,255,.9);
+        flex:0 0 auto;
+    }
+    .brand h1{ margin:0; font-size:14.5px; font-weight:650; letter-spacing:.01em; white-space:nowrap; }
+    .brand p{ margin:2px 0 0; font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); white-space:nowrap; }
+
+    /* ---------- search ---------- */
+    .search{ position:relative; flex:1 1 300px; max-width:720px; margin:0 auto; }
+
+    .search input{
+        width:100%; height:46px;
+        padding:0 46px 0 44px;
+        border-radius:14px;
+        background:rgba(255,255,255,.05);
+        border:1px solid var(--stroke);
+        color:var(--text);
+        font-size:14.5px;
+        font-family:inherit;
+        outline:none;
+        transition:background .18s, border-color .18s, box-shadow .18s;
+    }
+    .search input::placeholder{ color:#5c6779; }
+    .search input:focus{
+        background:rgba(255,255,255,.075);
+        border-color:rgba(124,92,255,.65);
+        box-shadow:0 0 0 4px rgba(124,92,255,.16), 0 10px 34px -12px rgba(124,92,255,.85);
+    }
+
+    .search-icon{
+        position:absolute; left:14px; top:50%; transform:translateY(-50%);
+        width:18px; height:18px; color:#5c6779; pointer-events:none;
+    }
+
+    .clear{
+        position:absolute; right:10px; top:50%; transform:translateY(-50%);
+        width:26px; height:26px; border-radius:8px;
+        display:none; place-items:center;
+        background:rgba(255,255,255,.07);
+        border:none; color:var(--muted);
+        font-size:15px; line-height:1; cursor:pointer;
+        transition:.15s;
+    }
+    .clear:hover{ background:rgba(255,255,255,.14); color:var(--text); }
+    .clear.show{ display:grid; }
+
+    /* ---------- suggestions ---------- */
+    .suggest{
+        position:absolute; top:calc(100% + 8px); left:0; right:0;
+        padding:6px;
+        max-height:364px; overflow:auto;
+        background:rgba(13,17,26,.97);
+        backdrop-filter:blur(22px);
+        -webkit-backdrop-filter:blur(22px);
+        border:1px solid rgba(255,255,255,.11);
+        border-radius:16px;
+        box-shadow:0 26px 64px -14px rgba(0,0,0,.9);
+        display:none;
+        z-index:60;
+    }
+    .suggest.show{ display:block; animation:pop .14s ease; }
+    @keyframes pop{ from{ opacity:0; transform:translateY(-6px) scale(.99); } to{ opacity:1; transform:none; } }
+
+    .sug{
+        display:flex; align-items:center; gap:10px;
+        padding:8px 10px; border-radius:10px; cursor:pointer;
+        transition:background .12s;
+    }
+    .sug:hover,
+    .sug.active{ background:linear-gradient(90deg, rgba(124,92,255,.26), rgba(34,211,238,.09)); }
+
+    .sug .num{
+        font:600 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+        color:#b39cff; background:rgba(124,92,255,.16);
+        border-radius:6px; padding:4px 6px; min-width:30px; text-align:center;
+        flex:0 0 auto;
+    }
+    .sug .name{
+        flex:1; font-size:13.5px;
+        white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .sug .tag{
+        flex:0 0 auto;
+        font-size:9.5px; letter-spacing:.1em; text-transform:uppercase;
+        color:var(--muted); border:1px solid var(--stroke);
+        padding:3px 7px; border-radius:99px;
+    }
+    .sug-empty{ padding:16px; text-align:center; font-size:13px; color:var(--muted); }
+
+    /* ---------- tools ---------- */
+    .tools{ display:flex; gap:8px; flex:0 0 auto; }
+    .tool{
+        padding:8px 14px; border-radius:10px;
+        background:rgba(255,255,255,.05);
+        border:1px solid var(--stroke);
+        color:var(--muted); font-size:12px; font-weight:600; letter-spacing:.03em;
+        font-family:inherit; cursor:pointer; transition:.16s;
+    }
+    .tool:hover{ color:var(--text); background:rgba(255,255,255,.09); border-color:rgba(255,255,255,.2); }
+    .tool:active{ transform:translateY(1px); }
+
+    /* ---------- layout ---------- */
+    .layout{
+        flex:1; min-height:0;
+        display:grid;
+        grid-template-columns:minmax(320px, 410px) 1fr;
+        gap:14px;
+        padding:14px;
+        position:relative;
+        z-index:1;
+    }
+
+    .panel{
+        min-height:0;
+        background:rgba(255,255,255,.028);
+        border:1px solid var(--stroke);
+        border-radius:var(--radius);
+        backdrop-filter:blur(12px);
+        -webkit-backdrop-filter:blur(12px);
+        overflow:hidden;
+    }
+
+    .tree-panel{ overflow:auto; padding:8px; }
+
+    /* ---------- tree ---------- */
+    .tree{ display:flex; flex-direction:column; gap:1px; }
+
+    .row{
+        display:flex; align-items:center; gap:9px;
+        width:100%; padding:9px 10px;
+        border-radius:11px;
+        background:transparent; border:none;
+        color:var(--text); font-family:inherit; font-size:13.5px;
+        text-align:left; cursor:pointer;
+        transition:background .13s, color .13s;
+    }
+    .row:hover{ background:rgba(255,255,255,.055); }
+
+    .head{ font-weight:650; letter-spacing:.02em; }
+    .head .label{ flex:1; }
+
+    .chev{
+        width:14px; height:14px; flex:0 0 auto;
+        color:var(--muted);
+        transition:transform .2s ease, color .2s ease;
+    }
+    .node.open > .head .chev{ transform:rotate(90deg); color:var(--accent2); }
+
+    .count{
+        font:600 10.5px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+        color:var(--muted); background:rgba(255,255,255,.05);
+        padding:4px 8px; border-radius:99px;
+        flex:0 0 auto;
+    }
+    .node.open > .head .count{ background:rgba(124,92,255,.18); color:#b39cff; }
+
+    .children{
+        display:none;
+        margin-left:15px;
+        padding-left:10px;
+        border-left:1px solid rgba(255,255,255,.07);
+    }
+    .node.open > .children{ display:block; animation:slide .18s ease; }
+    @keyframes slide{ from{ opacity:0; transform:translateY(-5px); } to{ opacity:1; transform:none; } }
+
+    .node.archive > .head .label{
+        font-weight:600; color:var(--muted);
+        font-size:12px; letter-spacing:.09em; text-transform:uppercase;
+    }
+
+    .item .num{
+        font:600 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+        color:#616f86; min-width:20px; flex:0 0 auto;
+        transition:color .13s;
+    }
+    .item:hover .num{ color:var(--accent2); }
+
+    .item .nm{ flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .item .ext{
+        font-size:9.5px; color:#47536a; letter-spacing:.07em; text-transform:uppercase;
+        flex:0 0 auto;
+    }
+
+    .hidden{ display:none !important; }
+
+    mark{
+        background:rgba(34,211,238,.22);
+        color:#a5f3fc;
+        border-radius:3px;
+        padding:0 1px;
+    }
+
+    @keyframes flash{
+        0%{ background:rgba(124,92,255,.5); box-shadow:inset 0 0 0 1px rgba(124,92,255,.75); }
+        100%{ background:transparent; box-shadow:inset 0 0 0 1px transparent; }
+    }
+    .item.flash{ animation:flash 1.4s ease; }
+
+    /* ---------- plot panel ---------- */
+    .plot-panel{ display:flex; flex-direction:column; }
+
+    .tabs{ display:flex; flex-wrap:wrap; gap:8px; padding:10px; border-bottom:1px solid var(--stroke); }
+
+    .tab{
+        padding:8px 18px; border-radius:99px;
+        border:1px solid var(--stroke); background:transparent;
+        color:var(--muted); font-family:inherit;
+        font-size:12.5px; font-weight:600; letter-spacing:.045em;
+        cursor:pointer; transition:.16s;
+    }
+    .tab:hover{ color:var(--text); border-color:rgba(255,255,255,.22); }
+    .tab.active{
+        background:linear-gradient(135deg,#7c5cff,#22d3ee);
+        color:#04070d; border-color:transparent;
+        box-shadow:0 10px 26px -10px rgba(124,92,255,.95);
+    }
+
+    #plotFrame{
+        flex:1;
+        width:100%;
+        border:0;
+        background:rgba(255,255,255,.02);
+    }
+
+    /* ---------- toast ---------- */
+    .toast{
+        position:fixed; left:50%; bottom:26px;
+        transform:translate(-50%, 16px);
+        padding:9px 18px; border-radius:99px;
+        background:rgba(20,26,40,.96);
+        border:1px solid rgba(124,92,255,.45);
+        color:#dfe6f5; font-size:12.5px;
+        opacity:0; pointer-events:none;
+        transition:opacity .22s, transform .22s;
+        backdrop-filter:blur(12px);
+        z-index:200;
+    }
+    .toast.show{ opacity:1; transform:translate(-50%, 0); }
+
+    /* ---------- responsive ---------- */
+    @media (max-width: 900px){
+        body{ height:auto; overflow:auto; }
+        .layout{ grid-template-columns:1fr; }
+        .tree-panel{ max-height:62vh; }
+        .plot-panel{ height:72vh; }
+        .topbar{ flex-wrap:wrap; gap:10px; }
+        .search{ order:3; flex-basis:100%; max-width:none; }
+        .brand p{ display:none; }
+    }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+    <div class="brand">
+        <div class="logo">M</div>
+        <div>
+            <h1>Mnemonics</h1>
+            <p>People · 2019-03.30 · 1440hr</p>
+        </div>
+    </div>
+
+    <div class="search">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="m20 20-3.2-3.2"></path>
+        </svg>
+        <input id="q" type="text" autocomplete="off" spellcheck="false"
+               placeholder="Search 400+ entries…   (press / to focus)">
+        <button class="clear" id="clearBtn" type="button" aria-label="Clear">✕</button>
+        <div class="suggest" id="suggest"></div>
+    </div>
+
+    <div class="tools">
+        <button class="tool" id="expandAll" type="button">Expand</button>
+        <button class="tool" id="collapseAll" type="button">Collapse</button>
+    </div>
+</header>
+
+<main class="layout">
+    <aside class="panel tree-panel">
+        <div class="tree" id="tree"></div>
+    </aside>
+
+    <section class="panel plot-panel">
+        <div class="tabs">
+            <button class="tab active" data-src="pneuma_interactive_plot.html">Pneuma</button>
+            <button class="tab" data-src="psyche_interactive_plot.html">Psyche</button>
+            <button class="tab" data-src="soma_interactive_plot.html">Soma</button>
+            <button class="tab" data-src="opus_interactive_plot.html">Opus</button>
+            <button class="tab" data-src="kismet_interactive_plot.html">Kismet</button>
+        </div>
+        <iframe id="plotFrame" src="pneuma_interactive_plot.html"></iframe>
+    </section>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+    'use strict';
+
+    /* =========================================================
+       DATA  —  [ group, files, archive ]
+       ========================================================= */
+    const RAW = [
+        ["00-09", [
+            "00. (null) Sadako.jpg",
+            "01. (null) Apocalypse.jpg",
+            "02. Sleeping Beauty.jpg",
+            "03. Santa Claus.jpg",
+            "03. Swedish Chef.jpg",
+            "04. (null) Medusa.jpg",
+            "05. Snake Eyes.jpg",
+            "06. (null) Obelix.jpg",
+            "07. (null) Gozilla",
+            "08. Stephen W. Hawking",
+            "09. Steve Irwin.jpg"
+        ], [
+            "00. (null) Syndrome.jpg",
+            "00. Steven Spielberg.jpg",
+            "00. Sophie Scholl.jpg",
+            "01. Sun Tze.jpg",
+            "01. Sun Tze_00.jpg",
+            "01. Swamp Thing.jpg",
+            "02. Stephen King.jpg",
+            "02. Shavarsh Karapetyan.jpg",
+            "03. Samuel P. Langley.jpg",
+            "03. Scarecrow.jpg",
+            "03. Song Ci.jpg",
+            "04. Spider man.jpg",
+            "04. Scooby Doo.jpg",
+            "05. Zhou EnLai.jpg",
+            "05. ShenNong.jpg",
+            "06. Sigmund Freud.jpg",
+            "07. Pegasus.jpg",
+            "07. Scott M. Peck.jpg",
+            "08. Stephen W. Hawking",
+            "09. Salman Rushdie.jpg"
+        ]],
+
+        ["10-19", [
+            "10. Arnold Schwarzenegger.jpg",
+            "11. Jack Jack.jpg",
+            "12. Astro Boy.jpg",
+            "13. Jesus Christ.jpg",
+            "14. Tree Demoness (千年树妖).jpg",
+            "15. Albert Einstein.jpg",
+            "16. The Fly.jpg",
+            "17. John Paul II.jpg",
+            "18. Adolf Hitler.jpg",
+            "19. Jack The Ripper.jpg"
+        ], [
+            "11. Andre Agassi.jpg",
+            "11. Alfred Adler.jpg",
+            "12. Alexander G. Bell.jpg",
+            "14. Jean Dunant.jpg",
+            "14. Joseph Merrick.jpg",
+            "14. Aqua Man",
+            "16. Terry Fox.jpg",
+            "17. John Paul.jpg",
+            "17. Audrey de Grey.jpg",
+            "19. John Ruskin.jpg"
+        ]],
+
+        ["20-29", [
+            "20. Bram Stoker.jpg",
+            "21. Udō Jin-e",
+            "22. BIG BIRD.jpg",
+            "23. Bruce Lee.jpg",
+            "24. Bat Man.jpg",
+            "25. King Neptune.jpg",
+            "26. Kermit the Frog",
+            "27. King Pin.png",
+            "28. Benny Hill.jpg",
+            "29. Kevin Richardson (a.k.a The Lion Whisperer)"
+        ], [
+            "21. Kim Jong-il",
+            "21. Karl Guthe Jansky.jpg",
+            "21. Korechika Anami.jpg",
+            "22. BARBA BEAU.jpg",
+            "24. Bomb Voyage",
+            "24. Kevin Mitnick.jpg",
+            "25. Bernhard Neumann.jpg",
+            "25. Bill Nye",
+            "26. Bolo Yeung",
+            "26. Benjamin Franklin.jpg",
+            "27. Uri Geller.jpg",
+            "29. Bertrand Russell.jpg"
+        ]],
+
+        ["30-39", [
+            "30. Vassili Zaitsev.jpg",
+            "31. Captain America.jpg",
+            "32. Ludwig van Beethoven.jpg",
+            "33. CAPTAIN COLD",
+            "34. Cookie Monster",
+            "35. Charles Xavier.jpg",
+            "36. Lord Farquaad.jpg",
+            "37. Lady Godiva.jpg",
+            "38. Captain Hook.jpg",
+            "39. Cardinal_Raker.jpg"
+        ], [
+            "31. Carl Jung.jpg",
+            "31. Li JiaCheng",
+            "33. CHRISTOPHER COLUMBUS",
+            "34. Charles Darwin",
+            "36. Léon Foucault.jpg",
+            "36. Viktor Frankl.jpg",
+            "37. Che Guevara.jpg",
+            "37. Luciano Pavarotti.jpg",
+            "38. Victor Hugo.jpg",
+            "39. Charles Richter.jpg",
+            "39. Lee Iacocca.jpg"
+        ]],
+
+        ["40-49", [
+            "40. Mr Snuffleupagus.jpg",
+            "41. Mother Teresa.jpg",
+            "42. Dragon Ball.jpg",
+            "43. Dr Vendetta",
+            "44. Mega Mind",
+            "45. Mr. X (Resident Evil, aka Tyrant)",
+            "46. Masutatsu Oyama.png",
+            "47. Miss Piggy.jpg",
+            "48. Dugu QiuBai.jpg",
+            "49. Mr Incredible.jpg"
+        ], [
+            "40. Mo Zi.jpg",
+            "40. William Shakespeare",
+            "41. Worm Tongue",
+            "42. Derren Brown",
+            "42. William Bullock",
+            "44. Wonder Woman",
+            "44. MARY MAGDALENE",
+            "44. MICKEY MOUSE",
+            "45. Malcolm X",
+            "46. Dominic O'Brien",
+            "47. Mahatma Gandhi",
+            "47. Dead Pool",
+            "48. Doug Hall.jpg"
+        ]],
+
+        ["50-59", [
+            "50. Edward Scissorhands",
+            "51. Neil Armstrong",
+            "52. Napolean Bonaparte",
+            "53. Night_Crawler",
+            "54. Edna Mode",
+            "55. Xiao Xing.jpg",
+            "56. Nameless One",
+            "57. ElastiGirl",
+            "58. E. Honda aka Edmund Honda",
+            "59. Earl Reagan (Time traveler, Trans-Time Corp. Hunts dinosaurs to make canned food.)"
+        ], [
+            "50. Nezha.jpg",
+            "52. Elizbeth Bathory.jpg",
+            "53. Eddie Carmel.jpg",
+            "53. Nadia Comaneci",
+            "54. Niccolo Machiavelli",
+            "55. XIE XUN",
+            "55. Edward Elric (fullmetal alchemist)",
+            "56. Xiang Yu",
+            "57. Eva Perón.jpg",
+            "58. Ernest Hemingway",
+            "58. Edwin Hubble",
+            "59. Erno Rubik"
+        ]],
+
+        ["60-69", [
+            "60. Flat Stanley.jpg",
+            "61. FeeJee (Mermaid)",
+            "62. Frozone B. (Lucius Best)",
+            "63. Yan Chixia (燕赤霞)",
+            "64. Yoda.jpg",
+            "65. Florence Nightingale.jpg",
+            "66. FRED FLINTSTONE.jpg",
+            "67. Yang Guo.jpg",
+            "68. Fritz Haber (Father of chemical warfare)",
+            "69. Franz Reichelt.jpg"
+        ], [
+            "60. Frank Sinatra.png",
+            "60. Frederick Soddy.jpg",
+            "61. Oliver Twist.jpg",
+            "62. Yasmine Bleeth.jpg",
+            "63. Frederic Chopin.jpg",
+            "63. Yuan Longping.png",
+            "64. Frank Mesmer.jpg",
+            "67. Oscar the Grouch.jpg",
+            "68. Oliver Holmes.jpg",
+            "68. Face Hugger",
+            "69. Franklin D. Roosevelt.jpg",
+            "69. Franz Reichelt (Parachute inventor)"
+        ]],
+
+        ["70-79", [
+            "70. Gollum Smeagol.jpg",
+            "71. Green Arrow.jpg",
+            "72. Puss-in-Boots.jpg",
+            "73. Green Lantern.jpg",
+            "74. Gingerbread man.jpg",
+            "75. Gustave Eiffel.jpg",
+            "76. Guan Yu.jpg",
+            "77. GALDORF THE GRAY.jpg",
+            "78. (Mr) Potato Head.jpg",
+            "79. Poison Ivy"
+        ], [
+            "70. George Soros",
+            "71. Patch Adams",
+            "72. Genghis Khan",
+            "73. George Lucas",
+            "73. Georges Lemaître",
+            "74. George Washington",
+            "74. Gregor J. Mendel",
+            "76. George Orwell",
+            "77. GALILEO GALILEI",
+            "77. GREEN GOBLIN",
+            "78. Grace Hopper",
+            "78. Paris Hilton",
+            "78. Peter Higgs.png",
+            "78. Grigori Rasputin",
+            "79. Ghost Rider",
+            "79. Grimp Reaper"
+        ]],
+
+        ["80-89", [
+            "80. Homer Simpson.jpg",
+            "81. Hua Tuo.jpg",
+            "82. Hentai Kamen",
+            "83. High Lander.jpg",
+            "84. Humpty Dumpty.jpg",
+            "85. Hunchback of Notre dame.jpg",
+            "86. Hawk Fire.jpg",
+            "87. Q, Post-Singularity Era (PSE).jpg",
+            "88. Hei Hei",
+            "89. Hanuman (of Ramayana).jpg"
+        ], [
+            "82. Hell Boy",
+            "82. Helen Keller.jpg",
+            "83. Harry Lorayne.jpg",
+            "83. Hillary Clinton.jpg",
+            "84. Hajji Mahmud.jpg",
+            "84. Henry Winstanley.jpg",
+            "85. Henri Nestlé.jpg",
+            "85. Hikaru Nakamura.jpg",
+            "85. Horatio Nelson.jpg",
+            "85. Hugh Everett.jpg",
+            "86. Henry Ford.jpg",
+            "87. Henri Poincaré.jpg",
+            "87. Hilary Putnam.jpg",
+            "88. HARRY HOUDINI",
+            "88. Green Goblin.jpg",
+            "88. Hendrich Hertz.jpg",
+            "89. Helena Rasiowa.jpg",
+            "89. Hans Rosling.jpg"
+        ]],
+
+        ["90-99", [
+            "90. Red Skull.jpg",
+            "91. Indiana Jones.jpg",
+            "92. Runny Babbit.jpg",
+            "93. Robo Cop.jpg",
+            "94. Ronald McDonald.jpg",
+            "95. RX-78-2 Gundam.jpg",
+            "96. Iron Fist.jpg",
+            "97. Iron Giant.jpg",
+            "98. Incredible Hulk.jpg",
+            "99. Road Runner"
+        ], [
+            "90. Regina Silveira.jpg",
+            "90. Regina Silveira's work.jpg",
+            "90. Richard Simmons.jpg",
+            "92. Rurouni Kenshin",
+            "92. Raymond Babbitt",
+            "92. Robert Koch.jpg",
+            "93. Richard Clayderman.jpg",
+            "93. Robinson Crusoe.jpg",
+            "93. René Laennec.jpg",
+            "95. Issac Newton",
+            "95. Pliny The Elder",
+            "96. Robert Frost.jpg",
+            "96. Rosalind Franklin.jpg",
+            "97. Ivan Pavlov.jpg",
+            "97. Inspector Gadget",
+            "98. Ruth Handler.jpg",
+            "99. Roger Rabbit",
+            "99. Ronald Reagan.jpg"
+        ]]
+    ];
+
+    /* =========================================================
+       HELPERS
+       ========================================================= */
+    const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+    const CHEV_SVG = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
+                   + 'stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">'
+                   + '<polyline points="9 18 15 12 9 6"></polyline></svg>';
+
+    const treeEl   = document.getElementById('tree');
+    const input    = document.getElementById('q');
+    const suggestEl= document.getElementById('suggest');
+    const clearBtn = document.getElementById('clearBtn');
+    const toastEl  = document.getElementById('toast');
+
+    const allItems = [];
+    const groups   = [];
+    const expanded = new Set();
+    let uidCounter = 0;
+
+    /* =========================================================
+       TREE BUILDER
+       ========================================================= */
+    function parseEntry(entry) {
+        const m = entry.match(/^(\d+)\.\s*([\s\S]*)$/);
+        return m ? { num: m[1], name: m[2] } : { num: '', name: entry };
+    }
+
+    function buildNode(label, entries, isArchive) {
+        const node = {
+            uid: 'n' + (uidCounter++),
+            label: label,
+            isArchive: !!isArchive,
+            items: [],
+            subNodes: [],
+            open: false
+        };
+
+        const el = document.createElement('div');
+        el.className = 'node' + (isArchive ? ' archive' : '');
+
+        const head = document.createElement('button');
+        head.type = 'button';
+        head.className = 'row head';
+        head.innerHTML = CHEV_SVG
+            + '<span class="label">' + esc(label) + '</span>'
+            + '<span class="count">' + entries.length + '</span>';
+
+        const children = document.createElement('div');
+        children.className = 'children';
+
+        el.appendChild(head);
+        el.appendChild(children);
+
+        node.el = el;
+        node.childrenEl = children;
+        head.addEventListener('click', () => setOpen(node, !node.open));
+
+        entries.forEach(raw => {
+            const parsed = parseEntry(raw);
+            const extMatch = parsed.name.match(/\.(jpe?g|png)$/i);
+            const ext = extMatch ? extMatch[1] : '';
+            const base = ext ? parsed.name.slice(0, parsed.name.length - ext.length - 1) : parsed.name;
+
+            const itemEl = document.createElement('div');
+            itemEl.className = 'row item';
+            itemEl.innerHTML =
+                '<span class="num">' + esc(parsed.num) + '</span>' +
+                '<span class="nm">' + esc(base) + '</span>' +
+                (ext ? '<span class="ext">' + ext + '</span>' : '');
+
+            const item = {
+                el: itemEl,
+                num: parsed.num,
+                base: base,
+                text: raw.toLowerCase(),
+                chain: [node]
+            };
+
+            itemEl.addEventListener('click', () => copyItem(item));
+
+            node.items.push(item);
+            allItems.push(item);
+            children.appendChild(itemEl);
+        });
+
+        return node;
+    }
+
+    RAW.forEach(function (row) {
+        const label = row[0], files = row[1], archive = row[2];
+
+        const group = buildNode(label, files, false);
+
+        if (archive && archive.length) {
+            const arch = buildNode('archive', archive, true);
+            arch.items.forEach(function (it) { it.chain = [group, arch]; });
+            group.childrenEl.appendChild(arch.el);
+            group.subNodes.push(arch);
+        }
+
+        groups.push(group);
+        treeEl.appendChild(group.el);
+    });
+
+    /* =========================================================
+       OPEN / CLOSE
+       ========================================================= */
+    function setOpen(node, open, record) {
+        if (record === undefined) record = true;
+        node.open = open;
+        node.el.classList.toggle('open', open);
+        if (record) {
+            if (open) expanded.add(node.uid);
+            else expanded.delete(node.uid);
+        }
+    }
+
+    function walk(node, fn) {
+        fn(node);
+        node.subNodes.forEach(function (n) { walk(n, fn); });
+    }
+
+    /* =========================================================
+       FILTERING THE TREE
+       ========================================================= */
+    function filterTree(value) {
+        const q = value.trim().toLowerCase();
+
+        if (!q) {
+            groups.forEach(resetNode);
+            return;
+        }
+
+        groups.forEach(function (g) { filterNode(g, q); });
+    }
+
+    function filterNode(node, q) {
+        let any = false;
+
+        node.items.forEach(function (it) {
+            const match = it.text.indexOf(q) !== -1;
+            it.el.classList.toggle('hidden', !match);
+            if (match) {
+                any = true;
+                paintHighlight(it, q);
+            } else {
+                it.el.querySelector('.nm').textContent = it.base;
+            }
+        });
+
+        node.subNodes.forEach(function (sub) {
+            const subAny = filterNode(sub, q);
+            sub.el.classList.toggle('hidden', !subAny);
+            if (subAny) any = true;
+        });
+
+        node.el.classList.toggle('hidden', !any);
+        setOpen(node, any, false);   // auto-open while searching, without recording
+        return any;
+    }
+
+    function resetNode(node) {
+        node.items.forEach(function (it) {
+            it.el.classList.remove('hidden');
+            it.el.querySelector('.nm').textContent = it.base;
+        });
+        node.subNodes.forEach(function (sub) {
+            sub.el.classList.remove('hidden');
+            resetNode(sub);
+        });
+        node.el.classList.remove('hidden');
+        setOpen(node, expanded.has(node.uid), false);
+    }
+
+    function paintHighlight(item, q) {
+        const nm = item.el.querySelector('.nm');
+        const lower = item.base.toLowerCase();
+        let out = '', i = 0, idx;
+
+        while ((idx = lower.indexOf(q, i)) !== -1) {
+            out += esc(item.base.slice(i, idx));
+            out += '<mark>' + esc(item.base.slice(idx, idx + q.length)) + '</mark>';
+            i = idx + q.length;
+        }
+        out += esc(item.base.slice(i));
+        nm.innerHTML = out;
+    }
+
+    /* =========================================================
+       AUTOCOMPLETE
+       ========================================================= */
+    let sugItems = [];
+    let activeIdx = -1;
+
+    function renderSuggest(value) {
+        const q = value.trim().toLowerCase();
+
+        if (!q) {
+            hideSuggest();
+            return;
+        }
+
+        const scored = [];
+
+        for (let i = 0; i < allItems.length; i++) {
+            const it = allItems[i];
+            const idx = it.text.indexOf(q);
+            if (idx === -1) continue;
+
+            let score = idx;
+            const b = it.base.toLowerCase();
+
+            if (b.startsWith(q)) score -= 2000;
+            else if (b.indexOf(' ' + q) !== -1) score -= 1000;
+            if (it.num && it.num === q) score -= 3000;
+
+            scored.push({ it: it, score: score });
+        }
+
+        scored.sort(function (a, b) {
+            return a.score - b.score || a.it.base.localeCompare(b.it.base);
+        });
+
+        sugItems = scored.slice(0, 12).map(function (s) { return s.it; });
+        activeIdx = sugItems.length ? 0 : -1;
+
+        if (!sugItems.length) {
+            suggestEl.innerHTML = '<div class="sug-empty">No matches for “' + esc(value.trim()) + '”</div>';
+        } else {
+            suggestEl.innerHTML = sugItems.map(function (it, i) {
+                const g = it.chain[0].label;
+                const tag = it.chain.length > 1 ? g + ' · arc' : g;
+                return '<div class="sug" data-i="' + i + '">'
+                     +   '<span class="num">' + (it.num || '—') + '</span>'
+                     +   '<span class="name">' + esc(it.base) + '</span>'
+                     +   '<span class="tag">' + tag + '</span>'
+                     + '</div>';
+            }).join('');
+        }
+
+        suggestEl.classList.add('show');
+        paintActive();
+    }
+
+    function paintActive() {
+        const rows = suggestEl.querySelectorAll('.sug');
+        for (let i = 0; i < rows.length; i++) {
+            rows[i].classList.toggle('active', i === activeIdx);
+        }
+        const active = suggestEl.querySelector('.sug.active');
+        if (active) active.scrollIntoView({ block: 'nearest' });
+    }
+
+    function hideSuggest() {
+        suggestEl.classList.remove('show');
+        sugItems = [];
+        activeIdx = -1;
+    }
+
+    /* =========================================================
+       NAVIGATE TO AN ITEM
+       ========================================================= */
+    function goTo(item) {
+        input.value = '';
+        clearBtn.classList.remove('show');
+        hideSuggest();
+
+        // restore the tree to its remembered state
+        groups.forEach(resetNode);
+
+        // reveal
+        item.chain.forEach(function (n) {
+            setOpen(n, true);
+            n.el.classList.remove('hidden');
+        });
+        item.el.classList.remove('hidden');
+
+        item.el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+
+        item.el.classList.remove('flash');
+        void item.el.offsetWidth;   // restart animation
+        item.el.classList.add('flash');
+
+        input.blur();
+    }
+
+    /* =========================================================
+       COPY TO CLIPBOARD
+       ========================================================= */
+    let toastTimer = null;
+
+    function showToast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 1600);
+    }
+
+    function copyItem(item) {
+        const text = item.num ? item.num + '. ' + item.base : item.base;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () {
+                showToast('Copied  ·  ' + text);
+            }).catch(function () {
+                showToast(text);
+            });
+        } else {
+            showToast(text);
+        }
+    }
+
+    /* =========================================================
+       EVENTS
+       ========================================================= */
+    input.addEventListener('input', function () {
+        const v = input.value;
+        clearBtn.classList.toggle('show', v.length > 0);
+        filterTree(v);
+        renderSuggest(v);
+    });
+
+    input.addEventListener('focus', function () {
+        if (input.value.trim() && sugItems.length) suggestEl.classList.add('show');
+    });
+
+    input.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+            if (!sugItems.length) return;
+            e.preventDefault();
+            const dir = e.key === 'ArrowDown' ? 1 : -1;
+            activeIdx = (activeIdx + dir + sugItems.length) % sugItems.length;
+            paintActive();
+        } else if (e.key === 'Enter') {
+            if (activeIdx >= 0 && sugItems[activeIdx]) {
+                e.preventDefault();
+                goTo(sugItems[activeIdx]);
+            }
+        } else if (e.key === 'Escape') {
+            input.value = '';
+            clearBtn.classList.remove('show');
+            hideSuggest();
+            filterTree('');
+            input.blur();
+        }
+    });
+
+    clearBtn.addEventListener('click', function () {
+        input.value = '';
+        clearBtn.classList.remove('show');
+        hideSuggest();
+        filterTree('');
+        input.focus();
+    });
+
+    suggestEl.addEventListener('mousedown', function (e) {
+        const row = e.target.closest('.sug');
+        if (!row) return;
+        e.preventDefault();
+        const i = parseInt(row.dataset.i, 10);
+        if (sugItems[i]) goTo(sugItems[i]);
+    });
+
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('.search')) hideSuggest();
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === '/' && document.activeElement !== input) {
+            e.preventDefault();
+            input.focus();
+            input.select();
+        }
+    });
+
+    document.getElementById('expandAll').addEventListener('click', function () {
+        groups.forEach(function (g) { walk(g, function (n) { setOpen(n, true); }); });
+    });
+
+    document.getElementById('collapseAll').addEventListener('click', function () {
+        groups.forEach(function (g) { walk(g, function (n) { setOpen(n, false); }); });
+    });
+
+    /* ---------- plot tabs ---------- */
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+            tabs.forEach(function (t) { t.classList.remove('active'); });
+            tab.classList.add('active');
+            document.getElementById('plotFrame').src = tab.dataset.src;
+        });
+    });
+
+})();
+</script>
+</body>
+</html>
