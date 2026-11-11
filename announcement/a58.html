@@ -168,15 +168,17 @@
     /* ---------- layout ---------- */
     .layout{
         flex:1; min-height:0;
-        display:grid;
-        grid-template-columns:minmax(320px, 410px) 1fr;
-        gap:14px;
+        display:flex;
+        justify-content:center;
         padding:14px;
         position:relative;
         z-index:1;
+        overflow:hidden;
     }
 
     .panel{
+        width:100%;
+        max-width:1180px;
         min-height:0;
         background:rgba(255,255,255,.028);
         border:1px solid var(--stroke);
@@ -184,9 +186,16 @@
         backdrop-filter:blur(12px);
         -webkit-backdrop-filter:blur(12px);
         overflow:hidden;
+        display:flex;
+        flex-direction:column;
     }
 
-    .tree-panel{ overflow:auto; padding:8px; }
+    .tree-panel{
+        flex:1;
+        min-height:0;
+        overflow:auto;
+        padding:10px;
+    }
 
     /* ---------- tree ---------- */
     .tree{ display:flex; flex-direction:column; gap:1px; }
@@ -242,10 +251,6 @@
     .item:hover .num{ color:var(--accent2); }
 
     .item .nm{ flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .item .ext{
-        font-size:9.5px; color:#47536a; letter-spacing:.07em; text-transform:uppercase;
-        flex:0 0 auto;
-    }
 
     .hidden{ display:none !important; }
 
@@ -261,32 +266,6 @@
         100%{ background:transparent; box-shadow:inset 0 0 0 1px transparent; }
     }
     .item.flash{ animation:flash 1.4s ease; }
-
-    /* ---------- plot panel ---------- */
-    .plot-panel{ display:flex; flex-direction:column; }
-
-    .tabs{ display:flex; flex-wrap:wrap; gap:8px; padding:10px; border-bottom:1px solid var(--stroke); }
-
-    .tab{
-        padding:8px 18px; border-radius:99px;
-        border:1px solid var(--stroke); background:transparent;
-        color:var(--muted); font-family:inherit;
-        font-size:12.5px; font-weight:600; letter-spacing:.045em;
-        cursor:pointer; transition:.16s;
-    }
-    .tab:hover{ color:var(--text); border-color:rgba(255,255,255,.22); }
-    .tab.active{
-        background:linear-gradient(135deg,#7c5cff,#22d3ee);
-        color:#04070d; border-color:transparent;
-        box-shadow:0 10px 26px -10px rgba(124,92,255,.95);
-    }
-
-    #plotFrame{
-        flex:1;
-        width:100%;
-        border:0;
-        background:rgba(255,255,255,.02);
-    }
 
     /* ---------- toast ---------- */
     .toast{
@@ -304,11 +283,10 @@
     .toast.show{ opacity:1; transform:translate(-50%, 0); }
 
     /* ---------- responsive ---------- */
-    @media (max-width: 900px){
+    @media (max-width: 780px){
         body{ height:auto; overflow:auto; }
-        .layout{ grid-template-columns:1fr; }
-        .tree-panel{ max-height:62vh; }
-        .plot-panel{ height:72vh; }
+        .layout{ overflow:visible; }
+        .panel{ max-height:78vh; }
         .topbar{ flex-wrap:wrap; gap:10px; }
         .search{ order:3; flex-basis:100%; max-width:none; }
         .brand p{ display:none; }
@@ -333,7 +311,7 @@
             <path d="m20 20-3.2-3.2"></path>
         </svg>
         <input id="q" type="text" autocomplete="off" spellcheck="false"
-               placeholder="Search 400+ entries…   (press / to focus)">
+               placeholder="Search 240+ entries…   (press / to focus)">
         <button class="clear" id="clearBtn" type="button" aria-label="Clear">✕</button>
         <div class="suggest" id="suggest"></div>
     </div>
@@ -345,19 +323,10 @@
 </header>
 
 <main class="layout">
-    <aside class="panel tree-panel">
-        <div class="tree" id="tree"></div>
-    </aside>
-
-    <section class="panel plot-panel">
-        <div class="tabs">
-            <button class="tab active" data-src="pneuma_interactive_plot.html">Pneuma</button>
-            <button class="tab" data-src="psyche_interactive_plot.html">Psyche</button>
-            <button class="tab" data-src="soma_interactive_plot.html">Soma</button>
-            <button class="tab" data-src="opus_interactive_plot.html">Opus</button>
-            <button class="tab" data-src="kismet_interactive_plot.html">Kismet</button>
+    <section class="panel">
+        <div class="tree-panel">
+            <div class="tree" id="tree"></div>
         </div>
-        <iframe id="plotFrame" src="pneuma_interactive_plot.html"></iframe>
     </section>
 </main>
 
@@ -369,131 +338,132 @@
 
     /* =========================================================
        DATA  —  [ group, files, archive ]
+       No file extensions anywhere.
        ========================================================= */
     const RAW = [
         ["00-09", [
-            "00. (null) Sadako.jpg",
-            "01. (null) Apocalypse.jpg",
-            "02. Sleeping Beauty.jpg",
-            "03. Santa Claus.jpg",
-            "03. Swedish Chef.jpg",
-            "04. (null) Medusa.jpg",
-            "05. Snake Eyes.jpg",
-            "06. (null) Obelix.jpg",
+            "00. (null) Sadako",
+            "01. (null) Apocalypse",
+            "02. Sleeping Beauty",
+            "03. Santa Claus",
+            "03. Swedish Chef",
+            "04. (null) Medusa",
+            "05. Snake Eyes",
+            "06. (null) Obelix",
             "07. (null) Gozilla",
             "08. Stephen W. Hawking",
-            "09. Steve Irwin.jpg"
+            "09. Steve Irwin"
         ], [
-            "00. (null) Syndrome.jpg",
-            "00. Steven Spielberg.jpg",
-            "00. Sophie Scholl.jpg",
-            "01. Sun Tze.jpg",
-            "01. Sun Tze_00.jpg",
-            "01. Swamp Thing.jpg",
-            "02. Stephen King.jpg",
-            "02. Shavarsh Karapetyan.jpg",
-            "03. Samuel P. Langley.jpg",
-            "03. Scarecrow.jpg",
-            "03. Song Ci.jpg",
-            "04. Spider man.jpg",
-            "04. Scooby Doo.jpg",
-            "05. Zhou EnLai.jpg",
-            "05. ShenNong.jpg",
-            "06. Sigmund Freud.jpg",
-            "07. Pegasus.jpg",
-            "07. Scott M. Peck.jpg",
+            "00. (null) Syndrome",
+            "00. Steven Spielberg",
+            "00. Sophie Scholl",
+            "01. Sun Tze",
+            "01. Sun Tze_00",
+            "01. Swamp Thing",
+            "02. Stephen King",
+            "02. Shavarsh Karapetyan",
+            "03. Samuel P. Langley",
+            "03. Scarecrow",
+            "03. Song Ci",
+            "04. Spider man",
+            "04. Scooby Doo",
+            "05. Zhou EnLai",
+            "05. ShenNong",
+            "06. Sigmund Freud",
+            "07. Pegasus",
+            "07. Scott M. Peck",
             "08. Stephen W. Hawking",
-            "09. Salman Rushdie.jpg"
+            "09. Salman Rushdie"
         ]],
 
         ["10-19", [
-            "10. Arnold Schwarzenegger.jpg",
-            "11. Jack Jack.jpg",
-            "12. Astro Boy.jpg",
-            "13. Jesus Christ.jpg",
-            "14. Tree Demoness (千年树妖).jpg",
-            "15. Albert Einstein.jpg",
-            "16. The Fly.jpg",
-            "17. John Paul II.jpg",
-            "18. Adolf Hitler.jpg",
-            "19. Jack The Ripper.jpg"
+            "10. Arnold Schwarzenegger",
+            "11. Jack Jack",
+            "12. Astro Boy",
+            "13. Jesus Christ",
+            "14. Tree Demoness (千年树妖)",
+            "15. Albert Einstein",
+            "16. The Fly",
+            "17. John Paul II",
+            "18. Adolf Hitler",
+            "19. Jack The Ripper"
         ], [
-            "11. Andre Agassi.jpg",
-            "11. Alfred Adler.jpg",
-            "12. Alexander G. Bell.jpg",
-            "14. Jean Dunant.jpg",
-            "14. Joseph Merrick.jpg",
+            "11. Andre Agassi",
+            "11. Alfred Adler",
+            "12. Alexander G. Bell",
+            "14. Jean Dunant",
+            "14. Joseph Merrick",
             "14. Aqua Man",
-            "16. Terry Fox.jpg",
-            "17. John Paul.jpg",
-            "17. Audrey de Grey.jpg",
-            "19. John Ruskin.jpg"
+            "16. Terry Fox",
+            "17. John Paul",
+            "17. Audrey de Grey",
+            "19. John Ruskin"
         ]],
 
         ["20-29", [
-            "20. Bram Stoker.jpg",
+            "20. Bram Stoker",
             "21. Udō Jin-e",
-            "22. BIG BIRD.jpg",
-            "23. Bruce Lee.jpg",
-            "24. Bat Man.jpg",
-            "25. King Neptune.jpg",
+            "22. BIG BIRD",
+            "23. Bruce Lee",
+            "24. Bat Man",
+            "25. King Neptune",
             "26. Kermit the Frog",
-            "27. King Pin.png",
-            "28. Benny Hill.jpg",
+            "27. King Pin",
+            "28. Benny Hill",
             "29. Kevin Richardson (a.k.a The Lion Whisperer)"
         ], [
             "21. Kim Jong-il",
-            "21. Karl Guthe Jansky.jpg",
-            "21. Korechika Anami.jpg",
-            "22. BARBA BEAU.jpg",
+            "21. Karl Guthe Jansky",
+            "21. Korechika Anami",
+            "22. BARBA BEAU",
             "24. Bomb Voyage",
-            "24. Kevin Mitnick.jpg",
-            "25. Bernhard Neumann.jpg",
+            "24. Kevin Mitnick",
+            "25. Bernhard Neumann",
             "25. Bill Nye",
             "26. Bolo Yeung",
-            "26. Benjamin Franklin.jpg",
-            "27. Uri Geller.jpg",
-            "29. Bertrand Russell.jpg"
+            "26. Benjamin Franklin",
+            "27. Uri Geller",
+            "29. Bertrand Russell"
         ]],
 
         ["30-39", [
-            "30. Vassili Zaitsev.jpg",
-            "31. Captain America.jpg",
-            "32. Ludwig van Beethoven.jpg",
+            "30. Vassili Zaitsev",
+            "31. Captain America",
+            "32. Ludwig van Beethoven",
             "33. CAPTAIN COLD",
             "34. Cookie Monster",
-            "35. Charles Xavier.jpg",
-            "36. Lord Farquaad.jpg",
-            "37. Lady Godiva.jpg",
-            "38. Captain Hook.jpg",
-            "39. Cardinal_Raker.jpg"
+            "35. Charles Xavier",
+            "36. Lord Farquaad",
+            "37. Lady Godiva",
+            "38. Captain Hook",
+            "39. Cardinal_Raker"
         ], [
-            "31. Carl Jung.jpg",
+            "31. Carl Jung",
             "31. Li JiaCheng",
             "33. CHRISTOPHER COLUMBUS",
             "34. Charles Darwin",
-            "36. Léon Foucault.jpg",
-            "36. Viktor Frankl.jpg",
-            "37. Che Guevara.jpg",
-            "37. Luciano Pavarotti.jpg",
-            "38. Victor Hugo.jpg",
-            "39. Charles Richter.jpg",
-            "39. Lee Iacocca.jpg"
+            "36. Léon Foucault",
+            "36. Viktor Frankl",
+            "37. Che Guevara",
+            "37. Luciano Pavarotti",
+            "38. Victor Hugo",
+            "39. Charles Richter",
+            "39. Lee Iacocca"
         ]],
 
         ["40-49", [
-            "40. Mr Snuffleupagus.jpg",
-            "41. Mother Teresa.jpg",
-            "42. Dragon Ball.jpg",
+            "40. Mr Snuffleupagus",
+            "41. Mother Teresa",
+            "42. Dragon Ball",
             "43. Dr Vendetta",
             "44. Mega Mind",
             "45. Mr. X (Resident Evil, aka Tyrant)",
-            "46. Masutatsu Oyama.png",
-            "47. Miss Piggy.jpg",
-            "48. Dugu QiuBai.jpg",
-            "49. Mr Incredible.jpg"
+            "46. Masutatsu Oyama",
+            "47. Miss Piggy",
+            "48. Dugu QiuBai",
+            "49. Mr Incredible"
         ], [
-            "40. Mo Zi.jpg",
+            "40. Mo Zi",
             "40. William Shakespeare",
             "41. Worm Tongue",
             "42. Derren Brown",
@@ -505,7 +475,7 @@
             "46. Dominic O'Brien",
             "47. Mahatma Gandhi",
             "47. Dead Pool",
-            "48. Doug Hall.jpg"
+            "48. Doug Hall"
         ]],
 
         ["50-59", [
@@ -514,62 +484,62 @@
             "52. Napolean Bonaparte",
             "53. Night_Crawler",
             "54. Edna Mode",
-            "55. Xiao Xing.jpg",
+            "55. Xiao Xing",
             "56. Nameless One",
             "57. ElastiGirl",
             "58. E. Honda aka Edmund Honda",
             "59. Earl Reagan (Time traveler, Trans-Time Corp. Hunts dinosaurs to make canned food.)"
         ], [
-            "50. Nezha.jpg",
-            "52. Elizbeth Bathory.jpg",
-            "53. Eddie Carmel.jpg",
+            "50. Nezha",
+            "52. Elizbeth Bathory",
+            "53. Eddie Carmel",
             "53. Nadia Comaneci",
             "54. Niccolo Machiavelli",
             "55. XIE XUN",
             "55. Edward Elric (fullmetal alchemist)",
             "56. Xiang Yu",
-            "57. Eva Perón.jpg",
+            "57. Eva Perón",
             "58. Ernest Hemingway",
             "58. Edwin Hubble",
             "59. Erno Rubik"
         ]],
 
         ["60-69", [
-            "60. Flat Stanley.jpg",
+            "60. Flat Stanley",
             "61. FeeJee (Mermaid)",
             "62. Frozone B. (Lucius Best)",
             "63. Yan Chixia (燕赤霞)",
-            "64. Yoda.jpg",
-            "65. Florence Nightingale.jpg",
-            "66. FRED FLINTSTONE.jpg",
-            "67. Yang Guo.jpg",
+            "64. Yoda",
+            "65. Florence Nightingale",
+            "66. FRED FLINTSTONE",
+            "67. Yang Guo",
             "68. Fritz Haber (Father of chemical warfare)",
-            "69. Franz Reichelt.jpg"
+            "69. Franz Reichelt"
         ], [
-            "60. Frank Sinatra.png",
-            "60. Frederick Soddy.jpg",
-            "61. Oliver Twist.jpg",
-            "62. Yasmine Bleeth.jpg",
-            "63. Frederic Chopin.jpg",
-            "63. Yuan Longping.png",
-            "64. Frank Mesmer.jpg",
-            "67. Oscar the Grouch.jpg",
-            "68. Oliver Holmes.jpg",
+            "60. Frank Sinatra",
+            "60. Frederick Soddy",
+            "61. Oliver Twist",
+            "62. Yasmine Bleeth",
+            "63. Frederic Chopin",
+            "63. Yuan Longping",
+            "64. Frank Mesmer",
+            "67. Oscar the Grouch",
+            "68. Oliver Holmes",
             "68. Face Hugger",
-            "69. Franklin D. Roosevelt.jpg",
+            "69. Franklin D. Roosevelt",
             "69. Franz Reichelt (Parachute inventor)"
         ]],
 
         ["70-79", [
-            "70. Gollum Smeagol.jpg",
-            "71. Green Arrow.jpg",
-            "72. Puss-in-Boots.jpg",
-            "73. Green Lantern.jpg",
-            "74. Gingerbread man.jpg",
-            "75. Gustave Eiffel.jpg",
-            "76. Guan Yu.jpg",
-            "77. GALDORF THE GRAY.jpg",
-            "78. (Mr) Potato Head.jpg",
+            "70. Gollum Smeagol",
+            "71. Green Arrow",
+            "72. Puss-in-Boots",
+            "73. Green Lantern",
+            "74. Gingerbread man",
+            "75. Gustave Eiffel",
+            "76. Guan Yu",
+            "77. GALDORF THE GRAY",
+            "78. (Mr) Potato Head",
             "79. Poison Ivy"
         ], [
             "70. George Soros",
@@ -584,74 +554,74 @@
             "77. GREEN GOBLIN",
             "78. Grace Hopper",
             "78. Paris Hilton",
-            "78. Peter Higgs.png",
+            "78. Peter Higgs",
             "78. Grigori Rasputin",
             "79. Ghost Rider",
             "79. Grimp Reaper"
         ]],
 
         ["80-89", [
-            "80. Homer Simpson.jpg",
-            "81. Hua Tuo.jpg",
+            "80. Homer Simpson",
+            "81. Hua Tuo",
             "82. Hentai Kamen",
-            "83. High Lander.jpg",
-            "84. Humpty Dumpty.jpg",
-            "85. Hunchback of Notre dame.jpg",
-            "86. Hawk Fire.jpg",
-            "87. Q, Post-Singularity Era (PSE).jpg",
+            "83. High Lander",
+            "84. Humpty Dumpty",
+            "85. Hunchback of Notre dame",
+            "86. Hawk Fire",
+            "87. Q, Post-Singularity Era (PSE)",
             "88. Hei Hei",
-            "89. Hanuman (of Ramayana).jpg"
+            "89. Hanuman (of Ramayana)"
         ], [
             "82. Hell Boy",
-            "82. Helen Keller.jpg",
-            "83. Harry Lorayne.jpg",
-            "83. Hillary Clinton.jpg",
-            "84. Hajji Mahmud.jpg",
-            "84. Henry Winstanley.jpg",
-            "85. Henri Nestlé.jpg",
-            "85. Hikaru Nakamura.jpg",
-            "85. Horatio Nelson.jpg",
-            "85. Hugh Everett.jpg",
-            "86. Henry Ford.jpg",
-            "87. Henri Poincaré.jpg",
-            "87. Hilary Putnam.jpg",
+            "82. Helen Keller",
+            "83. Harry Lorayne",
+            "83. Hillary Clinton",
+            "84. Hajji Mahmud",
+            "84. Henry Winstanley",
+            "85. Henri Nestlé",
+            "85. Hikaru Nakamura",
+            "85. Horatio Nelson",
+            "85. Hugh Everett",
+            "86. Henry Ford",
+            "87. Henri Poincaré",
+            "87. Hilary Putnam",
             "88. HARRY HOUDINI",
-            "88. Green Goblin.jpg",
-            "88. Hendrich Hertz.jpg",
-            "89. Helena Rasiowa.jpg",
-            "89. Hans Rosling.jpg"
+            "88. Green Goblin",
+            "88. Hendrich Hertz",
+            "89. Helena Rasiowa",
+            "89. Hans Rosling"
         ]],
 
         ["90-99", [
-            "90. Red Skull.jpg",
-            "91. Indiana Jones.jpg",
-            "92. Runny Babbit.jpg",
-            "93. Robo Cop.jpg",
-            "94. Ronald McDonald.jpg",
-            "95. RX-78-2 Gundam.jpg",
-            "96. Iron Fist.jpg",
-            "97. Iron Giant.jpg",
-            "98. Incredible Hulk.jpg",
+            "90. Red Skull",
+            "91. Indiana Jones",
+            "92. Runny Babbit",
+            "93. Robo Cop",
+            "94. Ronald McDonald",
+            "95. RX-78-2 Gundam",
+            "96. Iron Fist",
+            "97. Iron Giant",
+            "98. Incredible Hulk",
             "99. Road Runner"
         ], [
-            "90. Regina Silveira.jpg",
-            "90. Regina Silveira's work.jpg",
-            "90. Richard Simmons.jpg",
+            "90. Regina Silveira",
+            "90. Regina Silveira's work",
+            "90. Richard Simmons",
             "92. Rurouni Kenshin",
             "92. Raymond Babbitt",
-            "92. Robert Koch.jpg",
-            "93. Richard Clayderman.jpg",
-            "93. Robinson Crusoe.jpg",
-            "93. René Laennec.jpg",
+            "92. Robert Koch",
+            "93. Richard Clayderman",
+            "93. Robinson Crusoe",
+            "93. René Laennec",
             "95. Issac Newton",
             "95. Pliny The Elder",
-            "96. Robert Frost.jpg",
-            "96. Rosalind Franklin.jpg",
-            "97. Ivan Pavlov.jpg",
+            "96. Robert Frost",
+            "96. Rosalind Franklin",
+            "97. Ivan Pavlov",
             "97. Inspector Gadget",
-            "98. Ruth Handler.jpg",
+            "98. Ruth Handler",
             "99. Roger Rabbit",
-            "99. Ronald Reagan.jpg"
+            "99. Ronald Reagan"
         ]]
     ];
 
@@ -659,6 +629,9 @@
        HELPERS
        ========================================================= */
     const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+    // Defensive: strip any extension that might still sneak in.
+    const stripExt = s => s.replace(/\.(jpe?g|png|gif|bmp|webp)$/i, '');
 
     const CHEV_SVG = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
                    + 'stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">'
@@ -715,22 +688,19 @@
 
         entries.forEach(raw => {
             const parsed = parseEntry(raw);
-            const extMatch = parsed.name.match(/\.(jpe?g|png)$/i);
-            const ext = extMatch ? extMatch[1] : '';
-            const base = ext ? parsed.name.slice(0, parsed.name.length - ext.length - 1) : parsed.name;
+            const base = stripExt(parsed.name);
 
             const itemEl = document.createElement('div');
             itemEl.className = 'row item';
             itemEl.innerHTML =
                 '<span class="num">' + esc(parsed.num) + '</span>' +
-                '<span class="nm">' + esc(base) + '</span>' +
-                (ext ? '<span class="ext">' + ext + '</span>' : '');
+                '<span class="nm">' + esc(base) + '</span>';
 
             const item = {
                 el: itemEl,
                 num: parsed.num,
                 base: base,
-                text: raw.toLowerCase(),
+                text: (parsed.num + '. ' + base).toLowerCase(),
                 chain: [node]
             };
 
@@ -813,7 +783,7 @@
         });
 
         node.el.classList.toggle('hidden', !any);
-        setOpen(node, any, false);   // auto-open while searching, without recording
+        setOpen(node, any, false);
         return any;
     }
 
@@ -923,10 +893,8 @@
         clearBtn.classList.remove('show');
         hideSuggest();
 
-        // restore the tree to its remembered state
         groups.forEach(resetNode);
 
-        // reveal
         item.chain.forEach(function (n) {
             setOpen(n, true);
             n.el.classList.remove('hidden');
@@ -936,7 +904,7 @@
         item.el.scrollIntoView({ block: 'center', behavior: 'smooth' });
 
         item.el.classList.remove('flash');
-        void item.el.offsetWidth;   // restart animation
+        void item.el.offsetWidth;
         item.el.classList.add('flash');
 
         input.blur();
@@ -1036,16 +1004,6 @@
 
     document.getElementById('collapseAll').addEventListener('click', function () {
         groups.forEach(function (g) { walk(g, function (n) { setOpen(n, false); }); });
-    });
-
-    /* ---------- plot tabs ---------- */
-    const tabs = document.querySelectorAll('.tab');
-    tabs.forEach(function (tab) {
-        tab.addEventListener('click', function () {
-            tabs.forEach(function (t) { t.classList.remove('active'); });
-            tab.classList.add('active');
-            document.getElementById('plotFrame').src = tab.dataset.src;
-        });
     });
 
 })();
